@@ -27,16 +27,14 @@ curl https://exp.host      → CONNECT tunnel failed (403 connect_rejected)
 2. **حساب Apple Developer Program مدفوع (99$/سنة)** — إلزامي من Apple
    نفسها لأي Development/Internal Build يعمل على آيفون حقيقي (وليس
    قيدًا من هِمّة أو من EAS). بدونه لا يمكن توقيع التطبيق لجهاز حقيقي إطلاقًا.
-3. Node.js مثبت على جهازك، ونسخة من هذا المستودع (فرع
-   `claude/new-session-5fqs4q`) مستنسخة محليًا.
+3. Node.js مثبت على جهازك، ونسخة من هذا المستودع مستنسخة محليًا.
 4. آيفون حقيقي متصل بنفس شبكة الواي فاي أو عبر كابل USB.
 
 ## الخطوات (من جهازك، وليس من هذه الجلسة)
 
 ```bash
 git clone <repo-url>
-cd market-signals-platform
-git checkout claude/new-session-5fqs4q
+cd hemma
 npm install
 
 # 1) تسجيل الدخول إلى حساب Expo
@@ -86,5 +84,5 @@ npx expo start --dev-client
 ## بعد أول نجاح
 
 - بمجرد أن يضيف `eas init` قيم `extra.eas.projectId` و`owner` داخل
-  `app.json` على جهازك، ادفعها (commit) إلى نفس الفرع حتى تبقى الجلسات
-  القادمة (من هذا الطرف) قادرة على متابعة العمل على نفس مشروع EAS.
+  `app.json` على جهازك، ادفعها (commit) حتى تبقى الجلسات القادمة (من
+  هذا الطرف) قادرة على متابعة العمل على نفس مشروع EAS.

@@ -11,7 +11,7 @@ import { useHealthSync } from '@/src/integrations/health/useHealthSync';
 import { getFriendlyErrorMessage } from '@/src/lib/errors';
 import { GOAL_OPTIONS } from '@/src/features/profile/GoalPicker';
 
-const PRIVACY_POLICY_URL = 'https://github.com/bsd9899-create/market-signals-platform/blob/main/docs/PRIVACY_POLICY.md';
+const PRIVACY_POLICY_URL = 'https://github.com/bsd9899-create/hemma/blob/main/docs/PRIVACY_POLICY.md';
 
 export default function ProfileScreen() {
   const router = useRouter();
