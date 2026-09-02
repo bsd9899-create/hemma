@@ -57,6 +57,13 @@
       ],
       "expo-web-browser",
       "expo-apple-authentication"
-    ]
+    ],
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "10fcacd4-81f3-452f-bbe3-397f9aa004ee"
+      }
+    },
+    "owner": "himah"
   }
 }
