@@ -56,6 +56,13 @@ export async function signInWithGoogle(): Promise<SignInResult> {
   if (__DEV__) {
     console.log('[AUTH-DEBUG] signInWithOAuth error:', error ? { name: error.name, status: error.status, message: error.message } : null);
     console.log('[AUTH-DEBUG] رابط /authorize الفعلي العائد من Supabase (data.url):', data?.url);
+    if (data?.url) {
+      try {
+        console.log('[AUTH-DEBUG] redirect_uri المُرسَل لجوجل عبر Supabase:', new URL(data.url).searchParams.get('redirect_uri'));
+      } catch {
+        // تجاهل — لو data.url غير قابل للتحليل سيظهر ذلك من السطر أعلاه أصلًا.
+      }
+    }
   }
   if (error) throw error;
   if (!data.url) throw new Error('تعذّر بدء تسجيل الدخول عبر Google');
