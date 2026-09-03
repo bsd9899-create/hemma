@@ -29,7 +29,11 @@ const PREMIUM_ACTIVE_EVENTS = new Set(['INITIAL_PURCHASE', 'RENEWAL', 'PRODUCT_C
 const PREMIUM_INACTIVE_EVENTS = new Set(['EXPIRATION', 'BILLING_ISSUE']);
 
 Deno.serve(async (req) => {
-  if (WEBHOOK_AUTH_HEADER && req.headers.get('Authorization') !== WEBHOOK_AUTH_HEADER) {
+  // فشل مغلق (fail closed) عمدًا: لو REVENUECAT_WEBHOOK_AUTH_HEADER غير
+  // مضبوط بعد (سيناريو متوقع قبل ربط RevenueCat فعليًا)، يجب رفض كل
+  // الطلبات — وليس قبولها كلها. القبول الصامت هنا كان يسمح لأي طرف
+  // يعرف رابط الدالة بتغيير is_premium لأي مستخدم بدون أي مصادقة.
+  if (!WEBHOOK_AUTH_HEADER || req.headers.get('Authorization') !== WEBHOOK_AUTH_HEADER) {
     return new Response('Unauthorized', { status: 401 });
   }
 
