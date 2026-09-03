@@ -72,8 +72,21 @@ export async function signInWithGoogle(): Promise<SignInResult> {
     return { cancelled: true };
   }
 
+  if (__DEV__) {
+    const params = new URL(result.url).searchParams;
+    console.log('[AUTH-DEBUG] رجع إلى hemma://auth/callback؟', result.url.startsWith(redirectTo));
+    console.log('[AUTH-DEBUG] هل يوجد code في رابط العودة؟', params.has('code'));
+    console.log('[AUTH-DEBUG] هل يوجد error/error_description في رابط العودة؟', params.get('error') ?? params.get('error_description') ?? null);
+  }
+
   const code = extractAuthCode(result.url);
   const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
+  if (__DEV__) {
+    console.log(
+      '[AUTH-DEBUG] exchangeCodeForSession error:',
+      exchangeError ? { name: exchangeError.name, status: exchangeError.status, message: exchangeError.message } : null
+    );
+  }
   if (exchangeError) throw exchangeError;
   return { cancelled: false };
 }
