@@ -35,6 +35,16 @@ export const supabase = createClient<Database>(
   }
 );
 
+// ⚠️ DEBUG مؤقت لتشخيص "Invalid path specified in request URL" — احذف هذا
+// القسم بعد انتهاء التشخيص. يطبع فقط الروابط/المسارات، لا مفاتيح ولا tokens.
+if (__DEV__) {
+  const goTrueBaseUrl = (supabase.auth as any).url as string;
+  console.log('[AUTH-DEBUG] EXPO_PUBLIC_SUPABASE_URL (من env، كما وصلت وقت التشغيل):', env.EXPO_PUBLIC_SUPABASE_URL);
+  console.log('[AUTH-DEBUG] GoTrueClient.url الفعلي وقت التشغيل (الأساس لكل طلبات auth):', goTrueBaseUrl);
+  console.log('[AUTH-DEBUG] رابط /authorize الكامل الذي سيُستخدم فعليًا:', `${goTrueBaseUrl}/authorize`);
+  console.log('[AUTH-DEBUG] رابط /token الكامل الذي سيُستخدم فعليًا:', `${goTrueBaseUrl}/token?grant_type=id_token`);
+}
+
 // إيقاف/استئناف التجديد التلقائي للجلسة حسب حالة التطبيق (توصية Supabase
 // الرسمية لـ React Native) — يمنع استهلاك طلبات شبكة وهي في الخلفية.
 AppState.addEventListener('change', (state) => {

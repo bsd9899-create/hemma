@@ -1,4 +1,5 @@
 import * as AppleAuthentication from 'expo-apple-authentication';
+import Constants from 'expo-constants';
 import * as Crypto from 'expo-crypto';
 import * as Linking from 'expo-linking';
 import * as WebBrowser from 'expo-web-browser';
@@ -18,6 +19,15 @@ WebBrowser.maybeCompleteAuthSession();
  * URL Configuration → Redirect URLs، وإلا سيرفض Supabase إعادة التوجيه.
  */
 const redirectTo = Linking.createURL('auth/callback');
+
+// ⚠️ DEBUG مؤقت لتشخيص "Invalid path specified in request URL" — احذف هذا
+// القسم بعد انتهاء التشخيص. يطبع فقط الروابط/المسارات، لا مفاتيح ولا tokens.
+if (__DEV__) {
+  console.log('[AUTH-DEBUG] redirectTo (Linking.createURL):', redirectTo);
+  console.log('[AUTH-DEBUG] scheme الفعلي وقت التشغيل (Constants.expoConfig):', Constants.expoConfig?.scheme);
+  console.log('[AUTH-DEBUG] iOS bundleIdentifier الفعلي وقت التشغيل:', Constants.expoConfig?.ios?.bundleIdentifier);
+  console.log('[AUTH-DEBUG] executionEnvironment (dev client أم غيره):', Constants.executionEnvironment);
+}
 
 type SignInResult = { cancelled: boolean };
 
@@ -43,10 +53,20 @@ export async function signInWithGoogle(): Promise<SignInResult> {
     provider: 'google',
     options: { redirectTo, skipBrowserRedirect: true },
   });
+  if (__DEV__) {
+    console.log('[AUTH-DEBUG] signInWithOAuth error:', error ? { name: error.name, status: error.status, message: error.message } : null);
+    console.log('[AUTH-DEBUG] رابط /authorize الفعلي العائد من Supabase (data.url):', data?.url);
+  }
   if (error) throw error;
   if (!data.url) throw new Error('تعذّر بدء تسجيل الدخول عبر Google');
 
   const result = await WebBrowser.openAuthSessionAsync(data.url, redirectTo);
+  if (__DEV__) {
+    console.log('[AUTH-DEBUG] WebBrowser.openAuthSessionAsync نتيجة type:', result.type);
+    if ('url' in result) {
+      console.log('[AUTH-DEBUG] رابط العودة (code مُخفى):', result.url.replace(/([?&]code=)[^&]+/, '$1REDACTED'));
+    }
+  }
   if (result.type !== 'success') {
     // المستخدم أغلق المتصفح بنفسه — ليست حالة خطأ، فقط إلغاء صامت.
     return { cancelled: true };
@@ -98,6 +118,9 @@ export async function signInWithApple(): Promise<SignInResult> {
     token: credential.identityToken,
     nonce: rawNonce,
   });
+  if (__DEV__) {
+    console.log('[AUTH-DEBUG] signInWithIdToken (apple) error:', error ? { name: error.name, status: error.status, message: error.message } : null);
+  }
   if (error) throw error;
 
   // Apple يرسل الاسم الكامل مرة واحدة فقط عند أول موافقة على الإطلاق —
