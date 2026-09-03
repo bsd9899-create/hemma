@@ -9,12 +9,16 @@ type ButtonProps = {
   label: string;
   onPress?: () => void;
   variant?: ButtonVariant;
+  /** يلوّن نص الزر بلون التحذير — لأفعال مدمِّرة لا تُراجَع (حذف الحساب...)، لتمييزها بصريًا عن أزرار ثانوية عادية بنفس variant. */
+  danger?: boolean;
   disabled?: boolean;
   style?: ViewStyle;
 };
 
 /** زر أساسي بثلاث درجات: primary (تيل) للفعل الرئيسي، secondary (كريمي) وghost للثانوي. */
-export function Button({ label, onPress, variant = 'primary', disabled, style }: ButtonProps) {
+export function Button({ label, onPress, variant = 'primary', danger, disabled, style }: ButtonProps) {
+  const labelColor = danger ? 'danger' : variant === 'primary' ? 'onPrimary' : 'textPrimary';
+
   return (
     <Pressable
       accessibilityRole="button"
@@ -29,11 +33,7 @@ export function Button({ label, onPress, variant = 'primary', disabled, style }:
         style,
       ]}
     >
-      <Text
-        variant="bodyStrong"
-        color={variant === 'primary' ? 'onPrimary' : 'textPrimary'}
-        style={styles.label}
-      >
+      <Text variant="bodyStrong" color={labelColor} style={styles.label}>
         {label}
       </Text>
     </Pressable>
