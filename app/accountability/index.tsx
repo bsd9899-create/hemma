@@ -1,5 +1,5 @@
-import { ActivityIndicator, ScrollView, View } from 'react-native';
-import { Button, Card, Screen, Text, colors } from '@/src/design-system';
+import { ScrollView, View } from 'react-native';
+import { AccountabilitySkeleton, Button, Card, Screen, Text } from '@/src/design-system';
 import { spacing } from '@/src/design-system/spacing';
 import { useAuthStore } from '@/src/features/auth/store';
 import { useTeamData } from '@/src/features/teams/useTeamData';
@@ -39,8 +39,8 @@ export default function AccountabilityScreen() {
 
   if (isLoading && !pair) {
     return (
-      <Screen style={{ alignItems: 'center', justifyContent: 'center' }}>
-        <ActivityIndicator color={colors.primary} />
+      <Screen>
+        <AccountabilitySkeleton />
       </Screen>
     );
   }

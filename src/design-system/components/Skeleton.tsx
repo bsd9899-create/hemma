@@ -90,3 +90,14 @@ export function TeamsSkeleton() {
     </View>
   );
 }
+
+/** هيكل جاهز لشاشة رفيق هِمّة أثناء التحميل الأول. */
+export function AccountabilitySkeleton() {
+  return (
+    <View style={{ gap: 16, paddingTop: 16 }}>
+      <Skeleton width={180} height={30} />
+      <Skeleton height={16} width="80%" />
+      <Skeleton height={120} />
+    </View>
+  );
+}
