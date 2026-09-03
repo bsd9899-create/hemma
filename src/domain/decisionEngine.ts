@@ -29,6 +29,7 @@ const RECOVERY_THRESHOLD_PERCENT = 25;
 const RECOVERY_DECISION_TEXT = 'ما خربت… نكمل من هنا 🌱';
 
 function clamp01(value: number): number {
+  if (Number.isNaN(value)) return 0;
   return Math.max(0, Math.min(1, value));
 }
 

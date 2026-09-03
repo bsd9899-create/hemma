@@ -23,6 +23,10 @@ export function usePremiumStatus(userId: string | undefined) {
       // متزامنة في قاعدة البيانات (تُحدَّث فقط عبر webhook من الخادم).
       const row = await subscriptionsRepository.getCurrent(userId);
       setIsPremium(row?.is_premium ?? false);
+    } catch {
+      // فشل التحقق (شبكة، RevenueCat، Supabase) لا يجب أن يعطّل التطبيق —
+      // أسوأ نتيجة آمنة هي معاملة المستخدم كغير مشترك مؤقتًا، لا استثناء غير مُمسوك.
+      setIsPremium(false);
     } finally {
       setIsLoading(false);
     }

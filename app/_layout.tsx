@@ -11,6 +11,7 @@ import {
   Tajawal_800ExtraBold,
 } from '@expo-google-fonts/tajawal';
 import { colors } from '@/src/design-system';
+import { ErrorBoundary } from '@/src/lib/ErrorBoundary';
 import { ensureRTL } from '@/src/lib/rtl';
 import { useAuthGate } from '@/src/features/auth/useAuthGate';
 
@@ -52,24 +53,26 @@ export default function RootLayout() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaProvider>
-        <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.background } }}>
-          <Stack.Screen name="(auth)" />
-          <Stack.Screen name="onboarding" />
-          <Stack.Screen name="(tabs)" />
-          <Stack.Screen name="quick-add" options={{ presentation: 'modal' }} />
-          <Stack.Screen name="log/water" options={{ presentation: 'modal' }} />
-          <Stack.Screen name="log/weight" options={{ presentation: 'modal' }} />
-          <Stack.Screen name="log/steps" options={{ presentation: 'modal' }} />
-          <Stack.Screen name="log/nutrition" options={{ presentation: 'modal' }} />
-          <Stack.Screen name="log/workout" options={{ presentation: 'modal' }} />
-          <Stack.Screen name="log/sleep" options={{ presentation: 'modal' }} />
-          <Stack.Screen name="teams/create" options={{ presentation: 'modal' }} />
-          <Stack.Screen name="teams/join" options={{ presentation: 'modal' }} />
-          <Stack.Screen name="teams/new-challenge" options={{ presentation: 'modal' }} />
-          <Stack.Screen name="accountability/index" />
-          <Stack.Screen name="paywall" options={{ presentation: 'modal' }} />
-          <Stack.Screen name="profile-edit" options={{ presentation: 'modal' }} />
-        </Stack>
+        <ErrorBoundary>
+          <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.background } }}>
+            <Stack.Screen name="(auth)" />
+            <Stack.Screen name="onboarding" />
+            <Stack.Screen name="(tabs)" />
+            <Stack.Screen name="quick-add" options={{ presentation: 'modal' }} />
+            <Stack.Screen name="log/water" options={{ presentation: 'modal' }} />
+            <Stack.Screen name="log/weight" options={{ presentation: 'modal' }} />
+            <Stack.Screen name="log/steps" options={{ presentation: 'modal' }} />
+            <Stack.Screen name="log/nutrition" options={{ presentation: 'modal' }} />
+            <Stack.Screen name="log/workout" options={{ presentation: 'modal' }} />
+            <Stack.Screen name="log/sleep" options={{ presentation: 'modal' }} />
+            <Stack.Screen name="teams/create" options={{ presentation: 'modal' }} />
+            <Stack.Screen name="teams/join" options={{ presentation: 'modal' }} />
+            <Stack.Screen name="teams/new-challenge" options={{ presentation: 'modal' }} />
+            <Stack.Screen name="accountability/index" />
+            <Stack.Screen name="paywall" options={{ presentation: 'modal' }} />
+            <Stack.Screen name="profile-edit" options={{ presentation: 'modal' }} />
+          </Stack>
+        </ErrorBoundary>
       </SafeAreaProvider>
     </GestureHandlerRootView>
   );
