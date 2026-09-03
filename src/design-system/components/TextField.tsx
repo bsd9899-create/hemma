@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { TextInput, View, type TextInputProps } from 'react-native';
 import { colors } from '../colors';
+import { textAlignStart, writingDirection } from '../direction';
 import { radius, spacing } from '../spacing';
 import { fontFamily } from '../typography';
 import { Text } from './Text';
@@ -11,7 +12,7 @@ type TextFieldProps = TextInputProps & {
 };
 
 /**
- * حقل إدخال نصي موحّد — RTL افتراضيًا، مع تسمية ورسالة خطأ اختياريتين.
+ * حقل إدخال نصي موحّد — يحترم اتجاه اللغة الحالية، مع تسمية ورسالة خطأ اختياريتين.
  * يعكس حالة التركيز (حدّ بلون العلامة) والتعطيل (شفافية أقل) بصريًا —
  * وليس فقط منطقيًا — لأن هذا هو الفرق بين حقل "يبدو تفاعليًا فعلًا"
  * وحقل ثابت المظهر بغض النظر عن حالته.
@@ -30,7 +31,7 @@ export function TextField({ label, error, style, editable = true, onFocus, onBlu
       ) : null}
       <TextInput
         placeholderTextColor={colors.textSecondary}
-        textAlign="right"
+        textAlign={textAlignStart}
         editable={editable}
         onFocus={(e) => {
           setIsFocused(true);
@@ -51,7 +52,7 @@ export function TextField({ label, error, style, editable = true, onFocus, onBlu
             paddingVertical: spacing.sm,
             borderWidth: error || isFocused ? 1.5 : 1,
             borderColor,
-            writingDirection: 'rtl',
+            writingDirection,
           },
           style,
         ]}

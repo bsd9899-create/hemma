@@ -12,7 +12,7 @@ import {
 } from '@expo-google-fonts/tajawal';
 import { colors } from '@/src/design-system';
 import { ErrorBoundary } from '@/src/lib/ErrorBoundary';
-import { ensureRTL } from '@/src/lib/rtl';
+import { bootstrapI18n } from '@/src/lib/i18n';
 import { useAuthGate } from '@/src/features/auth/useAuthGate';
 
 SplashScreen.preventAutoHideAsync().catch(() => {
@@ -21,6 +21,7 @@ SplashScreen.preventAutoHideAsync().catch(() => {
 
 export default function RootLayout() {
   const [isRestarting, setIsRestarting] = useState(false);
+  const [isI18nReady, setIsI18nReady] = useState(false);
   const [fontsLoaded, fontsError] = useFonts({
     Tajawal_400Regular,
     Tajawal_500Medium,
@@ -29,24 +30,26 @@ export default function RootLayout() {
   });
 
   useEffect(() => {
-    // فحص لمرة واحدة فقط عند الإقلاع لحالة نظام خارجية (I18nManager)
-    // وليس اشتقاق حالة من props/state — إعادة الهيكلة لتفادي هذا التحذير
-    // ستضيف تعقيدًا (microtask وهمي) بلا أي فائدة فعلية هنا.
-    if (ensureRTL()) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setIsRestarting(true);
-    }
+    // يحدّد اللغة (محفوظة أو لغة الجهاز) ويتأكد أن اتجاه النظام يطابقها —
+    // لو تطلّب الأمر إعادة تشغيل (تغيّر الاتجاه) لا نعرض شيئًا بعدها.
+    bootstrapI18n().then((didRestart) => {
+      if (didRestart) {
+        setIsRestarting(true);
+      } else {
+        setIsI18nReady(true);
+      }
+    });
   }, []);
 
   const { isReady: isAuthReady } = useAuthGate();
 
   useEffect(() => {
-    if ((fontsLoaded || fontsError) && !isRestarting && isAuthReady) {
+    if ((fontsLoaded || fontsError) && !isRestarting && isI18nReady && isAuthReady) {
       SplashScreen.hideAsync().catch(() => {});
     }
-  }, [fontsLoaded, fontsError, isRestarting, isAuthReady]);
+  }, [fontsLoaded, fontsError, isRestarting, isI18nReady, isAuthReady]);
 
-  if (isRestarting || (!fontsLoaded && !fontsError) || !isAuthReady) {
+  if (isRestarting || !isI18nReady || (!fontsLoaded && !fontsError) || !isAuthReady) {
     return null;
   }
 

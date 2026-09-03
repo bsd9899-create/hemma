@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Animated, StyleSheet, View, type ViewStyle } from 'react-native';
 import { palette } from '../colors';
+import { rowDirection } from '../direction';
 import { radius } from '../spacing';
 
 type SkeletonProps = {
@@ -50,11 +51,11 @@ export function TodaySkeleton() {
       <Skeleton width={180} height={30} />
       <Skeleton height={90} />
       <Skeleton height={150} />
-      <View style={{ flexDirection: 'row-reverse', gap: 12 }}>
+      <View style={{ flexDirection: rowDirection, gap: 12 }}>
         <Skeleton height={90} style={{ flex: 1 }} />
         <Skeleton height={90} style={{ flex: 1 }} />
       </View>
-      <View style={{ flexDirection: 'row-reverse', gap: 12 }}>
+      <View style={{ flexDirection: rowDirection, gap: 12 }}>
         <Skeleton height={90} style={{ flex: 1 }} />
         <Skeleton height={90} style={{ flex: 1 }} />
       </View>
@@ -69,7 +70,7 @@ export function ProgressSkeleton() {
     <View style={{ gap: 16, paddingTop: 16 }}>
       <Skeleton width={140} height={30} />
       <Skeleton height={160} />
-      <View style={{ flexDirection: 'row-reverse', gap: 12 }}>
+      <View style={{ flexDirection: rowDirection, gap: 12 }}>
         <Skeleton height={80} style={{ flex: 1 }} />
         <Skeleton height={80} style={{ flex: 1 }} />
       </View>

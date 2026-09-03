@@ -1,5 +1,6 @@
 import { Text as RNText, type TextProps as RNTextProps } from 'react-native';
 import { colors, type ColorToken } from '../colors';
+import { textAlignStart, writingDirection } from '../direction';
 import { typography, type TypographyToken } from '../typography';
 
 export type TextProps = RNTextProps & {
@@ -8,18 +9,14 @@ export type TextProps = RNTextProps & {
 };
 
 /**
- * مكوّن النص الأساسي في التطبيق — عربي RTL افتراضيًا، بخط Tajawal
- * وأحجام موحّدة من الـ Design System. استخدم هذا بدل <Text> من
- * react-native مباشرة في كل الشاشات.
+ * مكوّن النص الأساسي في التطبيق — يحترم اتجاه اللغة الحالية (RTL للعربية،
+ * LTR للإنجليزية) بخط Tajawal وأحجام موحّدة من الـ Design System.
+ * استخدم هذا بدل <Text> من react-native مباشرة في كل الشاشات.
  */
 export function Text({ variant = 'body', color = 'textPrimary', style, ...rest }: TextProps) {
   return (
     <RNText
-      style={[
-        typography[variant],
-        { color: colors[color], textAlign: 'right', writingDirection: 'rtl' },
-        style,
-      ]}
+      style={[typography[variant], { color: colors[color], textAlign: textAlignStart, writingDirection }, style]}
       {...rest}
     />
   );
