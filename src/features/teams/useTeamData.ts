@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { progressRepository } from '@/src/data/repositories/progressRepository';
 import {
   teamsRepository,
@@ -21,6 +22,7 @@ export type TeamData = {
 };
 
 export function useTeamData(userId: string | undefined) {
+  const { t } = useTranslation();
   const [data, setData] = useState<TeamData | null>(null);
   /** null = لم يُحسم بعد هل عنده فريق، false = تأكّدنا أنه بلا فريق. */
   const [hasTeam, setHasTeam] = useState<boolean | null>(null);
@@ -70,11 +72,11 @@ export function useTeamData(userId: string | undefined) {
         challenges: challengesWithProgress,
       });
     } catch (e) {
-      setError(getFriendlyErrorMessage(e, 'تعذّر تحميل بيانات الفريق'));
+      setError(getFriendlyErrorMessage(e, t('teams.loadError')));
     } finally {
       setIsLoading(false);
     }
-  }, [userId]);
+  }, [userId, t]);
 
   useEffect(() => {
     // جلب أولي عند التركيب (يستدعي setIsLoading داخل load) — نمط قياسي

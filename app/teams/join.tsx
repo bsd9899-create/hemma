@@ -1,12 +1,14 @@
 import { useState } from 'react';
 import { KeyboardAvoidingView, Platform } from 'react-native';
 import { useRouter } from 'expo-router';
+import { useTranslation } from 'react-i18next';
 import { teamsRepository } from '@/src/data/repositories/teamsRepository';
 import { Button, Screen, Text, TextField } from '@/src/design-system';
 import { spacing } from '@/src/design-system/spacing';
 import { getFriendlyErrorMessage } from '@/src/lib/errors';
 
 export default function JoinTeamScreen() {
+  const { t } = useTranslation();
   const router = useRouter();
 
   const [code, setCode] = useState('');
@@ -15,7 +17,7 @@ export default function JoinTeamScreen() {
 
   async function handleSubmit() {
     if (!code.trim()) {
-      setError('أدخل كود الدعوة');
+      setError(t('teamJoin.codeRequired'));
       return;
     }
 
@@ -25,7 +27,7 @@ export default function JoinTeamScreen() {
       await teamsRepository.joinByCode(code.trim());
       router.back();
     } catch (e) {
-      setError(getFriendlyErrorMessage(e, 'كود الدعوة غير صحيح'));
+      setError(getFriendlyErrorMessage(e, t('teamJoin.error')));
     } finally {
       setIsSubmitting(false);
     }
@@ -34,17 +36,17 @@ export default function JoinTeamScreen() {
   return (
     <Screen>
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1, gap: spacing.lg }}>
-        <Text variant="displayMd">انضم لفريق 🔑</Text>
+        <Text variant="displayMd">{t('teamJoin.title')}</Text>
         <TextField
-          label="كود الدعوة"
-          placeholder="مثلاً: a1b2c3d4"
+          label={t('teamJoin.codeLabel')}
+          placeholder={t('teamJoin.codePlaceholder')}
           value={code}
           onChangeText={setCode}
           autoCapitalize="none"
           error={error ?? undefined}
           editable={!isSubmitting}
         />
-        <Button label={isSubmitting ? 'جارِ الانضمام...' : 'انضمام'} disabled={isSubmitting} onPress={handleSubmit} />
+        <Button label={isSubmitting ? t('teamJoin.joining') : t('teamJoin.join')} disabled={isSubmitting} onPress={handleSubmit} />
       </KeyboardAvoidingView>
     </Screen>
   );

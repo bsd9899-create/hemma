@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { ScrollView, View } from 'react-native';
 import { useRouter } from 'expo-router';
+import { useTranslation } from 'react-i18next';
 import type { GoalType } from '@/src/data/database.types';
 import { profileRepository } from '@/src/data/repositories/profileRepository';
 import { Button, Screen, Text, TextField } from '@/src/design-system';
@@ -10,6 +11,7 @@ import { useProfileStore } from '@/src/features/auth/profileStore';
 import { GoalPicker } from '@/src/features/profile/GoalPicker';
 
 export default function ProfileEditScreen() {
+  const { t } = useTranslation();
   const router = useRouter();
   const profile = useProfileStore((s) => s.profile);
   const fetchProfile = useProfileStore((s) => s.fetch);
@@ -21,11 +23,11 @@ export default function ProfileEditScreen() {
 
   async function handleSubmit() {
     if (!displayName.trim()) {
-      setError('أدخل اسمك أولًا');
+      setError(t('profileEdit.nameRequired'));
       return;
     }
     if (!goalType) {
-      setError('اختر هدفك الأساسي');
+      setError(t('profileEdit.goalRequired'));
       return;
     }
 
@@ -36,7 +38,7 @@ export default function ProfileEditScreen() {
       await fetchProfile();
       router.back();
     } catch (e) {
-      setError(getFriendlyErrorMessage(e, 'تعذّر الحفظ، حاول مرة أخرى'));
+      setError(getFriendlyErrorMessage(e, t('common.genericSaveError')));
     } finally {
       setIsSubmitting(false);
     }
@@ -45,13 +47,18 @@ export default function ProfileEditScreen() {
   return (
     <Screen>
       <ScrollView contentContainerStyle={{ gap: spacing.xl, paddingVertical: spacing.xl }}>
-        <Text variant="displayMd">تعديل ملفي</Text>
+        <Text variant="displayMd">{t('profileEdit.title')}</Text>
 
-        <TextField label="اسمك" placeholder="اسمك" value={displayName} onChangeText={setDisplayName} />
+        <TextField
+          label={t('profileEdit.nameLabel')}
+          placeholder={t('profileEdit.namePlaceholder')}
+          value={displayName}
+          onChangeText={setDisplayName}
+        />
 
         <View style={{ gap: spacing.sm }}>
           <Text variant="captionStrong" color="textSecondary">
-            هدفك الأساسي
+            {t('profileEdit.goalLabel')}
           </Text>
           <GoalPicker value={goalType} onChange={setGoalType} />
         </View>
@@ -62,7 +69,7 @@ export default function ProfileEditScreen() {
           </Text>
         ) : null}
 
-        <Button label={isSubmitting ? 'جارِ الحفظ...' : 'حفظ'} onPress={handleSubmit} disabled={isSubmitting} />
+        <Button label={isSubmitting ? t('common.saving') : t('common.save')} onPress={handleSubmit} disabled={isSubmitting} />
       </ScrollView>
     </Screen>
   );

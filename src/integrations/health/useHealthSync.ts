@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Platform } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { dailyLogsRepository } from '@/src/data/repositories/dailyLogsRepository';
 import {
   getActiveEnergyToday,
@@ -18,6 +19,7 @@ import { getFriendlyErrorMessage } from '@/src/lib/errors';
  * فوق إدخالات المستخدم اليدوية. راجع التحذير في healthkit.ts.
  */
 export function useHealthSync(userId: string | undefined) {
+  const { t } = useTranslation();
   const [isAvailable, setIsAvailable] = useState(false);
   const [isSyncing, setIsSyncing] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -35,7 +37,7 @@ export function useHealthSync(userId: string | undefined) {
     try {
       const granted = await requestHealthPermissions();
       if (!granted) {
-        setError('لم يُسمح بالوصول لبيانات Apple Health');
+        setError(t('health.permissionDenied'));
         return;
       }
 
@@ -52,17 +54,17 @@ export function useHealthSync(userId: string | undefined) {
         weightKg !== null ? dailyLogsRepository.addWeight(userId, weightKg) : Promise.resolve(),
         sleepHours > 0 ? dailyLogsRepository.setSleepToday(userId, sleepHours) : Promise.resolve(),
         workoutMinutes > 0
-          ? dailyLogsRepository.addWorkout(userId, { title: 'تمرين من Apple Health', durationMinutes: workoutMinutes })
+          ? dailyLogsRepository.addWorkout(userId, { title: t('health.autoWorkoutTitle'), durationMinutes: workoutMinutes })
           : Promise.resolve(),
       ]);
 
       setLastActiveEnergyKcal(activeEnergy);
     } catch (e) {
-      setError(getFriendlyErrorMessage(e, 'تعذّرت المزامنة مع Apple Health'));
+      setError(getFriendlyErrorMessage(e, t('health.syncError')));
     } finally {
       setIsSyncing(false);
     }
-  }, [userId, isAvailable]);
+  }, [userId, isAvailable, t]);
 
   return { isAvailable, isSyncing, error, lastActiveEnergyKcal, syncToday };
 }

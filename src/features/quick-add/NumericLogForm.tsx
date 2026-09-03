@@ -1,15 +1,16 @@
 import { useState } from 'react';
 import { KeyboardAvoidingView, Platform, Pressable, View } from 'react-native';
 import { useRouter } from 'expo-router';
-import { Button, Screen, Text, TextField, colors } from '@/src/design-system';
+import { useTranslation } from 'react-i18next';
+import { Button, Screen, Text, TextField, colors, rowDirection } from '@/src/design-system';
 import { radius, spacing } from '@/src/design-system/spacing';
 import { getFriendlyErrorMessage } from '@/src/lib/errors';
 
 type NumericLogFormProps = {
-  title: string;
+  titleKey: string;
   emoji: string;
-  unitLabel: string;
-  placeholder: string;
+  unitKey: string;
+  placeholderKey: string;
   /** أزرار قيم جاهزة (مثل 250/500/750 للماء) — اختيارية. */
   presets?: number[];
   /** يسمح بفواصل عشرية (الوزن/النوم) أم أعداد صحيحة فقط (الخطوات). */
@@ -22,14 +23,15 @@ type NumericLogFormProps = {
  * الشكل، فرقها فقط الوحدة والقيم الجاهزة والسماح بالكسور.
  */
 export function NumericLogForm({
-  title,
+  titleKey,
   emoji,
-  unitLabel,
-  placeholder,
+  unitKey,
+  placeholderKey,
   presets,
   allowDecimal = false,
   onSubmit,
 }: NumericLogFormProps) {
+  const { t } = useTranslation();
   const router = useRouter();
   const [value, setValue] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -37,7 +39,7 @@ export function NumericLogForm({
 
   async function submit(raw: number) {
     if (!Number.isFinite(raw) || raw <= 0) {
-      setError('أدخل رقمًا صحيحًا أكبر من صفر');
+      setError(t('logCommon.invalidNumber'));
       return;
     }
     setError(null);
@@ -46,7 +48,7 @@ export function NumericLogForm({
       await onSubmit(raw);
       router.back();
     } catch (e) {
-      setError(getFriendlyErrorMessage(e, 'تعذّر الحفظ، حاول مرة أخرى'));
+      setError(getFriendlyErrorMessage(e, t('common.genericSaveError')));
     } finally {
       setIsSubmitting(false);
     }
@@ -56,11 +58,11 @@ export function NumericLogForm({
     <Screen>
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1, gap: spacing.lg }}>
         <Text variant="displayMd">
-          {emoji} {title}
+          {emoji} {t(titleKey)}
         </Text>
 
         {presets && presets.length > 0 ? (
-          <View style={{ flexDirection: 'row-reverse', gap: spacing.sm }}>
+          <View style={{ flexDirection: rowDirection, gap: spacing.sm }}>
             {presets.map((preset) => (
               <Pressable
                 key={preset}
@@ -81,8 +83,8 @@ export function NumericLogForm({
         ) : null}
 
         <TextField
-          label={`أو أدخل قيمة مخصّصة (${unitLabel})`}
-          placeholder={placeholder}
+          label={t('logCommon.customValueLabel', { unit: t(unitKey) })}
+          placeholder={t(placeholderKey)}
           value={value}
           onChangeText={setValue}
           error={error ?? undefined}
@@ -91,7 +93,7 @@ export function NumericLogForm({
         />
 
         <Button
-          label={isSubmitting ? 'جارِ الحفظ...' : 'حفظ'}
+          label={isSubmitting ? t('common.saving') : t('common.save')}
           disabled={isSubmitting}
           onPress={() => submit(Number(value.replace(',', '.')))}
         />

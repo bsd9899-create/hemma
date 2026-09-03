@@ -1,30 +1,32 @@
 import type { Href } from 'expo-router';
 import { Pressable, View } from 'react-native';
 import { useRouter } from 'expo-router';
-import { Screen, Text, colors } from '@/src/design-system';
+import { useTranslation } from 'react-i18next';
+import { Screen, Text, colors, rowDirection } from '@/src/design-system';
 import { radius, spacing } from '@/src/design-system/spacing';
 
-const QUICK_ADD_OPTIONS: { emoji: string; label: string; href: Href }[] = [
-  { emoji: '💧', label: 'ماء', href: '/log/water' },
-  { emoji: '⚖️', label: 'وزن', href: '/log/weight' },
-  { emoji: '👟', label: 'خطوات', href: '/log/steps' },
-  { emoji: '🍽️', label: 'تغذية', href: '/log/nutrition' },
-  { emoji: '🏋️', label: 'تمرين', href: '/log/workout' },
-  { emoji: '💤', label: 'نوم', href: '/log/sleep' },
+const QUICK_ADD_OPTIONS: { emoji: string; labelKey: string; href: Href }[] = [
+  { emoji: '💧', labelKey: 'quickAdd.water', href: '/log/water' },
+  { emoji: '⚖️', labelKey: 'quickAdd.weight', href: '/log/weight' },
+  { emoji: '👟', labelKey: 'quickAdd.steps', href: '/log/steps' },
+  { emoji: '🍽️', labelKey: 'quickAdd.nutrition', href: '/log/nutrition' },
+  { emoji: '🏋️', labelKey: 'quickAdd.workout', href: '/log/workout' },
+  { emoji: '💤', labelKey: 'quickAdd.sleep', href: '/log/sleep' },
 ];
 
 export default function QuickAddModal() {
+  const { t } = useTranslation();
   const router = useRouter();
 
   return (
     <Screen>
       <View style={{ gap: spacing.lg }}>
-        <Text variant="title">إضافة سريعة</Text>
+        <Text variant="title">{t('quickAdd.title')}</Text>
 
-        <View style={{ flexDirection: 'row-reverse', flexWrap: 'wrap', gap: spacing.sm }}>
+        <View style={{ flexDirection: rowDirection, flexWrap: 'wrap', gap: spacing.sm }}>
           {QUICK_ADD_OPTIONS.map((option) => (
             <Pressable
-              key={option.label}
+              key={option.labelKey}
               onPress={() => router.push(option.href)}
               style={{
                 width: '30%',
@@ -37,7 +39,7 @@ export default function QuickAddModal() {
               }}
             >
               <Text variant="displayMd">{option.emoji}</Text>
-              <Text variant="captionStrong">{option.label}</Text>
+              <Text variant="captionStrong">{t(option.labelKey)}</Text>
             </Pressable>
           ))}
         </View>

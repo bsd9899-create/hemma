@@ -1,7 +1,8 @@
 import { View } from 'react-native';
-import { colors, Text } from '@/src/design-system';
+import { useTranslation } from 'react-i18next';
+import { colors, rowDirection, Text } from '@/src/design-system';
 import { radius, spacing } from '@/src/design-system/spacing';
-import { arabicWeekdayLetter, toDateKey } from '@/src/lib/date';
+import { toDateKey, weekdayLetter } from '@/src/lib/date';
 
 type WeeklyBarChartProps = {
   history: { date: string; completion_percent: number }[];
@@ -15,6 +16,8 @@ const BAR_MAX_HEIGHT = 96;
  * الناقصة من history بصفر حتى لو المستخدم لم يفتح التطبيق فيها.
  */
 export function WeeklyBarChart({ history, days }: WeeklyBarChartProps) {
+  const { t } = useTranslation();
+  const weekdayLetters = t('weekday.letters', { returnObjects: true }) as string[];
   const byDate = new Map(history.map((h) => [h.date, h.completion_percent]));
 
   const series = Array.from({ length: days }, (_, i) => {
@@ -25,7 +28,7 @@ export function WeeklyBarChart({ history, days }: WeeklyBarChartProps) {
   });
 
   return (
-    <View style={{ flexDirection: 'row-reverse', alignItems: 'flex-end', gap: spacing.sm, height: BAR_MAX_HEIGHT + 24 }}>
+    <View style={{ flexDirection: rowDirection, alignItems: 'flex-end', gap: spacing.sm, height: BAR_MAX_HEIGHT + 24 }}>
       {series.map((day) => (
         <View key={day.dateKey} style={{ flex: 1, alignItems: 'center', gap: spacing.xxs }}>
           <View
@@ -37,7 +40,7 @@ export function WeeklyBarChart({ history, days }: WeeklyBarChartProps) {
             }}
           />
           <Text variant="caption" color="textSecondary">
-            {arabicWeekdayLetter(day.dateKey)}
+            {weekdayLetter(day.dateKey, weekdayLetters)}
           </Text>
         </View>
       ))}

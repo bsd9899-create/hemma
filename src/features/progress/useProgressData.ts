@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { progressRepository } from '@/src/data/repositories/progressRepository';
 import { goalsRepository } from '@/src/data/repositories/goalsRepository';
 import { computeWeeklyReview, type WeeklyReview } from '@/src/domain/weeklyReview';
@@ -16,6 +17,7 @@ export type ProgressSummary = {
 };
 
 export function useProgressData(userId: string | undefined) {
+  const { t } = useTranslation();
   const [summary, setSummary] = useState<ProgressSummary | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -54,11 +56,11 @@ export function useProgressData(userId: string | undefined) {
         weeklyReview,
       });
     } catch (e) {
-      setError(getFriendlyErrorMessage(e, 'تعذّر تحميل التقدم'));
+      setError(getFriendlyErrorMessage(e, t('progress.loadError')));
     } finally {
       setIsLoading(false);
     }
-  }, [userId]);
+  }, [userId, t]);
 
   useEffect(() => {
     // جلب أولي عند التركيب (يستدعي setIsLoading داخل load) — نمط قياسي

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { KeyboardAvoidingView, Platform } from 'react-native';
 import { useRouter } from 'expo-router';
+import { useTranslation } from 'react-i18next';
 import { dailyLogsRepository } from '@/src/data/repositories/dailyLogsRepository';
 import { Button, Screen, Text, TextField } from '@/src/design-system';
 import { spacing } from '@/src/design-system/spacing';
@@ -8,6 +9,7 @@ import { useAuthStore } from '@/src/features/auth/store';
 import { getFriendlyErrorMessage } from '@/src/lib/errors';
 
 export default function LogWorkoutScreen() {
+  const { t } = useTranslation();
   const router = useRouter();
   const userId = useAuthStore((s) => s.session?.user.id);
 
@@ -19,12 +21,12 @@ export default function LogWorkoutScreen() {
   async function handleSubmit() {
     if (!userId) return;
     if (!title.trim()) {
-      setError('أدخل اسم التمرين');
+      setError(t('logWorkout.nameRequired'));
       return;
     }
     const minutes = Number(duration);
     if (!Number.isFinite(minutes) || minutes <= 0) {
-      setError('أدخل مدة صحيحة بالدقائق');
+      setError(t('logWorkout.durationRequired'));
       return;
     }
 
@@ -34,7 +36,7 @@ export default function LogWorkoutScreen() {
       await dailyLogsRepository.addWorkout(userId, { title: title.trim(), durationMinutes: Math.round(minutes) });
       router.back();
     } catch (e) {
-      setError(getFriendlyErrorMessage(e, 'تعذّر الحفظ، حاول مرة أخرى'));
+      setError(getFriendlyErrorMessage(e, t('common.genericSaveError')));
     } finally {
       setIsSubmitting(false);
     }
@@ -43,19 +45,19 @@ export default function LogWorkoutScreen() {
   return (
     <Screen>
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1, gap: spacing.lg }}>
-        <Text variant="displayMd">🏋️ التمرين</Text>
+        <Text variant="displayMd">{t('logWorkout.title')}</Text>
 
         <TextField
-          label="اسم التمرين"
-          placeholder="مثلاً: صدر وترايسبس"
+          label={t('logWorkout.nameLabel')}
+          placeholder={t('logWorkout.namePlaceholder')}
           value={title}
           onChangeText={setTitle}
           editable={!isSubmitting}
         />
 
         <TextField
-          label="المدة (دقيقة)"
-          placeholder="مثلاً 45"
+          label={t('logWorkout.durationLabel')}
+          placeholder={t('logWorkout.durationPlaceholder')}
           value={duration}
           onChangeText={setDuration}
           keyboardType="number-pad"
@@ -63,7 +65,7 @@ export default function LogWorkoutScreen() {
           editable={!isSubmitting}
         />
 
-        <Button label={isSubmitting ? 'جارِ الحفظ...' : 'حفظ'} disabled={isSubmitting} onPress={handleSubmit} />
+        <Button label={isSubmitting ? t('common.saving') : t('common.save')} disabled={isSubmitting} onPress={handleSubmit} />
       </KeyboardAvoidingView>
     </Screen>
   );

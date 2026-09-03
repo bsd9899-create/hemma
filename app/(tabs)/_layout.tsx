@@ -1,6 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { Tabs, useRouter } from 'expo-router';
 import { Pressable, StyleSheet, View } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { colors } from '@/src/design-system';
 import { spacing } from '@/src/design-system/spacing';
 
@@ -12,12 +13,13 @@ function TabIcon({ name, focused }: { name: IconName; focused: boolean }) {
 
 /** زر "+" الأوسط — لا يفتح تبويبًا، بل يفتح شاشة الإضافة السريعة كـ Modal. */
 function QuickAddButton() {
+  const { t } = useTranslation();
   const router = useRouter();
   return (
     <View style={styles.quickAddSlot}>
       <Pressable
         accessibilityRole="button"
-        accessibilityLabel="إضافة سريعة"
+        accessibilityLabel={t('quickAdd.title')}
         style={styles.quickAddButton}
         onPress={() => router.push('/quick-add')}
       >
@@ -28,6 +30,8 @@ function QuickAddButton() {
 }
 
 export default function TabsLayout() {
+  const { t } = useTranslation();
+
   return (
     <Tabs
       screenOptions={{
@@ -41,14 +45,14 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: 'اليوم',
+          title: t('nav.today'),
           tabBarIcon: ({ focused }) => <TabIcon name={focused ? 'sunny' : 'sunny-outline'} focused={focused} />,
         }}
       />
       <Tabs.Screen
         name="progress"
         options={{
-          title: 'تقدمي',
+          title: t('nav.progress'),
           tabBarIcon: ({ focused }) => (
             <TabIcon name={focused ? 'trending-up' : 'trending-up-outline'} focused={focused} />
           ),
@@ -67,7 +71,7 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="teams"
         options={{
-          title: 'الفرق',
+          title: t('nav.teams'),
           tabBarIcon: ({ focused }) => (
             <TabIcon name={focused ? 'people' : 'people-outline'} focused={focused} />
           ),
@@ -76,7 +80,7 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="profile"
         options={{
-          title: 'حسابي',
+          title: t('nav.profile'),
           tabBarIcon: ({ focused }) => (
             <TabIcon name={focused ? 'person' : 'person-outline'} focused={focused} />
           ),

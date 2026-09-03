@@ -1,20 +1,22 @@
 import { useState } from 'react';
 import { KeyboardAvoidingView, Platform, Pressable, View } from 'react-native';
 import { useRouter } from 'expo-router';
+import { useTranslation } from 'react-i18next';
 import { dailyLogsRepository } from '@/src/data/repositories/dailyLogsRepository';
-import { Button, Screen, Text, TextField, colors } from '@/src/design-system';
+import { Button, Screen, Text, TextField, colors, rowDirection } from '@/src/design-system';
 import { radius, spacing } from '@/src/design-system/spacing';
 import { useAuthStore } from '@/src/features/auth/store';
 import { getFriendlyErrorMessage } from '@/src/lib/errors';
 
-const MEAL_TYPES: { value: 'breakfast' | 'lunch' | 'dinner' | 'snack'; label: string }[] = [
-  { value: 'breakfast', label: 'فطور' },
-  { value: 'lunch', label: 'غداء' },
-  { value: 'dinner', label: 'عشاء' },
-  { value: 'snack', label: 'وجبة خفيفة' },
+const MEAL_TYPES: { value: 'breakfast' | 'lunch' | 'dinner' | 'snack'; labelKey: string }[] = [
+  { value: 'breakfast', labelKey: 'logNutrition.breakfast' },
+  { value: 'lunch', labelKey: 'logNutrition.lunch' },
+  { value: 'dinner', labelKey: 'logNutrition.dinner' },
+  { value: 'snack', labelKey: 'logNutrition.snack' },
 ];
 
 export default function LogNutritionScreen() {
+  const { t } = useTranslation();
   const router = useRouter();
   const userId = useAuthStore((s) => s.session?.user.id);
 
@@ -27,7 +29,7 @@ export default function LogNutritionScreen() {
   async function handleSubmit() {
     if (!userId) return;
     if (!description.trim()) {
-      setError('صف الوجبة باختصار');
+      setError(t('logNutrition.descriptionRequired'));
       return;
     }
 
@@ -41,7 +43,7 @@ export default function LogNutritionScreen() {
       });
       router.back();
     } catch (e) {
-      setError(getFriendlyErrorMessage(e, 'تعذّر الحفظ، حاول مرة أخرى'));
+      setError(getFriendlyErrorMessage(e, t('common.genericSaveError')));
     } finally {
       setIsSubmitting(false);
     }
@@ -50,9 +52,9 @@ export default function LogNutritionScreen() {
   return (
     <Screen>
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1, gap: spacing.lg }}>
-        <Text variant="displayMd">🍽️ التغذية</Text>
+        <Text variant="displayMd">{t('logNutrition.title')}</Text>
 
-        <View style={{ flexDirection: 'row-reverse', flexWrap: 'wrap', gap: spacing.sm }}>
+        <View style={{ flexDirection: rowDirection, flexWrap: 'wrap', gap: spacing.sm }}>
           {MEAL_TYPES.map((meal) => {
             const selected = mealType === meal.value;
             return (
@@ -67,7 +69,7 @@ export default function LogNutritionScreen() {
                 }}
               >
                 <Text variant="captionStrong" color={selected ? 'onPrimary' : 'textPrimary'}>
-                  {meal.label}
+                  {t(meal.labelKey)}
                 </Text>
               </Pressable>
             );
@@ -75,8 +77,8 @@ export default function LogNutritionScreen() {
         </View>
 
         <TextField
-          label="وش أكلت؟"
-          placeholder="مثلاً: صدر دجاج مع أرز"
+          label={t('logNutrition.descriptionLabel')}
+          placeholder={t('logNutrition.descriptionPlaceholder')}
           value={description}
           onChangeText={setDescription}
           error={error ?? undefined}
@@ -84,15 +86,15 @@ export default function LogNutritionScreen() {
         />
 
         <TextField
-          label="السعرات (اختياري)"
-          placeholder="مثلاً 450"
+          label={t('logNutrition.caloriesLabel')}
+          placeholder={t('logNutrition.caloriesPlaceholder')}
           value={calories}
           onChangeText={setCalories}
           keyboardType="number-pad"
           editable={!isSubmitting}
         />
 
-        <Button label={isSubmitting ? 'جارِ الحفظ...' : 'حفظ'} disabled={isSubmitting} onPress={handleSubmit} />
+        <Button label={isSubmitting ? t('common.saving') : t('common.save')} disabled={isSubmitting} onPress={handleSubmit} />
       </KeyboardAvoidingView>
     </Screen>
   );

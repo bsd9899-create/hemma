@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { ScrollView, View } from 'react-native';
 import { useRouter } from 'expo-router';
+import { useTranslation } from 'react-i18next';
 import type { GoalType } from '@/src/data/database.types';
 import { profileRepository } from '@/src/data/repositories/profileRepository';
 import { Button, Screen, Text, TextField } from '@/src/design-system';
@@ -10,6 +11,7 @@ import { GoalPicker } from '@/src/features/profile/GoalPicker';
 import { getFriendlyErrorMessage } from '@/src/lib/errors';
 
 export default function OnboardingScreen() {
+  const { t } = useTranslation();
   const router = useRouter();
   const fetchProfile = useProfileStore((s) => s.fetch);
 
@@ -20,11 +22,11 @@ export default function OnboardingScreen() {
 
   async function handleSubmit() {
     if (!displayName.trim()) {
-      setError('أدخل اسمك أولًا');
+      setError(t('onboarding.nameRequired'));
       return;
     }
     if (!goalType) {
-      setError('اختر هدفك الأساسي');
+      setError(t('onboarding.goalRequired'));
       return;
     }
 
@@ -39,7 +41,7 @@ export default function OnboardingScreen() {
       await fetchProfile();
       router.replace('/(tabs)');
     } catch (e) {
-      setError(getFriendlyErrorMessage(e, 'تعذّر الحفظ، حاول مرة أخرى'));
+      setError(getFriendlyErrorMessage(e, t('common.genericSaveError')));
     } finally {
       setIsSubmitting(false);
     }
@@ -49,17 +51,22 @@ export default function OnboardingScreen() {
     <Screen>
       <ScrollView contentContainerStyle={{ gap: spacing.xl, paddingVertical: spacing.xl }}>
         <View style={{ gap: spacing.xs }}>
-          <Text variant="displayMd">هلا فيك في هِمّة 🌿</Text>
+          <Text variant="displayMd">{t('onboarding.welcome')}</Text>
           <Text variant="body" color="textSecondary">
-            خلنا نتعرف عليك بسرعة قبل ما نبدأ
+            {t('onboarding.intro')}
           </Text>
         </View>
 
-        <TextField label="وش نناديك؟" placeholder="اسمك" value={displayName} onChangeText={setDisplayName} />
+        <TextField
+          label={t('onboarding.nameLabel')}
+          placeholder={t('onboarding.namePlaceholder')}
+          value={displayName}
+          onChangeText={setDisplayName}
+        />
 
         <View style={{ gap: spacing.sm }}>
           <Text variant="captionStrong" color="textSecondary">
-            وش هدفك الأساسي؟
+            {t('onboarding.goalLabel')}
           </Text>
           <GoalPicker value={goalType} onChange={setGoalType} />
         </View>
@@ -70,7 +77,7 @@ export default function OnboardingScreen() {
           </Text>
         ) : null}
 
-        <Button label={isSubmitting ? 'جارِ الحفظ...' : 'ابدأ رحلتك'} onPress={handleSubmit} disabled={isSubmitting} />
+        <Button label={isSubmitting ? t('common.saving') : t('onboarding.start')} onPress={handleSubmit} disabled={isSubmitting} />
       </ScrollView>
     </Screen>
   );

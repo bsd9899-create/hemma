@@ -1,10 +1,9 @@
 import { Pressable, View } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import type { DailyPromise, PromiseType } from '@/src/data/repositories/dailyPromiseRepository';
-import { Card, Text, colors } from '@/src/design-system';
+import { Card, Text, colors, rowDirection } from '@/src/design-system';
 import { radius, spacing } from '@/src/design-system/spacing';
-import { PROMISE_LABELS } from '../useDailyPromise';
-
-const PROMISE_OPTIONS = Object.keys(PROMISE_LABELS) as PromiseType[];
+import { PROMISE_TYPES } from '../useDailyPromise';
 
 type DailyPromiseCardProps = {
   promise: DailyPromise | null;
@@ -15,6 +14,8 @@ type DailyPromiseCardProps = {
 };
 
 export function DailyPromiseCard({ promise, isSaving, error, onChoose, onMarkFulfilled }: DailyPromiseCardProps) {
+  const { t } = useTranslation();
+
   const errorText = error ? (
     <Text variant="caption" color="danger" style={{ marginTop: spacing.xs }}>
       {error}
@@ -25,10 +26,10 @@ export function DailyPromiseCard({ promise, isSaving, error, onChoose, onMarkFul
     return (
       <Card variant="soft">
         <Text variant="overline" color="textSecondary">
-          وش وعدك اليوم؟
+          {t('today.promiseQuestion')}
         </Text>
-        <View style={{ flexDirection: 'row-reverse', flexWrap: 'wrap', gap: spacing.xs, marginTop: spacing.sm }}>
-          {PROMISE_OPTIONS.map((type) => (
+        <View style={{ flexDirection: rowDirection, flexWrap: 'wrap', gap: spacing.xs, marginTop: spacing.sm }}>
+          {PROMISE_TYPES.map((type) => (
             <Pressable
               key={type}
               disabled={isSaving}
@@ -41,7 +42,7 @@ export function DailyPromiseCard({ promise, isSaving, error, onChoose, onMarkFul
                 opacity: isSaving ? 0.6 : 1,
               }}
             >
-              <Text variant="captionStrong">{PROMISE_LABELS[type]}</Text>
+              <Text variant="captionStrong">{t(`promises.${type}`)}</Text>
             </Pressable>
           ))}
         </View>
@@ -54,15 +55,15 @@ export function DailyPromiseCard({ promise, isSaving, error, onChoose, onMarkFul
     return (
       <Card variant="soft">
         <Text variant="overline" color="textSecondary">
-          وعدك اليوم
+          {t('today.promiseOfDay')}
         </Text>
         <Text variant="bodyStrong" style={{ marginTop: spacing.xxs }}>
-          {PROMISE_LABELS[promise.promise_type]}
+          {t(`promises.${promise.promise_type}`)}
         </Text>
         <Text variant="caption" color="textSecondary" style={{ marginTop: spacing.sm }}>
-          وفيت بوعدك؟
+          {t('today.promiseFulfilledQuestion')}
         </Text>
-        <View style={{ flexDirection: 'row-reverse', gap: spacing.sm, marginTop: spacing.xs }}>
+        <View style={{ flexDirection: rowDirection, gap: spacing.sm, marginTop: spacing.xs }}>
           <Pressable
             disabled={isSaving}
             onPress={() => onMarkFulfilled(true)}
@@ -76,7 +77,7 @@ export function DailyPromiseCard({ promise, isSaving, error, onChoose, onMarkFul
             }}
           >
             <Text variant="captionStrong" color="onPrimary">
-              أيوه 👏
+              {t('today.promiseYes')}
             </Text>
           </Pressable>
           <Pressable
@@ -91,7 +92,7 @@ export function DailyPromiseCard({ promise, isSaving, error, onChoose, onMarkFul
               opacity: isSaving ? 0.6 : 1,
             }}
           >
-            <Text variant="captionStrong">مو بعد</Text>
+            <Text variant="captionStrong">{t('today.promiseNotYet')}</Text>
           </Pressable>
         </View>
         {errorText}
@@ -102,10 +103,10 @@ export function DailyPromiseCard({ promise, isSaving, error, onChoose, onMarkFul
   return (
     <Card variant="soft">
       <Text variant="overline" color="textSecondary">
-        وعدك اليوم
+        {t('today.promiseOfDay')}
       </Text>
       <Text variant="bodyStrong" style={{ marginTop: spacing.xxs }}>
-        {PROMISE_LABELS[promise.promise_type]} {promise.fulfilled ? '✅' : '↻ نكمل بكرة'}
+        {t(`promises.${promise.promise_type}`)} {promise.fulfilled ? t('today.promiseFulfilled') : t('today.promiseCarryOver')}
       </Text>
     </Card>
   );

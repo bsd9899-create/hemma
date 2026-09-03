@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { KeyboardAvoidingView, Platform } from 'react-native';
 import { useRouter } from 'expo-router';
+import { useTranslation } from 'react-i18next';
 import { teamsRepository } from '@/src/data/repositories/teamsRepository';
 import { Button, Screen, Text, TextField } from '@/src/design-system';
 import { spacing } from '@/src/design-system/spacing';
@@ -8,6 +9,7 @@ import { useAuthStore } from '@/src/features/auth/store';
 import { getFriendlyErrorMessage } from '@/src/lib/errors';
 
 export default function CreateTeamScreen() {
+  const { t } = useTranslation();
   const router = useRouter();
   const userId = useAuthStore((s) => s.session?.user.id);
 
@@ -18,7 +20,7 @@ export default function CreateTeamScreen() {
   async function handleSubmit() {
     if (!userId) return;
     if (!name.trim()) {
-      setError('أدخل اسم الفريق');
+      setError(t('teamCreate.nameRequired'));
       return;
     }
 
@@ -28,7 +30,7 @@ export default function CreateTeamScreen() {
       await teamsRepository.createTeam(name.trim(), userId);
       router.back();
     } catch (e) {
-      setError(getFriendlyErrorMessage(e, 'تعذّر إنشاء الفريق'));
+      setError(getFriendlyErrorMessage(e, t('teamCreate.error')));
     } finally {
       setIsSubmitting(false);
     }
@@ -37,16 +39,16 @@ export default function CreateTeamScreen() {
   return (
     <Screen>
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1, gap: spacing.lg }}>
-        <Text variant="displayMd">أنشئ فريقك 🤝</Text>
+        <Text variant="displayMd">{t('teamCreate.title')}</Text>
         <TextField
-          label="اسم الفريق"
-          placeholder="مثلاً: فريق الفجر"
+          label={t('teamCreate.nameLabel')}
+          placeholder={t('teamCreate.namePlaceholder')}
           value={name}
           onChangeText={setName}
           error={error ?? undefined}
           editable={!isSubmitting}
         />
-        <Button label={isSubmitting ? 'جارِ الإنشاء...' : 'إنشاء'} disabled={isSubmitting} onPress={handleSubmit} />
+        <Button label={isSubmitting ? t('teamCreate.creating') : t('teamCreate.create')} disabled={isSubmitting} onPress={handleSubmit} />
       </KeyboardAvoidingView>
     </Screen>
   );

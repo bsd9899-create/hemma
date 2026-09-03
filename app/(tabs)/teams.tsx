@@ -1,12 +1,14 @@
 import { useCallback } from 'react';
 import { RefreshControl, ScrollView, View } from 'react-native';
 import { useFocusEffect, useRouter } from 'expo-router';
-import { Button, Card, ProgressBar, Screen, Text, TeamsSkeleton, colors } from '@/src/design-system';
+import { useTranslation } from 'react-i18next';
+import { Button, Card, ProgressBar, Screen, Text, TeamsSkeleton, colors, rowDirection } from '@/src/design-system';
 import { spacing } from '@/src/design-system/spacing';
 import { useAuthStore } from '@/src/features/auth/store';
 import { useTeamData } from '@/src/features/teams/useTeamData';
 
 export default function TeamsScreen() {
+  const { t } = useTranslation();
   const router = useRouter();
   const userId = useAuthStore((s) => s.session?.user.id);
   const { data, hasTeam, isLoading, error, refetch } = useTeamData(userId);
@@ -30,13 +32,13 @@ export default function TeamsScreen() {
       <Screen>
         <View style={{ flex: 1, justifyContent: 'center', gap: spacing.lg }}>
           <View>
-            <Text variant="displayMd">الفرق 🤝</Text>
+            <Text variant="displayMd">{t('teams.title')}</Text>
             <Text variant="body" color="textSecondary" style={{ marginTop: spacing.xs }}>
-              التنافس هنا على نسبة الالتزام بهدفك الشخصي، مو على رقم واحد للجميع.
+              {t('teams.intro')}
             </Text>
           </View>
-          <Button label="أنشئ فريقًا" onPress={() => router.push('/teams/create')} />
-          <Button label="انضم بكود دعوة" variant="secondary" onPress={() => router.push('/teams/join')} />
+          <Button label={t('teams.createTeam')} onPress={() => router.push('/teams/create')} />
+          <Button label={t('teams.joinWithCode')} variant="secondary" onPress={() => router.push('/teams/join')} />
         </View>
       </Screen>
     );
@@ -46,9 +48,9 @@ export default function TeamsScreen() {
     return (
       <Screen style={{ alignItems: 'center', justifyContent: 'center', gap: spacing.sm }}>
         <Text variant="body" color="textSecondary">
-          {error ?? 'تعذّر تحميل الفريق'}
+          {error ?? t('teams.loadError')}
         </Text>
-        <Button label="إعادة المحاولة" variant="secondary" onPress={refetch} />
+        <Button label={t('common.retry')} variant="secondary" onPress={refetch} />
       </Screen>
     );
   }
@@ -63,13 +65,13 @@ export default function TeamsScreen() {
         <View style={{ marginTop: spacing.md }}>
           <Text variant="displayMd">{data.team.name}</Text>
           <Text variant="caption" color="textSecondary" style={{ marginTop: spacing.xxs }}>
-            كود الدعوة: {data.team.invite_code} — شاركه مع أصدقائك
+            {t('teams.inviteCode', { code: data.team.invite_code })}
           </Text>
         </View>
 
         <Card variant="soft">
           <Text variant="overline" color="textSecondary">
-            نبض الفريق اليوم
+            {t('teams.pulseToday')}
           </Text>
           <Text variant="displayLg" color="primary" style={{ marginTop: spacing.xxs }}>
             {data.pulsePercent ?? 0}%
@@ -81,21 +83,21 @@ export default function TeamsScreen() {
 
         <Card>
           <Text variant="overline" color="textSecondary">
-            الترتيب
+            {t('teams.leaderboard')}
           </Text>
           <View style={{ marginTop: spacing.sm, gap: spacing.sm }}>
             {data.leaderboard.map((row, index) => (
               <View
                 key={row.user_id}
-                style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center' }}
+                style={{ flexDirection: rowDirection, justifyContent: 'space-between', alignItems: 'center' }}
               >
-                <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: spacing.sm }}>
+                <View style={{ flexDirection: rowDirection, alignItems: 'center', gap: spacing.sm }}>
                   <Text variant="bodyStrong" color={index === 0 ? 'accent' : 'textSecondary'}>
                     {index === 0 ? '🥇' : `#${index + 1}`}
                   </Text>
                   <Text variant="body">
                     {row.display_name}
-                    {row.user_id === userId ? ' (أنت)' : ''}
+                    {row.user_id === userId ? t('teams.youSuffix') : ''}
                   </Text>
                 </View>
                 <Text variant="bodyStrong" color={index === 0 ? 'accent' : 'textPrimary'}>
@@ -108,7 +110,7 @@ export default function TeamsScreen() {
 
         <Card variant="soft">
           <Text variant="overline" color="textSecondary">
-            الأعضاء ({data.roster.length})
+            {t('teams.members', { count: data.roster.length })}
           </Text>
           <View style={{ marginTop: spacing.sm, gap: spacing.xs }}>
             {data.roster.map((member) => (
@@ -120,12 +122,12 @@ export default function TeamsScreen() {
         </Card>
 
         <Card>
-          <View style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center' }}>
+          <View style={{ flexDirection: rowDirection, justifyContent: 'space-between', alignItems: 'center' }}>
             <Text variant="overline" color="textSecondary">
-              التحديات
+              {t('teams.challenges')}
             </Text>
             <Button
-              label="تحدٍ جديد"
+              label={t('teams.newChallenge')}
               variant="ghost"
               onPress={() => router.push({ pathname: '/teams/new-challenge', params: { teamId: data.team.id } })}
             />
@@ -133,7 +135,7 @@ export default function TeamsScreen() {
 
           {data.challenges.length === 0 ? (
             <Text variant="body" color="textSecondary" style={{ marginTop: spacing.xs }}>
-              لا توجد تحديات بعد.
+              {t('teams.noChallenges')}
             </Text>
           ) : (
             <View style={{ marginTop: spacing.sm, gap: spacing.md }}>
@@ -141,13 +143,13 @@ export default function TeamsScreen() {
                 <View key={challenge.id}>
                   <Text variant="bodyStrong">{challenge.title}</Text>
                   <Text variant="caption" color="textSecondary">
-                    {challenge.start_date} → {challenge.end_date}
+                    {t('teams.dateRange', { start: challenge.start_date, end: challenge.end_date })}
                   </Text>
                   <View style={{ marginTop: spacing.xs }}>
                     <ProgressBar progress={challenge.myProgressPercent / 100} />
                   </View>
                   <Text variant="caption" color="textSecondary" style={{ marginTop: spacing.xxs }}>
-                    التزامك: {challenge.myProgressPercent}%
+                    {t('teams.myCommitment', { percent: challenge.myProgressPercent })}
                   </Text>
                 </View>
               ))}

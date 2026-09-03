@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { dailyLogsRepository } from '@/src/data/repositories/dailyLogsRepository';
 import { dailyProgressRepository } from '@/src/data/repositories/dailyProgressRepository';
 import { goalsRepository, type UserGoals } from '@/src/data/repositories/goalsRepository';
@@ -20,6 +21,7 @@ export type TodaySummary = TodayDecision & {
 };
 
 export function useTodayData(userId: string | undefined) {
+  const { t } = useTranslation();
   const [summary, setSummary] = useState<TodaySummary | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -49,7 +51,7 @@ export function useTodayData(userId: string | undefined) {
 
       await dailyProgressRepository.upsertToday(userId, {
         completion_percent: decision.completionPercent,
-        decision_text: decision.decisionText,
+        decision_text: decision.decisionTextKey,
         recovery_mode: decision.recoveryMode,
       });
 
@@ -64,11 +66,11 @@ export function useTodayData(userId: string | undefined) {
         goals,
       });
     } catch (e) {
-      setError(getFriendlyErrorMessage(e, 'تعذّر تحميل بيانات اليوم'));
+      setError(getFriendlyErrorMessage(e, t('today.loadError')));
     } finally {
       setIsLoading(false);
     }
-  }, [userId]);
+  }, [userId, t]);
 
   useEffect(() => {
     // جلب أولي عند التركيب (يستدعي setIsLoading داخل load) — نمط قياسي

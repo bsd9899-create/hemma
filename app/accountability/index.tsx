@@ -1,19 +1,21 @@
 import { ScrollView, View } from 'react-native';
-import { AccountabilitySkeleton, Button, Card, Screen, Text } from '@/src/design-system';
+import { useTranslation } from 'react-i18next';
+import { AccountabilitySkeleton, Button, Card, Screen, Text, rowDirection } from '@/src/design-system';
 import { spacing } from '@/src/design-system/spacing';
 import { useAuthStore } from '@/src/features/auth/store';
 import { useTeamData } from '@/src/features/teams/useTeamData';
 import { useAccountability } from '@/src/features/accountability/useAccountability';
 import type { PingKind } from '@/src/data/repositories/accountabilityRepository';
 
-const PING_OPTIONS: { kind: PingKind; label: string }[] = [
-  { kind: 'lets_go', label: '🔥 يلا نكمل' },
-  { kind: 'almost_there', label: '💪 باقي لك شوي' },
-  { kind: 'well_done', label: '👏 كفو' },
-  { kind: 'with_you', label: '🤝 معك للنهاية' },
+const PING_KINDS: { kind: PingKind; labelKey: string }[] = [
+  { kind: 'lets_go', labelKey: 'accountability.pingLetsGo' },
+  { kind: 'almost_there', labelKey: 'accountability.pingAlmostThere' },
+  { kind: 'well_done', labelKey: 'accountability.pingWellDone' },
+  { kind: 'with_you', labelKey: 'accountability.pingWithYou' },
 ];
 
 export default function AccountabilityScreen() {
+  const { t } = useTranslation();
   const userId = useAuthStore((s) => s.session?.user.id);
   const { data: team, hasTeam } = useTeamData(userId);
   const {
@@ -33,8 +35,8 @@ export default function AccountabilityScreen() {
   } = useAccountability(userId);
 
   function nameOf(id: string | null) {
-    if (!id) return 'شريكك';
-    return team?.roster.find((m) => m.user_id === id)?.display_name ?? 'شريكك';
+    if (!id) return t('accountability.fallbackPartnerName');
+    return team?.roster.find((m) => m.user_id === id)?.display_name ?? t('accountability.fallbackPartnerName');
   }
 
   if (isLoading && !pair) {
@@ -53,7 +55,7 @@ export default function AccountabilityScreen() {
         <Text variant="body" color="textSecondary">
           {error}
         </Text>
-        <Button label="إعادة المحاولة" variant="secondary" onPress={refetch} />
+        <Button label={t('common.retry')} variant="secondary" onPress={refetch} />
       </Screen>
     );
   }
@@ -62,9 +64,9 @@ export default function AccountabilityScreen() {
     <Screen>
       <ScrollView contentContainerStyle={{ gap: spacing.md, paddingBottom: spacing.xxxl }} showsVerticalScrollIndicator={false}>
         <View style={{ marginTop: spacing.md }}>
-          <Text variant="displayMd">رفيق هِمّة 🤝</Text>
+          <Text variant="displayMd">{t('accountability.title')}</Text>
           <Text variant="body" color="textSecondary" style={{ marginTop: spacing.xs }}>
-            شريك التزام واحد، بدون شات — بس تفاعلات سريعة تحفّزكم مع بعض.
+            {t('accountability.intro')}
           </Text>
         </View>
 
@@ -73,18 +75,18 @@ export default function AccountabilityScreen() {
             {hasTeam && team && team.roster.length > 1 ? (
               <View style={{ gap: spacing.sm }}>
                 <Text variant="captionStrong" color="textSecondary">
-                  اختر رفيقك من فريقك
+                  {t('accountability.pickFromTeam')}
                 </Text>
                 {team.roster
                   .filter((m) => m.user_id !== userId)
                   .map((member) => (
                     <View
                       key={member.user_id}
-                      style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center' }}
+                      style={{ flexDirection: rowDirection, justifyContent: 'space-between', alignItems: 'center' }}
                     >
                       <Text variant="body">{member.display_name}</Text>
                       <Button
-                        label="اطلب"
+                        label={t('accountability.request')}
                         variant="secondary"
                         disabled={isActing}
                         onPress={() => sendRequest(member.user_id)}
@@ -94,7 +96,7 @@ export default function AccountabilityScreen() {
               </View>
             ) : (
               <Text variant="body" color="textSecondary">
-                انضم لفريق فيه صديق واحد على الأقل عشان تقدر تختار رفيق هِمّة.
+                {t('accountability.needTeammate')}
               </Text>
             )}
           </Card>
@@ -102,17 +104,29 @@ export default function AccountabilityScreen() {
 
         {isOutgoingRequest && (
           <Card variant="soft">
-            <Text variant="body">بانتظار رد {nameOf(otherUserId)}...</Text>
-            <Button label="إلغاء الطلب" variant="ghost" disabled={isActing} style={{ marginTop: spacing.sm }} onPress={endPair} />
+            <Text variant="body">{t('accountability.waitingForResponse', { name: nameOf(otherUserId) })}</Text>
+            <Button
+              label={t('accountability.cancelRequest')}
+              variant="ghost"
+              disabled={isActing}
+              style={{ marginTop: spacing.sm }}
+              onPress={endPair}
+            />
           </Card>
         )}
 
         {isIncomingRequest && (
           <Card variant="soft">
-            <Text variant="bodyStrong">{nameOf(otherUserId)} يريد أن يكون رفيق هِمّة معك</Text>
-            <View style={{ flexDirection: 'row-reverse', gap: spacing.sm, marginTop: spacing.sm }}>
-              <Button label="قبول" disabled={isActing} onPress={() => respond(true)} style={{ flex: 1 }} />
-              <Button label="رفض" variant="secondary" disabled={isActing} onPress={() => respond(false)} style={{ flex: 1 }} />
+            <Text variant="bodyStrong">{t('accountability.incomingRequest', { name: nameOf(otherUserId) })}</Text>
+            <View style={{ flexDirection: rowDirection, gap: spacing.sm, marginTop: spacing.sm }}>
+              <Button label={t('accountability.accept')} disabled={isActing} onPress={() => respond(true)} style={{ flex: 1 }} />
+              <Button
+                label={t('accountability.reject')}
+                variant="secondary"
+                disabled={isActing}
+                onPress={() => respond(false)}
+                style={{ flex: 1 }}
+              />
             </View>
           </Card>
         )}
@@ -121,16 +135,16 @@ export default function AccountabilityScreen() {
           <>
             <Card>
               <Text variant="overline" color="textSecondary">
-                رفيقك
+                {t('accountability.yourPartner')}
               </Text>
               <Text variant="title" style={{ marginTop: spacing.xxs }}>
                 {nameOf(otherUserId)}
               </Text>
-              <View style={{ flexDirection: 'row-reverse', flexWrap: 'wrap', gap: spacing.sm, marginTop: spacing.md }}>
-                {PING_OPTIONS.map((option) => (
+              <View style={{ flexDirection: rowDirection, flexWrap: 'wrap', gap: spacing.sm, marginTop: spacing.md }}>
+                {PING_KINDS.map((option) => (
                   <Button
                     key={option.kind}
-                    label={option.label}
+                    label={t(option.labelKey)}
                     variant="secondary"
                     disabled={isActing}
                     onPress={() => sendPing(option.kind)}
@@ -141,25 +155,25 @@ export default function AccountabilityScreen() {
 
             <Card variant="soft">
               <Text variant="overline" color="textSecondary">
-                آخر التفاعلات
+                {t('accountability.recentActivity')}
               </Text>
               <View style={{ marginTop: spacing.sm, gap: spacing.xs }}>
                 {pings.length === 0 ? (
                   <Text variant="body" color="textSecondary">
-                    لا توجد تفاعلات بعد — ابدأ أنت!
+                    {t('accountability.noActivity')}
                   </Text>
                 ) : (
                   pings.map((ping) => (
                     <Text key={ping.id} variant="body">
-                      {ping.sender_id === userId ? 'أنت' : nameOf(ping.sender_id)}:{' '}
-                      {PING_OPTIONS.find((o) => o.kind === ping.kind)?.label}
+                      {ping.sender_id === userId ? t('common.you') : nameOf(ping.sender_id)}:{' '}
+                      {t(PING_KINDS.find((o) => o.kind === ping.kind)?.labelKey ?? '')}
                     </Text>
                   ))
                 )}
               </View>
             </Card>
 
-            <Button label="إنهاء الشراكة" variant="ghost" disabled={isActing} onPress={endPair} />
+            <Button label={t('accountability.endPartnership')} variant="ghost" disabled={isActing} onPress={endPair} />
           </>
         )}
 

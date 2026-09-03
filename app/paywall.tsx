@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { View } from 'react-native';
 import { useRouter } from 'expo-router';
+import { useTranslation } from 'react-i18next';
 import type { PurchasesPackage } from 'react-native-purchases';
 import { Button, Card, Screen, Skeleton, Text, Wordmark, palette } from '@/src/design-system';
 import { spacing } from '@/src/design-system/spacing';
@@ -10,6 +11,7 @@ import { usePremiumStatus } from '@/src/subscriptions/usePremiumStatus';
 import { getFriendlyErrorMessage } from '@/src/lib/errors';
 
 export default function PaywallScreen() {
+  const { t } = useTranslation();
   const router = useRouter();
   const userId = useAuthStore((s) => s.session?.user.id);
   const { isPremium, refresh } = usePremiumStatus(userId);
@@ -28,9 +30,9 @@ export default function PaywallScreen() {
     }
     getCurrentOfferingPackages()
       .then(setPackages)
-      .catch((e) => setError(getFriendlyErrorMessage(e, 'تعذّر تحميل الخطط')))
+      .catch((e) => setError(getFriendlyErrorMessage(e, t('paywall.loadError'))))
       .finally(() => setIsLoading(false));
-  }, []);
+  }, [t]);
 
   async function handlePurchase(pkg: PurchasesPackage) {
     setBusyPackageId(pkg.identifier);
@@ -40,7 +42,7 @@ export default function PaywallScreen() {
       await refresh();
       router.back();
     } catch (e) {
-      setError(getFriendlyErrorMessage(e, 'تعذّر إتمام الشراء'));
+      setError(getFriendlyErrorMessage(e, t('paywall.purchaseError')));
     } finally {
       setBusyPackageId(null);
     }
@@ -54,7 +56,7 @@ export default function PaywallScreen() {
       await refresh();
       router.back();
     } catch (e) {
-      setError(getFriendlyErrorMessage(e, 'تعذّر استعادة المشتريات'));
+      setError(getFriendlyErrorMessage(e, t('paywall.restoreError')));
     } finally {
       setIsRestoring(false);
     }
@@ -64,11 +66,11 @@ export default function PaywallScreen() {
     return (
       <Screen style={{ alignItems: 'center', justifyContent: 'center', gap: spacing.md }}>
         <Text variant="displayMd">✅</Text>
-        <Text variant="title">أنت مشترك في هِمّة+</Text>
+        <Text variant="title">{t('paywall.subscribedTitle')}</Text>
         <Text variant="body" color="textSecondary" style={{ textAlign: 'center' }}>
-          إدارة الاشتراك أو إلغاؤه يتم من إعدادات الاشتراكات في جهازك (App Store).
+          {t('paywall.manageSubscription')}
         </Text>
-        <Button label="إغلاق" variant="secondary" onPress={() => router.back()} />
+        <Button label={t('paywall.close')} variant="secondary" onPress={() => router.back()} />
       </Screen>
     );
   }
@@ -79,17 +81,17 @@ export default function PaywallScreen() {
         <View style={{ alignItems: 'center', gap: spacing.sm }}>
           <Wordmark />
           <Text variant="title" style={{ textAlign: 'center' }}>
-            هِمّة+ ✨
+            {t('paywall.title')}
           </Text>
           <Text variant="body" color="textSecondary" style={{ textAlign: 'center' }}>
-            دعم الالتزام على المدى الطويل — مزايا إضافية قادمة تباعًا.
+            {t('paywall.subtitle')}
           </Text>
         </View>
 
         {!isRevenueCatConfigured ? (
           <Card variant="soft">
             <Text variant="body" color="textSecondary">
-              الاشتراكات غير مفعّلة بعد في هذه النسخة — بانتظار ربط منتجات هِمّة+ من App Store Connect وRevenueCat.
+              {t('paywall.notConfigured')}
             </Text>
           </Card>
         ) : isLoading ? (
@@ -100,7 +102,7 @@ export default function PaywallScreen() {
         ) : packages.length === 0 ? (
           <Card variant="soft">
             <Text variant="body" color="textSecondary">
-              لا توجد خطط متاحة حاليًا.
+              {t('paywall.noPlans')}
             </Text>
           </Card>
         ) : (
@@ -114,7 +116,7 @@ export default function PaywallScreen() {
                 >
                   {isAnnual ? (
                     <Text variant="overline" color="accent">
-                      الأفضل قيمة
+                      {t('paywall.bestValue')}
                     </Text>
                   ) : null}
                   <Text variant="bodyStrong" style={{ marginTop: spacing.xxs }}>
@@ -124,7 +126,7 @@ export default function PaywallScreen() {
                     {pkg.product.priceString}
                   </Text>
                   <Button
-                    label={busyPackageId === pkg.identifier ? 'جارِ الشراء...' : 'اشترك'}
+                    label={busyPackageId === pkg.identifier ? t('paywall.purchasing') : t('paywall.subscribe')}
                     variant={isAnnual ? 'primary' : 'secondary'}
                     style={{ marginTop: spacing.sm }}
                     disabled={busyPackageId !== null}
@@ -143,7 +145,7 @@ export default function PaywallScreen() {
         ) : null}
 
         <Button
-          label={isRestoring ? 'جارِ الاستعادة...' : 'استعادة المشتريات'}
+          label={isRestoring ? t('paywall.restoring') : t('paywall.restorePurchases')}
           variant="ghost"
           disabled={isRestoring}
           onPress={handleRestore}

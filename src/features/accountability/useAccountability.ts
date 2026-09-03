@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   accountabilityRepository,
   type AccountabilityPair,
@@ -8,6 +9,7 @@ import {
 import { getFriendlyErrorMessage } from '@/src/lib/errors';
 
 export function useAccountability(userId: string | undefined) {
+  const { t } = useTranslation();
   const [pair, setPair] = useState<AccountabilityPair | null>(null);
   const [pings, setPings] = useState<AccountabilityPing[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -23,11 +25,11 @@ export function useAccountability(userId: string | undefined) {
       setPings(currentPair && currentPair.status === 'active' ? await accountabilityRepository.getPings(currentPair.id) : []);
       setError(null);
     } catch (e) {
-      setError(getFriendlyErrorMessage(e, 'تعذّر تحميل رفيق هِمّة'));
+      setError(getFriendlyErrorMessage(e, t('accountability.loadError')));
     } finally {
       setIsLoading(false);
     }
-  }, [userId]);
+  }, [userId, t]);
 
   useEffect(() => {
     // جلب أولي عند التركيب (يستدعي setIsLoading داخل load) — نمط قياسي
@@ -52,22 +54,22 @@ export function useAccountability(userId: string | undefined) {
 
   function sendRequest(partnerId: string) {
     if (!userId) return Promise.resolve();
-    return runAction(() => accountabilityRepository.sendRequest(userId, partnerId), 'تعذّر إرسال الطلب');
+    return runAction(() => accountabilityRepository.sendRequest(userId, partnerId), t('accountability.requestError'));
   }
 
   function respond(accept: boolean) {
     if (!pair) return Promise.resolve();
-    return runAction(() => accountabilityRepository.respond(pair.id, accept), 'تعذّر إرسال الرد');
+    return runAction(() => accountabilityRepository.respond(pair.id, accept), t('accountability.respondError'));
   }
 
   function endPair() {
     if (!pair) return Promise.resolve();
-    return runAction(() => accountabilityRepository.endPair(pair.id), 'تعذّر إنهاء الشراكة');
+    return runAction(() => accountabilityRepository.endPair(pair.id), t('accountability.endError'));
   }
 
   function sendPing(kind: PingKind) {
     if (!pair || !userId) return Promise.resolve();
-    return runAction(() => accountabilityRepository.sendPing(pair.id, userId, kind), 'تعذّر إرسال التفاعل');
+    return runAction(() => accountabilityRepository.sendPing(pair.id, userId, kind), t('accountability.pingError'));
   }
 
   const otherUserId = pair && userId ? (pair.requester_id === userId ? pair.partner_id : pair.requester_id) : null;

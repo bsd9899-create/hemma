@@ -1,7 +1,8 @@
 import { useCallback } from 'react';
 import { RefreshControl, ScrollView, View } from 'react-native';
 import { useFocusEffect, useRouter } from 'expo-router';
-import { Button, Card, ProgressRing, Screen, Text, TodaySkeleton, colors, palette } from '@/src/design-system';
+import { useTranslation } from 'react-i18next';
+import { Button, Card, ProgressRing, Screen, Text, TodaySkeleton, colors, palette, rowDirection } from '@/src/design-system';
 import { spacing } from '@/src/design-system/spacing';
 import { useAuthStore } from '@/src/features/auth/store';
 import { useProfileStore } from '@/src/features/auth/profileStore';
@@ -14,6 +15,7 @@ import { useTeamData } from '@/src/features/teams/useTeamData';
 import { getTimeGreeting } from '@/src/lib/greeting';
 
 export default function TodayScreen() {
+  const { t } = useTranslation();
   const router = useRouter();
   const userId = useAuthStore((s) => s.session?.user.id);
   const displayName = useProfileStore((s) => s.profile?.display_name);
@@ -50,9 +52,9 @@ export default function TodayScreen() {
     return (
       <Screen edges={['top']} style={{ alignItems: 'center', justifyContent: 'center', gap: spacing.sm }}>
         <Text variant="body" color="textSecondary">
-          {error ?? 'تعذّر تحميل بيانات اليوم'}
+          {error ?? t('today.loadError')}
         </Text>
-        <Button label="إعادة المحاولة" variant="secondary" onPress={refetch} />
+        <Button label={t('common.retry')} variant="secondary" onPress={refetch} />
       </Screen>
     );
   }
@@ -68,7 +70,7 @@ export default function TodayScreen() {
       >
         <View style={{ marginTop: spacing.md }}>
           <Text variant="displayMd">
-            {getTimeGreeting()} {displayName ?? ''} 👋
+            {getTimeGreeting(t)} {displayName ?? ''} 👋
           </Text>
         </View>
 
@@ -83,12 +85,12 @@ export default function TodayScreen() {
         {/* البطاقة الرئيسية — قرار اليوم وإنجاز اليوم معًا، تجيب فورًا على
             "كيف وضعي؟" بدون تفريق بصري بين رقمين مرتبطين بنفس الفكرة. */}
         <Card variant={summary.recoveryMode ? 'soft' : 'surface'}>
-          <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: spacing.md }}>
+          <View style={{ flexDirection: rowDirection, alignItems: 'center', gap: spacing.md }}>
             <View style={{ flex: 1, gap: spacing.xxs }}>
               <Text variant="overline" color="textSecondary">
-                {summary.recoveryMode ? 'وضع الإنقاذ 🌱' : 'قرار اليوم'}
+                {summary.recoveryMode ? t('today.recoveryMode') : t('today.decisionOfDay')}
               </Text>
-              <Text variant="title">{summary.decisionText}</Text>
+              <Text variant="title">{t(summary.decisionTextKey)}</Text>
             </View>
             <ProgressRing
               progress={summary.completionPercent / 100}
@@ -104,77 +106,73 @@ export default function TodayScreen() {
         </Card>
 
         <Text variant="overline" color="textSecondary" style={{ marginTop: spacing.xs }}>
-          أساسيات اليوم
+          {t('today.sectionTitle')}
         </Text>
 
-        <View style={{ flexDirection: 'row-reverse', gap: spacing.sm }}>
+        <View style={{ flexDirection: rowDirection, gap: spacing.sm }}>
           <MetricTile
             emoji="🏋️"
-            label="التمرين"
-            valueText={`${summary.workoutMinutes} د`}
+            label={t('today.workout')}
+            valueText={t('today.workoutValue', { minutes: summary.workoutMinutes })}
             progress={summary.workoutMinutes / 30}
           />
-          <MetricTile emoji="🍽️" label="التغذية" valueText={`${summary.mealsLogged} وجبات`} />
+          <MetricTile emoji="🍽️" label={t('today.nutrition')} valueText={t('today.nutritionValue', { count: summary.mealsLogged })} />
         </View>
-        <View style={{ flexDirection: 'row-reverse', gap: spacing.sm }}>
+        <View style={{ flexDirection: rowDirection, gap: spacing.sm }}>
           <MetricTile
             emoji="💧"
-            label="الماء"
-            valueText={`${summary.waterMl}/${summary.waterTargetMl} مل`}
+            label={t('today.water')}
+            valueText={t('today.waterValue', { amount: summary.waterMl, target: summary.waterTargetMl })}
             progress={summary.waterMl / summary.waterTargetMl}
           />
           <MetricTile
             emoji="👟"
-            label="الخطوات"
-            valueText={`${summary.steps}/${summary.stepsTarget}`}
+            label={t('today.steps')}
+            valueText={t('today.stepsValue', { steps: summary.steps, target: summary.stepsTarget })}
             progress={summary.steps / summary.stepsTarget}
           />
         </View>
 
         <Card>
           <Text variant="overline" color="textSecondary">
-            مهمتك القادمة
+            {t('today.nextTaskTitle')}
           </Text>
-          <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: spacing.sm, marginTop: spacing.xs }}>
+          <View style={{ flexDirection: rowDirection, alignItems: 'center', gap: spacing.sm, marginTop: spacing.xs }}>
             <Text variant="displayMd">{nextTask.emoji}</Text>
             <View>
-              <Text variant="bodyStrong">{nextTask.title}</Text>
+              <Text variant="bodyStrong">{t(nextTask.titleKey)}</Text>
               <Text variant="caption" color="textSecondary">
-                {nextTask.subtitle}
+                {t(nextTask.subtitleKey, nextTask.subtitleParams)}
               </Text>
             </View>
           </View>
-          {nextTask.ctaLabel ? (
-            <Button
-              label={nextTask.ctaLabel}
-              style={{ marginTop: spacing.md }}
-              onPress={() => router.push('/quick-add')}
-            />
+          {nextTask.ctaLabelKey ? (
+            <Button label={t(nextTask.ctaLabelKey)} style={{ marginTop: spacing.md }} onPress={() => router.push('/quick-add')} />
           ) : null}
         </Card>
 
         <Card variant="soft">
           <Text variant="overline" color="textSecondary">
-            مع فريقك
+            {t('today.teamSectionTitle')}
           </Text>
           {hasTeam && team ? (
             <>
               <Text variant="bodyStrong" style={{ marginTop: spacing.xs }}>
-                نبض الفريق: {team.pulsePercent ?? 0}%
+                {t('today.teamPulse', { percent: team.pulsePercent ?? 0 })}
               </Text>
               {team.myRank ? (
                 <Text variant="caption" color="textSecondary" style={{ marginTop: spacing.xxs }}>
-                  أنت المركز #{team.myRank}
+                  {t('today.myRank', { rank: team.myRank })}
                 </Text>
               ) : null}
             </>
           ) : (
             <>
               <Text variant="body" color="textSecondary" style={{ marginTop: spacing.xs }}>
-                ما انضممت لفريق بعد — أنشئ فريقك أو انضم لصديق لتتحفزوا مع بعض.
+                {t('today.noTeamText')}
               </Text>
               <Button
-                label="اذهب إلى الفرق"
+                label={t('today.goToTeams')}
                 variant="secondary"
                 style={{ marginTop: spacing.sm }}
                 onPress={() => router.push('/(tabs)/teams')}
