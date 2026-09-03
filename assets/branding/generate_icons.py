@@ -22,8 +22,8 @@ from pathlib import Path
 import cairosvg
 from PIL import Image
 
-TEAL = (15, 46, 42, 255)  # #0F2E2A — اللون الأساسي في src/design-system/colors.ts
-GOLD = "#C79A56"  # اللون المميِّز (Accent) نفسه
+TEAL = (15, 61, 62, 255)  # #0F3D3E — اللون الأساسي في src/design-system/colors.ts
+GOLD = "#C8A15A"  # اللون المميِّز (Accent) نفسه
 WHITE = "#FFFFFF"
 
 ASSETS = Path(__file__).resolve().parent.parent
