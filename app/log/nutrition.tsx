@@ -79,6 +79,7 @@ export default function LogNutritionScreen() {
           placeholder="مثلاً: صدر دجاج مع أرز"
           value={description}
           onChangeText={setDescription}
+          error={error ?? undefined}
           editable={!isSubmitting}
         />
 
@@ -88,7 +89,6 @@ export default function LogNutritionScreen() {
           value={calories}
           onChangeText={setCalories}
           keyboardType="number-pad"
-          error={error ?? undefined}
           editable={!isSubmitting}
         />
 

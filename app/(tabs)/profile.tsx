@@ -19,6 +19,18 @@ export default function ProfileScreen() {
   const profile = useProfileStore((s) => s.profile);
   const { isAvailable, isSyncing, error, syncToday } = useHealthSync(userId);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isSigningOut, setIsSigningOut] = useState(false);
+
+  async function handleSignOut() {
+    setIsSigningOut(true);
+    try {
+      await signOut();
+    } catch (e) {
+      Alert.alert('تعذّر تسجيل الخروج', getFriendlyErrorMessage(e, 'حاول مرة أخرى'));
+    } finally {
+      setIsSigningOut(false);
+    }
+  }
 
   function confirmDeleteAccount() {
     Alert.alert(
@@ -94,7 +106,12 @@ export default function ProfileScreen() {
           variant="ghost"
           onPress={() => Linking.openURL(PRIVACY_POLICY_URL).catch(() => {})}
         />
-        <Button label="تسجيل الخروج" variant="ghost" onPress={() => signOut()} />
+        <Button
+          label={isSigningOut ? 'جارِ تسجيل الخروج...' : 'تسجيل الخروج'}
+          variant="ghost"
+          disabled={isSigningOut}
+          onPress={handleSignOut}
+        />
         <Button
           label={isDeleting ? 'جارِ الحذف...' : 'حذف حسابي نهائيًا'}
           variant="ghost"
