@@ -2,9 +2,12 @@ import type { TodaySummary } from './useTodayData';
 
 export type NextTask = {
   emoji: string;
-  title: string;
-  subtitle: string;
-  ctaLabel: string | null;
+  /** مفتاح ترجمة (namespace "nextTask")، وليس نصًا جاهزًا. */
+  titleKey: string;
+  subtitleKey: string;
+  /** قيم للاستيفاء داخل نص العنوان الفرعي المترجَم (مثل {{amount}}). */
+  subtitleParams?: Record<string, number>;
+  ctaLabelKey: string | null;
 };
 
 /** أهم مهمة قادمة واحدة — أول عنصر أساسي لم يُنجز بعد، بترتيب أولوية ثابت. */
@@ -12,9 +15,9 @@ export function getNextTask(summary: TodaySummary): NextTask {
   if (summary.workoutMinutes === 0) {
     return {
       emoji: '🏋️',
-      title: 'تمرين اليوم',
-      subtitle: 'ما سجّلت تمرينًا بعد',
-      ctaLabel: 'ابدأ التمرين',
+      titleKey: 'nextTask.workoutTitle',
+      subtitleKey: 'nextTask.workoutSubtitle',
+      ctaLabelKey: 'nextTask.workoutCta',
     };
   }
 
@@ -22,9 +25,10 @@ export function getNextTask(summary: TodaySummary): NextTask {
     const remainingMl = summary.waterTargetMl - summary.waterMl;
     return {
       emoji: '💧',
-      title: 'أكمل الماء',
-      subtitle: `${remainingMl} مل متبقية`,
-      ctaLabel: 'أضف ماء',
+      titleKey: 'nextTask.waterTitle',
+      subtitleKey: 'nextTask.waterSubtitle',
+      subtitleParams: { amount: remainingMl },
+      ctaLabelKey: 'nextTask.waterCta',
     };
   }
 
@@ -32,16 +36,17 @@ export function getNextTask(summary: TodaySummary): NextTask {
     const remainingSteps = summary.stepsTarget - summary.steps;
     return {
       emoji: '👟',
-      title: 'أكمل خطواتك',
-      subtitle: `${remainingSteps.toLocaleString('ar')} خطوة متبقية`,
-      ctaLabel: 'سجّل خطواتك',
+      titleKey: 'nextTask.stepsTitle',
+      subtitleKey: 'nextTask.stepsSubtitle',
+      subtitleParams: { amount: remainingSteps },
+      ctaLabelKey: 'nextTask.stepsCta',
     };
   }
 
   return {
     emoji: '🎉',
-    title: 'أنجزت أساسيات اليوم',
-    subtitle: 'استمر بهذا الشكل',
-    ctaLabel: null,
+    titleKey: 'nextTask.doneTitle',
+    subtitleKey: 'nextTask.doneSubtitle',
+    ctaLabelKey: null,
   };
 }

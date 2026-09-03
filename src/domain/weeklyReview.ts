@@ -1,4 +1,9 @@
-/** التقييم الأسبوعي — دالة صافية تحوّل متوسطات الأسبوع الخام إلى ملخص. */
+/**
+ * التقييم الأسبوعي — دالة صافية تحوّل متوسطات الأسبوع الخام إلى ملخص.
+ * تعيد مفاتيح مؤشرات (مثل "steps") تُترجَم في طبقة الواجهة عبر
+ * `t('weeklyMetrics.' + key)`، وليس تسميات جاهزة، حتى تبقى الدالة
+ * بمعزل عن i18n وقابلة للاختبار مباشرة.
+ */
 
 export type WeeklyRawAverages = {
   avgWaterMl: number;
@@ -13,32 +18,27 @@ export type WeeklyGoals = {
   targetSleepHours: number;
 };
 
+export type WeeklyMetricKey = 'workout' | 'water' | 'steps' | 'sleep';
+
 export type WeeklyReview = {
   /** من 0 إلى 10 */
   score: number;
-  strongestLabel: string;
-  weakestLabel: string;
-  focusNextWeekLabel: string;
+  strongestKey: WeeklyMetricKey;
+  weakestKey: WeeklyMetricKey;
+  focusNextWeekKey: WeeklyMetricKey;
 };
 
 const REFERENCE_WORKOUT_MINUTES_PER_DAY = 30;
 
-const METRIC_LABELS = {
-  workout: 'التمارين 🔥',
-  water: 'الماء 💧',
-  steps: 'الخطوات 👟',
-  sleep: 'النوم 💤',
-} as const;
-
 export function computeWeeklyReview(raw: WeeklyRawAverages, goals: WeeklyGoals): WeeklyReview {
-  const ratios: Record<keyof typeof METRIC_LABELS, number> = {
+  const ratios: Record<WeeklyMetricKey, number> = {
     workout: raw.avgWorkoutMinutes / REFERENCE_WORKOUT_MINUTES_PER_DAY,
     water: raw.avgWaterMl / goals.targetWaterMl,
     steps: raw.avgSteps / goals.targetSteps,
     sleep: raw.avgSleepHours / goals.targetSleepHours,
   };
 
-  const entries = Object.entries(ratios) as [keyof typeof METRIC_LABELS, number][];
+  const entries = Object.entries(ratios) as [WeeklyMetricKey, number][];
   const overallRatio = entries.reduce((sum, [, ratio]) => sum + Math.min(1, ratio), 0) / entries.length;
 
   const [strongestKey] = entries.reduce((best, curr) => (curr[1] > best[1] ? curr : best));
@@ -46,8 +46,8 @@ export function computeWeeklyReview(raw: WeeklyRawAverages, goals: WeeklyGoals):
 
   return {
     score: Math.round(overallRatio * 100) / 10,
-    strongestLabel: METRIC_LABELS[strongestKey],
-    weakestLabel: METRIC_LABELS[weakestKey],
-    focusNextWeekLabel: METRIC_LABELS[weakestKey],
+    strongestKey,
+    weakestKey,
+    focusNextWeekKey: weakestKey,
   };
 }

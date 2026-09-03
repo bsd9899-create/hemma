@@ -21,8 +21,8 @@ describe('computeWeeklyReview', () => {
       { avgWaterMl: 2000, avgWorkoutMinutes: 30, avgSteps: 8000, avgSleepHours: 2 },
       goals
     );
-    expect(result.weakestLabel).toContain('النوم');
-    expect(result.focusNextWeekLabel).toContain('النوم');
+    expect(result.weakestKey).toBe('sleep');
+    expect(result.focusNextWeekKey).toBe('sleep');
   });
 
   it('لا يمنح نقاطًا إضافية لتجاوز الهدف (Cap عند 100% لكل مؤشر)', () => {

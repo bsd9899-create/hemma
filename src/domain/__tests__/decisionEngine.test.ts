@@ -64,7 +64,7 @@ describe('computeTodayDecision — إنجاز اليوم', () => {
 describe('computeTodayDecision — قرار اليوم', () => {
   it('يقترح التركيز على التمرين عندما نسبته منخفضة جدًا', () => {
     const result = computeTodayDecision({ ...baseSignals, workoutRatio: 0.1 });
-    expect(result.decisionText).toContain('التمرين');
+    expect(result.decisionTextKey).toBe('decision.focusWorkoutText');
   });
 
   it('يقول "قريب جدًا" عندما الخطوات بين 80% و100%', () => {
@@ -75,7 +75,7 @@ describe('computeTodayDecision — قرار اليوم', () => {
       waterRatio: 1,
       stepsRatio: 0.85,
     });
-    expect(result.decisionText).toContain('قريب جدًا');
+    expect(result.decisionTextKey).toBe('decision.stepsCloseText');
   });
 
   it('يهنّئ المستخدم عندما الإنجاز 90% فأكثر', () => {
@@ -87,7 +87,7 @@ describe('computeTodayDecision — قرار اليوم', () => {
       sleepRatio: 0.4,
     });
     expect(result.completionPercent).toBeGreaterThanOrEqual(90);
-    expect(result.decisionText).toContain('رائع');
+    expect(result.decisionTextKey).toBe('decision.greatText');
   });
 });
 
@@ -108,7 +108,7 @@ describe('computeTodayDecision — وضع الإنقاذ', () => {
       recentCompletionPercents: [5, 0, 10],
     });
     expect(result.recoveryMode).toBe(true);
-    expect(result.decisionText).toContain('ما خربت');
+    expect(result.decisionTextKey).toBe('decision.recoveryText');
   });
 
   it('يتجاوز رسالة وضع الإنقاذ أي قرار آخر حتى لو تحسّن أداء اليوم فجأة', () => {
@@ -121,6 +121,6 @@ describe('computeTodayDecision — وضع الإنقاذ', () => {
       recentCompletionPercents: [0, 0, 0],
     });
     expect(result.recoveryMode).toBe(true);
-    expect(result.decisionText).toContain('ما خربت');
+    expect(result.decisionTextKey).toBe('decision.recoveryText');
   });
 });

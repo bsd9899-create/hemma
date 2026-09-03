@@ -2,6 +2,10 @@
  * محرّك "قرار اليوم" و"وضع الإنقاذ" — Rule Engine بسيط ومقصود، وليس AI،
  * تمامًا كما طُلب للنسخة الأولى. كل الدوال هنا صافية (pure) وقابلة
  * للاختبار بدون أي اتصال بقاعدة بيانات (راجع المرحلة 11).
+ *
+ * لا تعرف هذه الدوال أي لغة — تعيد مفاتيح ترجمة (راجع src/lib/i18n
+ * locales، namespace "decision") تُترجَم في طبقة الواجهة عبر `t()`،
+ * وليس نصوصًا جاهزة، حتى تبقى قابلة للاختبار بمعزل عن i18n.
  */
 
 export type DailySignals = {
@@ -18,7 +22,8 @@ export type DailySignals = {
 
 export type TodayDecision = {
   completionPercent: number;
-  decisionText: string;
+  /** مفتاح ترجمة كامل (مثل "decision.greatText")، وليس نصًا جاهزًا. */
+  decisionTextKey: string;
   recoveryMode: boolean;
 };
 
@@ -26,7 +31,7 @@ const WEIGHTS = { water: 0.2, steps: 0.3, workout: 0.35, sleep: 0.15 } as const;
 
 const RECOVERY_LOOKBACK_DAYS = 3;
 const RECOVERY_THRESHOLD_PERCENT = 25;
-const RECOVERY_DECISION_TEXT = 'ما خربت… نكمل من هنا 🌱';
+const RECOVERY_DECISION_TEXT_KEY = 'decision.recoveryText';
 
 function clamp01(value: number): number {
   if (Number.isNaN(value)) return 0;
@@ -58,23 +63,23 @@ function detectRecoveryMode(recentCompletionPercents: number[]): boolean {
   return lastDays.length >= 2 && lastDays.every((p) => p < RECOVERY_THRESHOLD_PERCENT);
 }
 
-function pickDecisionText(signals: DailySignals, completionPercent: number): string {
+function pickDecisionTextKey(signals: DailySignals, completionPercent: number): string {
   // "قريب جدًا" مقصودة تحديدًا لهذا الموقف (شبه منتهٍ والخطوات هي
   // الفجوة الوحيدة المتبقية) — لذلك تُفحص قبل تهنئة ≥90% العامة، وإلا
   // لن تظهر أبدًا في الأيام شبه المثالية التي تستحقها أكثر.
   if (signals.stepsRatio >= 0.8 && signals.stepsRatio < 1) {
-    return 'اليوم: أنت قريب جدًا 👟';
+    return 'decision.stepsCloseText';
   }
   if (completionPercent >= 90) {
-    return 'أنت رائع اليوم 🌟 استمر بهذا الشكل';
+    return 'decision.greatText';
   }
   if (signals.workoutRatio < 0.34) {
-    return 'اليوم ركز على التمرين 🔥';
+    return 'decision.focusWorkoutText';
   }
   if (completionPercent < 20) {
-    return 'اليوم: خذها بهدوء 💤';
+    return 'decision.lowText';
   }
-  return 'يلا نكمل يومك 💪';
+  return 'decision.defaultText';
 }
 
 export function computeTodayDecision(signals: DailySignals): TodayDecision {
@@ -84,6 +89,6 @@ export function computeTodayDecision(signals: DailySignals): TodayDecision {
   return {
     completionPercent,
     recoveryMode,
-    decisionText: recoveryMode ? RECOVERY_DECISION_TEXT : pickDecisionText(signals, completionPercent),
+    decisionTextKey: recoveryMode ? RECOVERY_DECISION_TEXT_KEY : pickDecisionTextKey(signals, completionPercent),
   };
 }

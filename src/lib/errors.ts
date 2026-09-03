@@ -1,17 +1,19 @@
+import i18n from '@/src/lib/i18n';
+
 /**
- * يحوّل أخطاء الشبكة/Supabase الخام إلى رسالة عربية مفهومة للمستخدم.
- * نستخدمها في كل مكان بدل عرض `error.message` الخام (غالبًا إنجليزي
- * وتقني)، وتكتشف تحديدًا حالة "لا يوجد اتصال إنترنت" لتعطي رسالة
- * مختلفة قابلة للتصرف (أعد المحاولة) بدل رسالة عامة.
+ * يحوّل أخطاء الشبكة/Supabase الخام إلى رسالة مفهومة للمستخدم بلغته
+ * الحالية. نستخدمها في كل مكان بدل عرض `error.message` الخام (غالبًا
+ * إنجليزي وتقني)، وتكتشف تحديدًا حالة "لا يوجد اتصال إنترنت" لتعطي
+ * رسالة مختلفة قابلة للتصرف (أعد المحاولة) بدل رسالة عامة.
  */
-export function getFriendlyErrorMessage(error: unknown, fallback = 'حدث خطأ غير متوقع، حاول مرة أخرى'): string {
+export function getFriendlyErrorMessage(error: unknown, fallback?: string): string {
   if (isOfflineError(error)) {
-    return 'يبدو أنك غير متصل بالإنترنت — تحقق من اتصالك وحاول مرة أخرى';
+    return i18n.t('common.offlineError');
   }
   if (error instanceof Error && error.message) {
     return error.message;
   }
-  return fallback;
+  return fallback ?? i18n.t('common.genericError');
 }
 
 /** يكتشف فشل fetch الناتج عن انقطاع الشبكة (وليس خطأ خادم/منطق). */

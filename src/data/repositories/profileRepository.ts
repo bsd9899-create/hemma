@@ -1,4 +1,5 @@
 import { supabase } from '../supabase';
+import i18n from '@/src/lib/i18n';
 import type { Database } from '../database.types';
 
 export type Profile = Database['public']['Tables']['profiles']['Row'];
@@ -26,7 +27,7 @@ export const profileRepository = {
     const {
       data: { user },
     } = await supabase.auth.getUser();
-    if (!user) throw new Error('لا يوجد مستخدم مسجّل الدخول');
+    if (!user) throw new Error(i18n.t('common.notSignedIn'));
 
     const { data, error } = await supabase
       .from('profiles')

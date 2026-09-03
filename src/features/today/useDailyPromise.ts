@@ -2,13 +2,8 @@ import { useCallback, useEffect, useState } from 'react';
 import { dailyPromiseRepository, type DailyPromise, type PromiseType } from '@/src/data/repositories/dailyPromiseRepository';
 import { getFriendlyErrorMessage } from '@/src/lib/errors';
 
-export const PROMISE_LABELS: Record<PromiseType, string> = {
-  workout: 'أتمرن اليوم',
-  steps: 'أكمل خطواتي',
-  nutrition: 'ألتزم بأكلي',
-  water: 'أكمل الماء',
-  sleep: 'أنام بشكل أفضل',
-};
+/** كل قيم PromiseType بترتيب ثابت — ترجمتها الفعلية في namespace "promises" بملفات i18n. */
+export const PROMISE_TYPES: PromiseType[] = ['workout', 'steps', 'nutrition', 'water', 'sleep'];
 
 export function useDailyPromise(userId: string | undefined) {
   const [promise, setPromise] = useState<DailyPromise | null>(null);

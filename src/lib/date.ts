@@ -13,11 +13,13 @@ export function startOfTodayISO(): string {
   return d.toISOString();
 }
 
-/** الحرف الأول من اسم اليوم بالعربي (ح ن ث ر خ ج س) — لتسميات الرسوم الصغيرة. */
-const ARABIC_WEEKDAY_LETTERS = ['ح', 'ن', 'ث', 'ر', 'خ', 'ج', 'س'];
-
-export function arabicWeekdayLetter(dateKey: string): string {
+/**
+ * الحرف الأول لاسم اليوم من مصفوفة مترجَمة (راجع weekday.letters في
+ * ملفات الترجمة) — بترتيب `Date.getDay()` (0 = الأحد). الدالة نفسها
+ * لا تعرف لغة، فقط تفهرس المصفوفة التي يمررها المستدعي.
+ */
+export function weekdayLetter(dateKey: string, letters: readonly string[]): string {
   const [year, month, day] = dateKey.split('-').map(Number);
   const date = new Date(year, month - 1, day);
-  return ARABIC_WEEKDAY_LETTERS[date.getDay()];
+  return letters[date.getDay()];
 }
