@@ -1,12 +1,14 @@
-#!/usr/bin/env node
 // يولّد Apple "Sign in with Apple" Client Secret (JWT موقّع ES256) محليًا فقط،
 // باستخدام وحدة crypto المدمجة في Node — بدون أي package خارجي.
 //
 // المفتاح الخاص (.p8) لا يغادر هذا الجهاز أبدًا، ولا يُرفَع لأي مكان،
 // ولا تُطبَع قيمته أو قيمة JWT الناتج في الطرفية.
 //
-// الاستخدام:
+// الاستخدام (macOS/Linux):
 //   node generate-apple-secret.mjs /path/to/AuthKey_52VJV7V438.p8
+//
+// الاستخدام (Windows PowerShell):
+//   node .\generate-apple-secret.mjs "C:\path\to\AuthKey_52VJV7V438.p8"
 //
 // الناتج: apple-client-secret.txt بجانب هذا السكربت (صلاحيات 600).
 // انسخ محتواه يدويًا إلى Supabase Dashboard → Authentication → Providers
