@@ -14,14 +14,14 @@
     },
     "ios": {
       "supportsTablet": false,
-      "bundleIdentifier": "com.hemma.app",
+      "bundleIdentifier": "com.hemma.himah",
       "infoPlist": {
         "UIBackgroundModes": [],
         "ITSAppUsesNonExemptEncryption": false
       }
     },
     "android": {
-      "package": "com.hemma.app",
+      "package": "com.hemma.himah",
       "adaptiveIcon": {
         "backgroundColor": "#F7F3EE",
         "foregroundImage": "./assets/android-icon-foreground.png",

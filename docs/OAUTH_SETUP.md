@@ -26,9 +26,9 @@ hemma://auth/callback
 ## 2) Apple
 
 1. **Apple Developer Portal** → Certificates, Identifiers & Profiles →
-   Identifiers → تأكد أن App ID الحالي (`com.hemma.app`) مفعّل عليه
+   Identifiers → تأكد أن App ID الحالي (`com.hemma.himah`) مفعّل عليه
    قابلية **Sign In with Apple**.
-2. أنشئ **Services ID** جديد (مثلًا `com.hemma.app.signin`) —
+2. أنشئ **Services ID** جديد (المستخدَم فعليًا: `com.hemma.himah.login`) —
    هذا مختلف عن Bundle ID التطبيق، ويمثّل "عميل الويب" الذي يتحدث معه
    Supabase. أضف:
    - Domain: `<project-ref>.supabase.co`
@@ -41,10 +41,10 @@ hemma://auth/callback
    - Team ID
    - Key ID
    - محتوى ملف `.p8`
-   - **مهم:** في حقل "Authorized Client IDs" أضف أيضًا `com.hemma.app`
+   - **مهم:** في حقل "Authorized Client IDs" أضف أيضًا `com.hemma.himah`
      (Bundle ID نفسه) — لأن تسجيل الدخول من داخل التطبيق (الطريقة
      الأصلية عبر `expo-apple-authentication` المستخدمة في الكود) يصدر
-     رمزًا يحمل `aud = com.hemma.app`، وليس الـ Services ID. بدون هذا
+     رمزًا يحمل `aud = com.hemma.himah`، وليس الـ Services ID. بدون هذا
      السطر سيرفض Supabase الرمز حتى لو كانت كل الإعدادات الأخرى صحيحة.
 
 ## 3) رابط العودة داخل Supabase (خطوة مشتركة لكل من Google وApple)

@@ -6,8 +6,8 @@
 
 ## ✅ مكتمل في الكود
 
-- [x] Bundle Identifier مبدئي: `com.hemma.app` (`app.json`) — يحتاج
-      تسجيله فعليًا في حساب Apple Developer، أو تغييره لو غير متاح.
+- [x] Bundle Identifier: `com.hemma.himah` (`app.json`) — مسجَّل فعليًا في
+      Apple Developer Portal (App ID)، ومفعَّل عليه Sign In with Apple.
 - [x] EAS build profiles (`eas.json`): development / preview / production
 - [x] أيقونة وSplash مُعاد بناؤهما ليطابقا شعار الهوية المرجعي (دمبل ذهبي
       + كلمة "هِمّة" الخطّية، بنفس الألوان بالضبط) — راجع `assets/branding/README.md`.
