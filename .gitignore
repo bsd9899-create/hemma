@@ -34,6 +34,9 @@ yarn-error.*
 .env
 .env*.local
 
+# Apple Sign In client secret (generated locally by generate-apple-secret.mjs)
+apple-client-secret.txt
+
 # typescript
 *.tsbuildinfo
 
