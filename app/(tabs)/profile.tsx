@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Alert, Linking, View } from 'react-native';
+import { Alert, Linking, ScrollView, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import Constants from 'expo-constants';
 import { Button, Card, Screen, Text } from '@/src/design-system';
@@ -58,7 +58,7 @@ export default function ProfileScreen() {
 
   return (
     <Screen>
-      <View style={{ gap: spacing.lg }}>
+      <ScrollView contentContainerStyle={{ gap: spacing.lg, paddingBottom: spacing.xxxl }} showsVerticalScrollIndicator={false}>
         <View>
           <Text variant="title">{profile?.display_name ?? 'حسابي'}</Text>
           <Text variant="body" color="textSecondary" style={{ marginTop: spacing.xxs }}>
@@ -115,6 +115,7 @@ export default function ProfileScreen() {
         <Button
           label={isDeleting ? 'جارِ الحذف...' : 'حذف حسابي نهائيًا'}
           variant="ghost"
+          danger
           disabled={isDeleting}
           onPress={confirmDeleteAccount}
         />
@@ -122,7 +123,7 @@ export default function ProfileScreen() {
         <Text variant="caption" color="textSecondary" style={{ textAlign: 'center' }}>
           هِمّة — الإصدار {Constants.expoConfig?.version ?? '1.0.0'}
         </Text>
-      </View>
+      </ScrollView>
     </Screen>
   );
 }
