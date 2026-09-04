@@ -65,7 +65,7 @@ export async function runNetworkDiagnostics(): Promise<void> {
 
 /**
  * جولة 2: عزل هل الفشل خاص بمضيف مشروع Supabase تحديدًا
- * (zvcynshexffvxskqhet.supabase.co) أم بنطاق supabase.co عمومًا.
+ * (EXPO_PUBLIC_SUPABASE_URL الحالي) أم بنطاق supabase.co عمومًا.
  */
 export async function runHostnameDiagnostics(): Promise<void> {
   console.log('[NET-DEBUG] ===== بدء فحص الشبكة (جولة 2 — hostname) =====');
