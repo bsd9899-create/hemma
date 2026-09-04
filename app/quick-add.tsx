@@ -2,7 +2,7 @@ import type { Href } from 'expo-router';
 import { Pressable, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
-import { Screen, Text, colors, rowDirection } from '@/src/design-system';
+import { Screen, ScreenHeader, Text, colors, rowDirection } from '@/src/design-system';
 import { radius, spacing } from '@/src/design-system/spacing';
 
 const QUICK_ADD_OPTIONS: { emoji: string; labelKey: string; href: Href }[] = [
@@ -21,44 +21,27 @@ export default function QuickAddModal() {
   return (
     <Screen>
       <View style={{ gap: spacing.lg }}>
-        {/* النافذة كانت بلا أي وسيلة إغلاق ظاهرة — الاعتماد على سحب الورقة
-            وحده لا يكفي (ولا يعمل على أندرويد ولا مع تقنيات الوصول). */}
-        <View style={{ flexDirection: rowDirection, alignItems: 'center', justifyContent: 'space-between' }}>
-          <Text variant="title">{t('quickAdd.title')}</Text>
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel={t('common.close')}
-            onPress={() => router.back()}
-            hitSlop={spacing.sm}
-            style={{
-              width: 32,
-              height: 32,
-              borderRadius: radius.pill,
-              backgroundColor: colors.surfaceAlt,
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
-            <Text variant="bodyStrong" color="textSecondary">
-              ✕
-            </Text>
-          </Pressable>
-        </View>
+        <ScreenHeader title={t('quickAdd.title')} action="close" />
 
         <View style={{ flexDirection: rowDirection, flexWrap: 'wrap', gap: spacing.sm }}>
           {QUICK_ADD_OPTIONS.map((option) => (
             <Pressable
               key={option.labelKey}
+              accessibilityRole="button"
+              accessibilityLabel={t(option.labelKey)}
               onPress={() => router.push(option.href)}
-              style={{
-                width: '30%',
-                aspectRatio: 1,
-                borderRadius: radius.lg,
-                backgroundColor: colors.surfaceAlt,
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: spacing.xxs,
-              }}
+              style={({ pressed }) => [
+                {
+                  width: '30%',
+                  aspectRatio: 1,
+                  borderRadius: radius.lg,
+                  backgroundColor: colors.surfaceAlt,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: spacing.xxs,
+                },
+                pressed && { opacity: 0.75, transform: [{ scale: 0.96 }] },
+              ]}
             >
               <Text variant="displayMd">{option.emoji}</Text>
               <Text variant="captionStrong">{t(option.labelKey)}</Text>

@@ -1,7 +1,20 @@
 import { RefreshControl, ScrollView, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
-import { Button, Card, ProgressRing, Screen, Text, TodaySkeleton, colors, palette, rowDirection } from '@/src/design-system';
+import {
+  Button,
+  Card,
+  ErrorState,
+  ProgressRing,
+  Screen,
+  SectionHeader,
+  Text,
+  TodaySkeleton,
+  Wordmark,
+  colors,
+  palette,
+  rowDirection,
+} from '@/src/design-system';
 import { spacing } from '@/src/design-system/spacing';
 import { useAuthStore } from '@/src/features/auth/store';
 import { useProfileStore } from '@/src/features/auth/profileStore';
@@ -38,11 +51,8 @@ export default function TodayScreen() {
 
   if (!summary) {
     return (
-      <Screen edges={['top']} style={{ alignItems: 'center', justifyContent: 'center', gap: spacing.sm }}>
-        <Text variant="body" color="textSecondary">
-          {error ?? t('today.loadError')}
-        </Text>
-        <Button label={t('common.retry')} variant="secondary" onPress={refetch} />
+      <Screen edges={['top']} style={{ flex: 1, justifyContent: 'center' }}>
+        <ErrorState message={error ?? t('today.loadError')} onRetry={refetch} retryLabel={t('common.retry')} />
       </Screen>
     );
   }
@@ -56,10 +66,19 @@ export default function TodayScreen() {
         showsVerticalScrollIndicator={false}
         refreshControl={<RefreshControl refreshing={isLoading} onRefresh={refetch} tintColor={colors.primary} />}
       >
-        <View style={{ marginTop: spacing.md }}>
-          <Text variant="displayMd">
+        <View
+          style={{
+            flexDirection: rowDirection,
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            marginTop: spacing.md,
+            gap: spacing.md,
+          }}
+        >
+          <Text variant="displayMd" style={{ flex: 1 }}>
             {getTimeGreeting(t)} {displayName ?? ''} 👋
           </Text>
+          <Wordmark size="sm" />
         </View>
 
         <DailyPromiseCard
@@ -93,9 +112,9 @@ export default function TodayScreen() {
           </View>
         </Card>
 
-        <Text variant="overline" color="textSecondary" style={{ marginTop: spacing.xs }}>
-          {t('today.sectionTitle')}
-        </Text>
+        <View style={{ marginTop: spacing.xs }}>
+          <SectionHeader title={t('today.sectionTitle')} />
+        </View>
 
         <View style={{ flexDirection: rowDirection, gap: spacing.sm }}>
           <MetricTile
@@ -103,8 +122,14 @@ export default function TodayScreen() {
             label={t('today.workout')}
             valueText={t('today.workoutValue', { minutes: summary.workoutMinutes })}
             progress={summary.workoutMinutes / 30}
+            href="/log/workout"
           />
-          <MetricTile emoji="🍽️" label={t('today.nutrition')} valueText={t('today.nutritionValue', { count: summary.mealsLogged })} />
+          <MetricTile
+            emoji="🍽️"
+            label={t('today.nutrition')}
+            valueText={t('today.nutritionValue', { count: summary.mealsLogged })}
+            href="/log/nutrition"
+          />
         </View>
         <View style={{ flexDirection: rowDirection, gap: spacing.sm }}>
           <MetricTile
@@ -112,12 +137,14 @@ export default function TodayScreen() {
             label={t('today.water')}
             valueText={t('today.waterValue', { amount: summary.waterMl, target: summary.waterTargetMl })}
             progress={summary.waterMl / summary.waterTargetMl}
+            href="/log/water"
           />
           <MetricTile
             emoji="👟"
             label={t('today.steps')}
             valueText={t('today.stepsValue', { steps: summary.steps, target: summary.stepsTarget })}
             progress={summary.steps / summary.stepsTarget}
+            href="/log/steps"
           />
         </View>
 

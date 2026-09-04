@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { KeyboardAvoidingView, Platform, Pressable, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
-import { Button, Screen, Text, TextField, colors, rowDirection } from '@/src/design-system';
+import { Button, InlineMessage, Screen, ScreenHeader, Text, TextField, colors, rowDirection } from '@/src/design-system';
 import { radius, spacing } from '@/src/design-system/spacing';
 import { getFriendlyErrorMessage } from '@/src/lib/errors';
 
@@ -63,24 +63,29 @@ export function NumericLogForm({
   return (
     <Screen>
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1, gap: spacing.lg }}>
-        <Text variant="displayMd">
-          {emoji} {t(titleKey)}
-        </Text>
+        <ScreenHeader title={`${emoji} ${t(titleKey)}`} action="close" />
 
         {presets && presets.length > 0 ? (
           <View style={{ flexDirection: rowDirection, gap: spacing.sm }}>
             {presets.map((preset) => (
               <Pressable
                 key={preset}
+                accessibilityRole="button"
                 disabled={isSubmitting}
                 onPress={() => submit(preset)}
-                style={{
-                  flex: 1,
-                  paddingVertical: spacing.md,
-                  borderRadius: radius.md,
-                  backgroundColor: colors.surfaceAlt,
-                  alignItems: 'center',
-                }}
+                style={({ pressed }) => [
+                  {
+                    flex: 1,
+                    paddingVertical: spacing.md,
+                    borderRadius: radius.md,
+                    backgroundColor: colors.surfaceAlt,
+                    borderWidth: 1,
+                    borderColor: colors.divider,
+                    alignItems: 'center',
+                  },
+                  isSubmitting && { opacity: 0.45 },
+                  pressed && !isSubmitting && { opacity: 0.75, transform: [{ scale: 0.97 }] },
+                ]}
               >
                 <Text variant="bodyStrong">{preset}</Text>
               </Pressable>
@@ -92,15 +97,22 @@ export function NumericLogForm({
           label={t('logCommon.customValueLabel', { unit: t(unitKey) })}
           placeholder={t(placeholderKey)}
           value={value}
-          onChangeText={setValue}
-          error={error ?? undefined}
+          onChangeText={(next) => {
+            setValue(next);
+            if (error) setError(null);
+          }}
           keyboardType={allowDecimal ? 'decimal-pad' : 'number-pad'}
           editable={!isSubmitting}
+          returnKeyType="done"
+          onSubmitEditing={() => submit(Number(value.replace(',', '.')))}
         />
 
+        {error ? <InlineMessage tone="danger" message={error} /> : null}
+
         <Button
-          label={isSubmitting ? t('common.saving') : t('common.save')}
-          disabled={isSubmitting}
+          label={t('common.save')}
+          size="lg"
+          loading={isSubmitting}
           onPress={() => submit(Number(value.replace(',', '.')))}
         />
       </KeyboardAvoidingView>
