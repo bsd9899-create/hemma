@@ -21,7 +21,29 @@ export default function QuickAddModal() {
   return (
     <Screen>
       <View style={{ gap: spacing.lg }}>
-        <Text variant="title">{t('quickAdd.title')}</Text>
+        {/* النافذة كانت بلا أي وسيلة إغلاق ظاهرة — الاعتماد على سحب الورقة
+            وحده لا يكفي (ولا يعمل على أندرويد ولا مع تقنيات الوصول). */}
+        <View style={{ flexDirection: rowDirection, alignItems: 'center', justifyContent: 'space-between' }}>
+          <Text variant="title">{t('quickAdd.title')}</Text>
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={t('common.close')}
+            onPress={() => router.back()}
+            hitSlop={spacing.sm}
+            style={{
+              width: 32,
+              height: 32,
+              borderRadius: radius.pill,
+              backgroundColor: colors.surfaceAlt,
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <Text variant="bodyStrong" color="textSecondary">
+              ✕
+            </Text>
+          </Pressable>
+        </View>
 
         <View style={{ flexDirection: rowDirection, flexWrap: 'wrap', gap: spacing.sm }}>
           {QUICK_ADD_OPTIONS.map((option) => (

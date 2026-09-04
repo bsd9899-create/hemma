@@ -4,7 +4,6 @@ import * as AppleAuthentication from 'expo-apple-authentication';
 import { Button, Screen, Text, Wordmark } from '@/src/design-system';
 import { radius, spacing } from '@/src/design-system/spacing';
 import { signInWithApple, signInWithGoogle } from '@/src/features/auth/oauth';
-import { runHostnameDiagnostics, runNetworkDiagnostics } from '@/src/features/auth/networkDiagnostics';
 import { getFriendlyErrorMessage } from '@/src/lib/errors';
 
 export default function SignInScreen() {
@@ -80,15 +79,6 @@ export default function SignInScreen() {
             <Text variant="caption" color="danger" style={{ textAlign: 'center' }}>
               {error}
             </Text>
-          ) : null}
-
-          {/* ⚠️ زر تشخيصي مؤقت فقط — احذفه مع src/features/auth/networkDiagnostics.ts
-              بعد انتهاء تشخيص مشكلة الشبكة. النتائج تُطبع في Metro logs فقط. */}
-          {__DEV__ ? (
-            <>
-              <Button label="فحص الشبكة (تشخيصي)" variant="ghost" onPress={() => void runNetworkDiagnostics()} />
-              <Button label="فحص hostname (تشخيصي)" variant="ghost" onPress={() => void runHostnameDiagnostics()} />
-            </>
           ) : null}
         </View>
 

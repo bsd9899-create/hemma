@@ -46,7 +46,13 @@ export function NumericLogForm({
     setIsSubmitting(true);
     try {
       await onSubmit(raw);
-      router.back();
+      // شاشات التسجيل تُفتح من داخل نافذة "إضافة سريعة"، فـ back() وحدها
+      // تُرجع المستخدم إلى شبكة الاختيارات بدل إغلاق النافذة كاملة بعد الحفظ.
+      if (router.canDismiss()) {
+        router.dismissAll();
+      } else {
+        router.back();
+      }
     } catch (e) {
       setError(getFriendlyErrorMessage(e, t('common.genericSaveError')));
     } finally {

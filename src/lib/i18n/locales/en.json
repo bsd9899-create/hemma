@@ -20,7 +20,17 @@
     "genericSaveError": "Couldn't save, please try again",
     "offlineError": "Looks like you're offline — check your connection and try again",
     "notSignedIn": "No signed-in user",
-    "you": "You"
+    "you": "You",
+    "errors": {
+      "permissionDenied": "You don't have permission to do this",
+      "sessionExpired": "Your session expired — please sign in again",
+      "duplicate": "This item already exists",
+      "missingData": "Some required fields are missing",
+      "invalidReference": "The related data no longer exists",
+      "invalidValue": "One of the values entered isn't valid",
+      "notFound": "We couldn't find the requested data",
+      "serverError": "The service is temporarily unavailable — try again shortly"
+    }
   },
   "goals": {
     "loseWeight": "Lose weight",
@@ -35,7 +45,17 @@
     "evening": "Good evening",
     "night": "Rise and grind"
   },
-  "weekday": { "letters": ["S", "M", "T", "W", "T", "F", "S"] },
+  "weekday": {
+    "letters": [
+      "S",
+      "M",
+      "T",
+      "W",
+      "T",
+      "F",
+      "S"
+    ]
+  },
   "promises": {
     "workout": "I'll work out today",
     "steps": "I'll hit my steps",
@@ -244,10 +264,26 @@
     "customValueLabel": "Or enter a custom value ({{unit}})",
     "invalidNumber": "Enter a valid number greater than zero"
   },
-  "logWater": { "title": "Water", "placeholder": "e.g. 300", "unit": "ml" },
-  "logWeight": { "title": "Weight", "placeholder": "e.g. 75.5", "unit": "kg" },
-  "logSteps": { "title": "Steps", "placeholder": "Total steps today", "unit": "steps" },
-  "logSleep": { "title": "Sleep", "placeholder": "e.g. 7.5", "unit": "hours" },
+  "logWater": {
+    "title": "Water",
+    "placeholder": "e.g. 300",
+    "unit": "ml"
+  },
+  "logWeight": {
+    "title": "Weight",
+    "placeholder": "e.g. 75.5",
+    "unit": "kg"
+  },
+  "logSteps": {
+    "title": "Steps",
+    "placeholder": "Total steps today",
+    "unit": "steps"
+  },
+  "logSleep": {
+    "title": "Sleep",
+    "placeholder": "e.g. 7.5",
+    "unit": "hours"
+  },
   "logNutrition": {
     "title": "🍽️ Nutrition",
     "breakfast": "Breakfast",

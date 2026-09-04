@@ -41,7 +41,12 @@ export default function LogNutritionScreen() {
         description: description.trim(),
         calories: calories ? Number(calories) : undefined,
       });
-      router.back();
+      // نفس منطق NumericLogForm: أُغلق نافذة "إضافة سريعة" كاملة بعد الحفظ.
+      if (router.canDismiss()) {
+        router.dismissAll();
+      } else {
+        router.back();
+      }
     } catch (e) {
       setError(getFriendlyErrorMessage(e, t('common.genericSaveError')));
     } finally {

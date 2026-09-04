@@ -20,7 +20,17 @@
     "genericSaveError": "تعذّر الحفظ، حاول مرة أخرى",
     "offlineError": "يبدو أنك غير متصل بالإنترنت — تحقق من اتصالك وحاول مرة أخرى",
     "notSignedIn": "لا يوجد مستخدم مسجّل الدخول",
-    "you": "أنت"
+    "you": "أنت",
+    "errors": {
+      "permissionDenied": "ليس لديك صلاحية لتنفيذ هذا الإجراء",
+      "sessionExpired": "انتهت جلستك — سجّل الدخول مرة أخرى",
+      "duplicate": "هذا العنصر مُسجَّل مسبقًا",
+      "missingData": "بعض الحقول المطلوبة ناقصة",
+      "invalidReference": "البيانات المرتبطة غير موجودة",
+      "invalidValue": "إحدى القيم المُدخَلة غير صالحة",
+      "notFound": "لم نجد البيانات المطلوبة",
+      "serverError": "الخدمة غير متاحة مؤقتًا — حاول بعد قليل"
+    }
   },
   "goals": {
     "loseWeight": "التنحيف",
@@ -35,7 +45,17 @@
     "evening": "مساء الخير",
     "night": "مساء النشاط"
   },
-  "weekday": { "letters": ["ح", "ن", "ث", "ر", "خ", "ج", "س"] },
+  "weekday": {
+    "letters": [
+      "ح",
+      "ن",
+      "ث",
+      "ر",
+      "خ",
+      "ج",
+      "س"
+    ]
+  },
   "promises": {
     "workout": "أتمرن اليوم",
     "steps": "أكمل خطواتي",
@@ -244,10 +264,26 @@
     "customValueLabel": "أو أدخل قيمة مخصّصة ({{unit}})",
     "invalidNumber": "أدخل رقمًا صحيحًا أكبر من صفر"
   },
-  "logWater": { "title": "الماء", "placeholder": "مثلاً 300", "unit": "مل" },
-  "logWeight": { "title": "الوزن", "placeholder": "مثلاً 75.5", "unit": "كجم" },
-  "logSteps": { "title": "الخطوات", "placeholder": "إجمالي خطوات اليوم", "unit": "خطوة" },
-  "logSleep": { "title": "النوم", "placeholder": "مثلاً 7.5", "unit": "ساعة" },
+  "logWater": {
+    "title": "الماء",
+    "placeholder": "مثلاً 300",
+    "unit": "مل"
+  },
+  "logWeight": {
+    "title": "الوزن",
+    "placeholder": "مثلاً 75.5",
+    "unit": "كجم"
+  },
+  "logSteps": {
+    "title": "الخطوات",
+    "placeholder": "إجمالي خطوات اليوم",
+    "unit": "خطوة"
+  },
+  "logSleep": {
+    "title": "النوم",
+    "placeholder": "مثلاً 7.5",
+    "unit": "ساعة"
+  },
   "logNutrition": {
     "title": "🍽️ التغذية",
     "breakfast": "فطور",

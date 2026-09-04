@@ -34,7 +34,12 @@ export default function LogWorkoutScreen() {
     setIsSubmitting(true);
     try {
       await dailyLogsRepository.addWorkout(userId, { title: title.trim(), durationMinutes: Math.round(minutes) });
-      router.back();
+      // نفس منطق NumericLogForm: أُغلق نافذة "إضافة سريعة" كاملة بعد الحفظ.
+      if (router.canDismiss()) {
+        router.dismissAll();
+      } else {
+        router.back();
+      }
     } catch (e) {
       setError(getFriendlyErrorMessage(e, t('common.genericSaveError')));
     } finally {
