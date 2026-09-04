@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Platform, View } from 'react-native';
 import * as AppleAuthentication from 'expo-apple-authentication';
-import { Button, Screen, Text, Wordmark } from '@/src/design-system';
+import { Button, InlineMessage, Screen, Text, Wordmark } from '@/src/design-system';
 import { radius, spacing } from '@/src/design-system/spacing';
 import { signInWithApple, signInWithGoogle } from '@/src/features/auth/oauth';
 import { getFriendlyErrorMessage } from '@/src/lib/errors';
@@ -45,7 +45,7 @@ export default function SignInScreen() {
   return (
     <Screen>
       <View style={{ flex: 1, justifyContent: 'center', gap: spacing.xl }}>
-        <Wordmark />
+        <Wordmark size="lg" />
         <View style={{ gap: spacing.xs }}>
           <Text variant="title" style={{ textAlign: 'center' }}>
             هلا فيك 👋
@@ -57,10 +57,12 @@ export default function SignInScreen() {
 
         <View style={{ gap: spacing.sm }}>
           <Button
-            label={isGoogleLoading ? 'جارِ تسجيل الدخول...' : 'المتابعة عبر Google'}
+            label="المتابعة عبر Google"
             variant="secondary"
-            onPress={handleGoogle}
+            size="lg"
+            loading={isGoogleLoading}
             disabled={isBusy}
+            onPress={handleGoogle}
           />
 
           {/* زر Apple الأصلي إلزامي على iOS فقط طالما نعرض بديلًا اجتماعيًا آخر (Google) —
@@ -70,16 +72,12 @@ export default function SignInScreen() {
               buttonType={AppleAuthentication.AppleAuthenticationButtonType.CONTINUE}
               buttonStyle={AppleAuthentication.AppleAuthenticationButtonStyle.BLACK}
               cornerRadius={radius.pill}
-              style={{ height: 50, opacity: isBusy ? 0.5 : 1 }}
+              style={{ height: 56, opacity: isBusy ? 0.45 : 1 }}
               onPress={handleApple}
             />
           ) : null}
 
-          {error ? (
-            <Text variant="caption" color="danger" style={{ textAlign: 'center' }}>
-              {error}
-            </Text>
-          ) : null}
+          {error ? <InlineMessage tone="danger" message={error} /> : null}
         </View>
 
         <Text variant="caption" color="textSecondary" style={{ textAlign: 'center' }}>

@@ -3,7 +3,7 @@ import { KeyboardAvoidingView, Platform } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { teamsRepository } from '@/src/data/repositories/teamsRepository';
-import { Button, Screen, Text, TextField } from '@/src/design-system';
+import { Button, InlineMessage, Screen, ScreenHeader, TextField } from '@/src/design-system';
 import { spacing } from '@/src/design-system/spacing';
 import { useAuthStore } from '@/src/features/auth/store';
 import { toDateKey } from '@/src/lib/date';
@@ -57,12 +57,15 @@ export default function NewChallengeScreen() {
   return (
     <Screen>
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1, gap: spacing.lg }}>
-        <Text variant="displayMd">{t('newChallenge.title')}</Text>
+        <ScreenHeader title={t('newChallenge.title')} action="close" />
         <TextField
           label={t('newChallenge.nameLabel')}
           placeholder={t('newChallenge.namePlaceholder')}
           value={title}
-          onChangeText={setTitle}
+          onChangeText={(next) => {
+            setTitle(next);
+            if (error) setError(null);
+          }}
           editable={!isSubmitting}
         />
         <TextField
@@ -70,14 +73,13 @@ export default function NewChallengeScreen() {
           value={durationDays}
           onChangeText={setDurationDays}
           keyboardType="number-pad"
-          error={error ?? undefined}
           editable={!isSubmitting}
+          returnKeyType="done"
         />
-        <Button
-          label={isSubmitting ? t('newChallenge.creating') : t('newChallenge.create')}
-          disabled={isSubmitting}
-          onPress={handleSubmit}
-        />
+
+        {error ? <InlineMessage tone="danger" message={error} /> : null}
+
+        <Button label={t('newChallenge.create')} size="lg" loading={isSubmitting} onPress={handleSubmit} />
       </KeyboardAvoidingView>
     </Screen>
   );
