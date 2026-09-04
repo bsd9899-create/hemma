@@ -149,7 +149,9 @@
     "strongestPoint": "أقوى نقطة:",
     "weakestPoint": "تحتاج اهتمامًا:",
     "focusNextWeek": "تركيزك للأسبوع القادم: {{label}}",
-    "loadError": "تعذّر تحميل التقدم"
+    "loadError": "تعذّر تحميل التقدم",
+    "noActivityTitle": "ما فيه بيانات كافية بعد",
+    "noActivityCta": "سجّل أول نشاط"
   },
   "weeklyMetrics": {
     "workout": "التمارين 🔥",

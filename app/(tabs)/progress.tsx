@@ -1,6 +1,7 @@
 import { RefreshControl, ScrollView, View } from 'react-native';
+import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
-import { Card, ErrorState, ProgressSkeleton, Screen, Text, colors, rowDirection } from '@/src/design-system';
+import { Card, EmptyState, ErrorState, ProgressSkeleton, Screen, Text, colors, rowDirection } from '@/src/design-system';
 import { spacing } from '@/src/design-system/spacing';
 import { useAuthStore } from '@/src/features/auth/store';
 import { useProgressData } from '@/src/features/progress/useProgressData';
@@ -9,6 +10,7 @@ import { formatNumber } from '@/src/lib/i18n/format';
 
 export default function ProgressScreen() {
   const { t } = useTranslation();
+  const router = useRouter();
   const userId = useAuthStore((s) => s.session?.user.id);
   const { summary, isLoading, error, refetch } = useProgressData(userId);
 
@@ -43,11 +45,13 @@ export default function ProgressScreen() {
         </Text>
 
         {!hasAnyActivity ? (
-          <Card variant="soft">
-            <Text variant="body" color="textSecondary">
-              {t('progress.noActivity')}
-            </Text>
-          </Card>
+          <EmptyState
+            emoji="📈"
+            title={t('progress.noActivityTitle')}
+            description={t('progress.noActivity')}
+            actionLabel={t('progress.noActivityCta')}
+            onAction={() => router.push('/quick-add')}
+          />
         ) : null}
 
         <Card>

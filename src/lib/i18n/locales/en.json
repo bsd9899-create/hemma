@@ -149,7 +149,9 @@
     "strongestPoint": "Strongest area:",
     "weakestPoint": "Needs attention:",
     "focusNextWeek": "Your focus for next week: {{label}}",
-    "loadError": "Couldn't load your progress"
+    "loadError": "Couldn't load your progress",
+    "noActivityTitle": "Not enough data yet",
+    "noActivityCta": "Log your first activity"
   },
   "weeklyMetrics": {
     "workout": "Workouts 🔥",
