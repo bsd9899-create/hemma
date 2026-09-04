@@ -54,6 +54,15 @@ export default function TabsLayout() {
         }}
       />
       <Tabs.Screen
+        name="nutrition"
+        options={{
+          title: t('nav.nutrition'),
+          tabBarIcon: ({ focused }) => (
+            <TabIcon name={focused ? 'restaurant' : 'restaurant-outline'} focused={focused} />
+          ),
+        }}
+      />
+      <Tabs.Screen
         name="progress"
         options={{
           title: t('nav.progress'),

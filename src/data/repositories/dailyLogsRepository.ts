@@ -1,5 +1,18 @@
 import { supabase } from '../supabase';
 import { startOfTodayISO, toDateKey } from '@/src/lib/date';
+import type { Database } from '../database.types';
+
+export type Meal = Database['public']['Tables']['nutrition_logs']['Row'];
+export type MealType = Meal['meal_type'];
+
+export type NewMeal = {
+  mealType: MealType;
+  description: string;
+  calories?: number;
+  proteinG?: number;
+  carbsG?: number;
+  fatG?: number;
+};
 
 /**
  * قراءات وإضافات "اليوم" من جداول السجلات الفعلية — تغذّي شاشة اليوم
@@ -86,17 +99,29 @@ export const dailyLogsRepository = {
     if (error) throw error;
   },
 
-  async addNutritionLog(
-    userId: string,
-    meal: { mealType: 'breakfast' | 'lunch' | 'dinner' | 'snack'; description: string; calories?: number }
-  ) {
+  async addNutritionLog(userId: string, meal: NewMeal) {
     const { error } = await supabase.from('nutrition_logs').insert({
       user_id: userId,
       meal_type: meal.mealType,
       description: meal.description,
       calories: meal.calories,
+      protein_g: meal.proteinG,
+      carbs_g: meal.carbsG,
+      fat_g: meal.fatG,
     });
     if (error) throw error;
+  },
+
+  /** وجبات اليوم كاملة بالترتيب الزمني — أساس شاشة التغذية. */
+  async getTodayMeals(userId: string): Promise<Meal[]> {
+    const { data, error } = await supabase
+      .from('nutrition_logs')
+      .select('*')
+      .eq('user_id', userId)
+      .gte('logged_at', startOfTodayISO())
+      .order('logged_at', { ascending: true });
+    if (error) throw error;
+    return data ?? [];
   },
 
   async addWorkout(userId: string, workout: { title: string; durationMinutes: number }) {

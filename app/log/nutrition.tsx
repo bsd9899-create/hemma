@@ -15,6 +15,12 @@ const MEAL_TYPES: { value: 'breakfast' | 'lunch' | 'dinner' | 'snack'; labelKey:
   { value: 'snack', labelKey: 'logNutrition.snack' },
 ];
 
+/** حقل رقمي فارغ أو غير صالح = لم يُدخِله المستخدم، وليس صفرًا. */
+function toOptionalNumber(raw: string): number | undefined {
+  const value = Number(raw.replace(',', '.'));
+  return raw.trim() && Number.isFinite(value) && value >= 0 ? value : undefined;
+}
+
 export default function LogNutritionScreen() {
   const { t } = useTranslation();
   const router = useRouter();
@@ -23,6 +29,9 @@ export default function LogNutritionScreen() {
   const [mealType, setMealType] = useState<(typeof MEAL_TYPES)[number]['value']>('lunch');
   const [description, setDescription] = useState('');
   const [calories, setCalories] = useState('');
+  const [protein, setProtein] = useState('');
+  const [carbs, setCarbs] = useState('');
+  const [fat, setFat] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -44,7 +53,10 @@ export default function LogNutritionScreen() {
       await dailyLogsRepository.addNutritionLog(userId, {
         mealType,
         description: description.trim(),
-        calories: calories ? Number(calories) : undefined,
+        calories: toOptionalNumber(calories),
+        proteinG: toOptionalNumber(protein),
+        carbsG: toOptionalNumber(carbs),
+        fatG: toOptionalNumber(fat),
       });
       // نفس منطق NumericLogForm: أُغلق نافذة "إضافة سريعة" كاملة بعد الحفظ.
       if (router.canDismiss()) {
@@ -115,6 +127,41 @@ export default function LogNutritionScreen() {
           keyboardType="number-pad"
           editable={!isSubmitting}
         />
+
+        <View style={{ gap: spacing.sm }}>
+          <Text variant="captionStrong" color="textSecondary">
+            {t('logNutrition.macrosOptional')}
+          </Text>
+          <View style={{ flexDirection: rowDirection, gap: spacing.sm }}>
+            <View style={{ flex: 1 }}>
+              <TextField
+                label={t('logNutrition.proteinLabel')}
+                value={protein}
+                onChangeText={setProtein}
+                keyboardType="decimal-pad"
+                editable={!isSubmitting}
+              />
+            </View>
+            <View style={{ flex: 1 }}>
+              <TextField
+                label={t('logNutrition.carbsLabel')}
+                value={carbs}
+                onChangeText={setCarbs}
+                keyboardType="decimal-pad"
+                editable={!isSubmitting}
+              />
+            </View>
+            <View style={{ flex: 1 }}>
+              <TextField
+                label={t('logNutrition.fatLabel')}
+                value={fat}
+                onChangeText={setFat}
+                keyboardType="decimal-pad"
+                editable={!isSubmitting}
+              />
+            </View>
+          </View>
+        </View>
 
         {error ? <InlineMessage tone="danger" message={error} /> : null}
 

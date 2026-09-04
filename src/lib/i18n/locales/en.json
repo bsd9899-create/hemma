@@ -3,7 +3,8 @@
     "today": "Today",
     "progress": "Progress",
     "teams": "Teams",
-    "profile": "Profile"
+    "profile": "Profile",
+    "nutrition": "Nutrition"
   },
   "errorBoundary": {
     "title": "Something went wrong",
@@ -281,7 +282,12 @@
     "descriptionPlaceholder": "e.g. Grilled chicken with rice",
     "descriptionRequired": "Briefly describe the meal",
     "caloriesLabel": "Calories (optional)",
-    "caloriesPlaceholder": "e.g. 450"
+    "caloriesPlaceholder": "e.g. 450",
+    "proteinLabel": "Protein (g)",
+    "carbsLabel": "Carbs (g)",
+    "fatLabel": "Fat (g)",
+    "macrosOptional": "Macros — optional",
+    "optional": "Optional"
   },
   "logWorkout": {
     "title": "🏋️ Workout",
@@ -317,5 +323,41 @@
   "notFound": {
     "title": "Page not found",
     "backHome": "Back to Today"
+  },
+  "nutrition": {
+    "title": "Nutrition",
+    "todayCalories": "Today's calories",
+    "ofTarget": "of {{target}}",
+    "remaining": "{{value}} kcal left",
+    "overBy": "{{value}} kcal over",
+    "macrosTitle": "Macros",
+    "mealsTitle": "Today's meals",
+    "addMeal": "Add a meal",
+    "loadError": "Couldn't load your nutrition data",
+    "emptyTitle": "No meals logged today",
+    "emptyDescription": "Log your first meal and watch your calories and macros update instantly",
+    "kcalValue": "{{value}} kcal",
+    "gramsOfTarget": "{{value}} / {{target}} g",
+    "hintNoMeals": "Start your day by logging a meal",
+    "hintEarly": "Early in the day — plenty of room left",
+    "hintHalfway": "Halfway there, going well",
+    "hintOnTarget": "Right around your target 👌",
+    "hintOverTarget": "Over target today — tomorrow's a fresh start",
+    "macro": {
+      "protein": "Protein",
+      "carbs": "Carbs",
+      "fat": "Fat"
+    },
+    "macroShort": {
+      "protein": "Protein {{value}}g",
+      "carbs": "Carbs {{value}}g",
+      "fat": "Fat {{value}}g"
+    },
+    "mealType": {
+      "breakfast": "Breakfast",
+      "lunch": "Lunch",
+      "dinner": "Dinner",
+      "snack": "Snack"
+    }
   }
 }

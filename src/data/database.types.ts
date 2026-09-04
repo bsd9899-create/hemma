@@ -44,6 +44,10 @@ export interface Database {
           target_sleep_hours: number;
           target_workouts_per_week: number;
           target_weight_kg: number | null;
+          target_calories: number;
+          target_protein_g: number;
+          target_carbs_g: number;
+          target_fat_g: number;
           updated_at: string;
         };
         Insert: Partial<Database['public']['Tables']['user_goals']['Row']> & { user_id: string };
@@ -74,6 +78,9 @@ export interface Database {
           meal_type: 'breakfast' | 'lunch' | 'dinner' | 'snack';
           description: string;
           calories: number | null;
+          protein_g: number | null;
+          carbs_g: number | null;
+          fat_g: number | null;
           logged_at: string;
           source: LogSource;
           created_at: string;

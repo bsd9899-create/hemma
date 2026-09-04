@@ -3,7 +3,8 @@
     "today": "اليوم",
     "progress": "تقدمي",
     "teams": "الفرق",
-    "profile": "حسابي"
+    "profile": "حسابي",
+    "nutrition": "التغذية"
   },
   "errorBoundary": {
     "title": "حدث خطأ غير متوقع",
@@ -281,7 +282,12 @@
     "descriptionPlaceholder": "مثلاً: صدر دجاج مع أرز",
     "descriptionRequired": "صف الوجبة باختصار",
     "caloriesLabel": "السعرات (اختياري)",
-    "caloriesPlaceholder": "مثلاً 450"
+    "caloriesPlaceholder": "مثلاً 450",
+    "proteinLabel": "بروتين (جم)",
+    "carbsLabel": "كربوهيدرات (جم)",
+    "fatLabel": "دهون (جم)",
+    "macrosOptional": "الماكروز — اختيارية",
+    "optional": "اختياري"
   },
   "logWorkout": {
     "title": "🏋️ التمرين",
@@ -317,5 +323,41 @@
   "notFound": {
     "title": "الصفحة غير موجودة",
     "backHome": "الرجوع إلى اليوم"
+  },
+  "nutrition": {
+    "title": "التغذية",
+    "todayCalories": "سعرات اليوم",
+    "ofTarget": "من {{target}}",
+    "remaining": "باقي {{value}} سعرة",
+    "overBy": "تجاوزت بـ {{value}} سعرة",
+    "macrosTitle": "الماكروز",
+    "mealsTitle": "وجبات اليوم",
+    "addMeal": "أضف وجبة",
+    "loadError": "تعذّر تحميل بيانات التغذية",
+    "emptyTitle": "ما سجّلت أي وجبة اليوم",
+    "emptyDescription": "سجّل وجبتك الأولى وشوف سعراتك وماكروزك تتحدّث لحظيًا",
+    "kcalValue": "{{value}} سعرة",
+    "gramsOfTarget": "{{value}} / {{target}} جم",
+    "hintNoMeals": "ابدأ يومك بتسجيل أول وجبة",
+    "hintEarly": "بداية اليوم — لسّه عندك مساحة كبيرة",
+    "hintHalfway": "نص الطريق، ماشي تمام",
+    "hintOnTarget": "قريب من هدفك اليوم 👌",
+    "hintOverTarget": "تجاوزت هدفك اليوم — بكرة فرصة جديدة",
+    "macro": {
+      "protein": "بروتين",
+      "carbs": "كربوهيدرات",
+      "fat": "دهون"
+    },
+    "macroShort": {
+      "protein": "بروتين {{value}} جم",
+      "carbs": "كارب {{value}} جم",
+      "fat": "دهون {{value}} جم"
+    },
+    "mealType": {
+      "breakfast": "فطور",
+      "lunch": "غداء",
+      "dinner": "عشاء",
+      "snack": "سناك"
+    }
   }
 }
