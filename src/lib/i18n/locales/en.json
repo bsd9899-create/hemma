@@ -35,10 +35,23 @@
     "back": "Back"
   },
   "goals": {
-    "loseWeight": "Lose weight",
-    "gainMuscle": "Build muscle",
-    "increaseActivity": "Get more active",
-    "generalHealth": "General health"
+    "title": "My goals",
+    "subtitle": "Update your numbers whenever they change — progress is measured against them",
+    "activitySection": "Activity",
+    "nutritionSection": "Nutrition",
+    "bodySection": "Body",
+    "steps": "Daily steps",
+    "sleepHours": "Sleep hours",
+    "workoutsPerWeek": "Workouts per week",
+    "calories": "Daily calories",
+    "protein": "Protein (g)",
+    "carbs": "Carbs (g)",
+    "fat": "Fat (g)",
+    "targetWeight": "Target weight (kg)",
+    "targetWeightOptional": "Leave empty if you have no target weight",
+    "saved": "Your goals are saved",
+    "loadError": "Couldn't load your goals",
+    "invalidValue": "Please check the numbers you entered"
   },
   "greeting": {
     "late": "It's getting late 🌙",
@@ -245,7 +258,8 @@
     "deleteError": "Couldn't delete your account",
     "tryAgainLater": "Please try again later",
     "version": "Hemma — version {{version}}",
-    "linkError": "Couldn't open the link on this device"
+    "linkError": "Couldn't open the link on this device",
+    "goalsEntry": "My goals"
   },
   "quickAdd": {
     "title": "Quick add",

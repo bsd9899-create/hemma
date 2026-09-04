@@ -35,10 +35,23 @@
     "back": "رجوع"
   },
   "goals": {
-    "loseWeight": "التنحيف",
-    "gainMuscle": "زيادة العضلات",
-    "increaseActivity": "زيادة النشاط",
-    "generalHealth": "صحة عامة"
+    "title": "أهدافي",
+    "subtitle": "عدّل أرقامك متى ما تغيّرت — التطبيق يقيس تقدّمك عليها",
+    "activitySection": "النشاط",
+    "nutritionSection": "التغذية",
+    "bodySection": "الجسم",
+    "steps": "خطوات يوميًا",
+    "sleepHours": "ساعات نوم",
+    "workoutsPerWeek": "تمارين أسبوعيًا",
+    "calories": "سعرات يوميًا",
+    "protein": "بروتين (جم)",
+    "carbs": "كربوهيدرات (جم)",
+    "fat": "دهون (جم)",
+    "targetWeight": "الوزن المستهدف (كجم)",
+    "targetWeightOptional": "اتركه فارغًا إن ما عندك وزن مستهدف",
+    "saved": "تم حفظ أهدافك",
+    "loadError": "تعذّر تحميل أهدافك",
+    "invalidValue": "تأكد من الأرقام المدخلة"
   },
   "greeting": {
     "late": "الوقت متأخر 🌙",
@@ -245,7 +258,8 @@
     "deleteError": "تعذّر حذف الحساب",
     "tryAgainLater": "حاول مرة أخرى لاحقًا",
     "version": "هِمّة — الإصدار {{version}}",
-    "linkError": "تعذّر فتح الرابط على هذا الجهاز"
+    "linkError": "تعذّر فتح الرابط على هذا الجهاز",
+    "goalsEntry": "أهدافي"
   },
   "quickAdd": {
     "title": "إضافة سريعة",

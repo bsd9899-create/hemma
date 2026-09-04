@@ -73,6 +73,7 @@ export default function RootLayout() {
             <Stack.Screen name="accountability/index" />
             <Stack.Screen name="paywall" options={{ presentation: 'modal' }} />
             <Stack.Screen name="profile-edit" options={{ presentation: 'modal' }} />
+            <Stack.Screen name="goals" />
           </Stack>
         </ErrorBoundary>
       </SafeAreaProvider>

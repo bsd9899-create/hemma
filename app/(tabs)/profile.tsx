@@ -90,6 +90,7 @@ export default function ProfileScreen() {
         </View>
 
         <Button label={t('profile.editProfile')} variant="secondary" onPress={() => router.push('/profile-edit')} />
+        <Button label={t('profile.goalsEntry')} variant="secondary" onPress={() => router.push('/goals')} />
         <Button label={t('profile.accountabilityPartner')} variant="secondary" onPress={() => router.push('/accountability')} />
         <Button label={t('profile.premium')} variant="secondary" onPress={() => router.push('/paywall')} />
 
