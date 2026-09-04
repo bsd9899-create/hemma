@@ -6,8 +6,6 @@ function makeSummary(overrides: Partial<TodaySummary>): TodaySummary {
     completionPercent: 0,
     decisionTextKey: '',
     recoveryMode: false,
-    waterMl: 2000,
-    waterTargetMl: 2000,
     steps: 8000,
     stepsTarget: 8000,
     workoutMinutes: 30,
@@ -32,14 +30,14 @@ describe('getNextTask', () => {
     expect(task.ctaLabelKey).not.toBeNull();
   });
 
-  it('يقترح إكمال الماء لو التمرين تم لكن الماء ناقص', () => {
-    const task = getNextTask(makeSummary({ workoutMinutes: 30, waterMl: 500, waterTargetMl: 2000 }));
-    expect(task.titleKey).toBe('nextTask.waterTitle');
-    expect(task.subtitleParams).toEqual({ amount: 1500 });
+  it('يقترح تسجيل وجبة لو التمرين تم ولا توجد وجبات بعد', () => {
+    const task = getNextTask(makeSummary({ workoutMinutes: 30, mealsLogged: 0 }));
+    expect(task.titleKey).toBe('nextTask.nutritionTitle');
+    expect(task.ctaLabelKey).not.toBeNull();
   });
 
-  it('يقترح إكمال الخطوات لو التمرين والماء تمّا لكن الخطوات ناقصة', () => {
-    const task = getNextTask(makeSummary({ workoutMinutes: 30, waterMl: 2000, steps: 3000, stepsTarget: 8000 }));
+  it('يقترح إكمال الخطوات لو التمرين والتغذية تمّا لكن الخطوات ناقصة', () => {
+    const task = getNextTask(makeSummary({ workoutMinutes: 30, steps: 3000, stepsTarget: 8000 }));
     expect(task.titleKey).toBe('nextTask.stepsTitle');
   });
 

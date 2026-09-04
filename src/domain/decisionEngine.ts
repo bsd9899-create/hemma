@@ -10,7 +10,6 @@
 
 export type DailySignals = {
   /** نسبة (فعلي/هدف)، بدون سقف علوي — قد تتجاوز 1 لو تجاوز المستخدم هدفه. */
-  waterRatio: number;
   stepsRatio: number;
   /** null = لا يوجد هدف تمرين محدد لهذا اليوم أساسًا (نادر، احتياطي فقط). */
   workoutRatio: number;
@@ -27,7 +26,9 @@ export type TodayDecision = {
   recoveryMode: boolean;
 };
 
-const WEIGHTS = { water: 0.2, steps: 0.3, workout: 0.35, sleep: 0.15 } as const;
+// أوزان صريحة بعد إخراج تتبّع الماء من المنتج: التمرين هو المحرّك
+// الأساسي، ثم الحركة اليومية، ثم النوم كعامل تعافٍ.
+const WEIGHTS = { steps: 0.35, workout: 0.45, sleep: 0.2 } as const;
 
 const RECOVERY_LOOKBACK_DAYS = 3;
 const RECOVERY_THRESHOLD_PERCENT = 25;
@@ -41,7 +42,6 @@ function clamp01(value: number): number {
 /** متوسط مرجَّح لنسبة الإنجاز — يعيد توزيع وزن النوم لو لم تتوفر بياناته بعد. */
 function computeCompletionPercent(signals: DailySignals): number {
   const parts: { ratio: number; weight: number }[] = [
-    { ratio: clamp01(signals.waterRatio), weight: WEIGHTS.water },
     { ratio: clamp01(signals.stepsRatio), weight: WEIGHTS.steps },
     { ratio: clamp01(signals.workoutRatio), weight: WEIGHTS.workout },
   ];

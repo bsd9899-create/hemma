@@ -7,16 +7,6 @@ import { startOfTodayISO, toDateKey } from '@/src/lib/date';
  * الإضافة السريعة (app/log/*).
  */
 export const dailyLogsRepository = {
-  async getTodayWaterMl(userId: string): Promise<number> {
-    const { data, error } = await supabase
-      .from('water_logs')
-      .select('amount_ml')
-      .eq('user_id', userId)
-      .gte('logged_at', startOfTodayISO());
-    if (error) throw error;
-    return (data ?? []).reduce((sum, row) => sum + row.amount_ml, 0);
-  },
-
   async getTodaySteps(userId: string): Promise<number> {
     const { data, error } = await supabase
       .from('steps_logs')
@@ -75,11 +65,6 @@ export const dailyLogsRepository = {
   },
 
   // ---- Quick Add (المرحلة 5) ----
-
-  async addWater(userId: string, amountMl: number) {
-    const { error } = await supabase.from('water_logs').insert({ user_id: userId, amount_ml: amountMl });
-    if (error) throw error;
-  },
 
   async addWeight(userId: string, weightKg: number) {
     const { error } = await supabase.from('weight_logs').insert({ user_id: userId, weight_kg: weightKg });

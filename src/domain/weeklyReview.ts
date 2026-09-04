@@ -6,19 +6,17 @@
  */
 
 export type WeeklyRawAverages = {
-  avgWaterMl: number;
   avgWorkoutMinutes: number;
   avgSteps: number;
   avgSleepHours: number;
 };
 
 export type WeeklyGoals = {
-  targetWaterMl: number;
   targetSteps: number;
   targetSleepHours: number;
 };
 
-export type WeeklyMetricKey = 'workout' | 'water' | 'steps' | 'sleep';
+export type WeeklyMetricKey = 'workout' | 'steps' | 'sleep';
 
 export type WeeklyReview = {
   /** من 0 إلى 10 */
@@ -33,7 +31,6 @@ const REFERENCE_WORKOUT_MINUTES_PER_DAY = 30;
 export function computeWeeklyReview(raw: WeeklyRawAverages, goals: WeeklyGoals): WeeklyReview {
   const ratios: Record<WeeklyMetricKey, number> = {
     workout: raw.avgWorkoutMinutes / REFERENCE_WORKOUT_MINUTES_PER_DAY,
-    water: raw.avgWaterMl / goals.targetWaterMl,
     steps: raw.avgSteps / goals.targetSteps,
     sleep: raw.avgSleepHours / goals.targetSleepHours,
   };

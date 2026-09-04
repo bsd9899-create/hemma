@@ -12,8 +12,6 @@ const REFERENCE_WORKOUT_MINUTES = 30;
 const RECOVERY_LOOKBACK_DAYS = 7;
 
 export type TodaySummary = TodayDecision & {
-  waterMl: number;
-  waterTargetMl: number;
   steps: number;
   stepsTarget: number;
   workoutMinutes: number;
@@ -32,9 +30,8 @@ export function useTodayData(userId: string | undefined) {
     if (!options?.silent) setIsLoading(true);
     setError(null);
     try {
-      const [goals, waterMl, steps, workoutMinutes, mealsLogged, sleepHours, recentProgress] = await Promise.all([
+      const [goals, steps, workoutMinutes, mealsLogged, sleepHours, recentProgress] = await Promise.all([
         goalsRepository.getCurrent(userId),
-        dailyLogsRepository.getTodayWaterMl(userId),
         dailyLogsRepository.getTodaySteps(userId),
         dailyLogsRepository.getTodayWorkoutMinutes(userId),
         dailyLogsRepository.getTodayMealsCount(userId),
@@ -43,7 +40,6 @@ export function useTodayData(userId: string | undefined) {
       ]);
 
       const decision = computeTodayDecision({
-        waterRatio: waterMl / goals.target_water_ml,
         stepsRatio: steps / goals.target_steps,
         workoutRatio: workoutMinutes / REFERENCE_WORKOUT_MINUTES,
         sleepRatio: sleepHours !== null ? sleepHours / goals.target_sleep_hours : null,
@@ -58,8 +54,6 @@ export function useTodayData(userId: string | undefined) {
 
       setSummary({
         ...decision,
-        waterMl,
-        waterTargetMl: goals.target_water_ml,
         steps,
         stepsTarget: goals.target_steps,
         workoutMinutes,

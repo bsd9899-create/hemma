@@ -1,7 +1,6 @@
 import { computeTodayDecision, type DailySignals } from '../decisionEngine';
 
 const baseSignals: DailySignals = {
-  waterRatio: 0,
   stepsRatio: 0,
   workoutRatio: 0,
   sleepRatio: 0,
@@ -17,7 +16,6 @@ describe('computeTodayDecision — إنجاز اليوم', () => {
   it('يعيد 100% عندما كل المؤشرات مكتملة', () => {
     const result = computeTodayDecision({
       ...baseSignals,
-      waterRatio: 1,
       stepsRatio: 1,
       workoutRatio: 1,
       sleepRatio: 1,
@@ -25,23 +23,28 @@ describe('computeTodayDecision — إنجاز اليوم', () => {
     expect(result.completionPercent).toBe(100);
   });
 
-  it('يحسب متوسطًا مرجّحًا صحيحًا (ماء 20%، خطوات 30%، تمرين 35%، نوم 15%)', () => {
-    const result = computeTodayDecision({
-      ...baseSignals,
-      waterRatio: 1,
-      stepsRatio: 0,
-      workoutRatio: 0,
-      sleepRatio: 0,
-    });
-    expect(result.completionPercent).toBe(20);
+  it('يحسب متوسطًا مرجّحًا صحيحًا (خطوات 35%، تمرين 45%، نوم 20%)', () => {
+    // الخطوات وحدها مكتملة: 0.35 من إجمالي 1.0 = 35%.
+    expect(
+      computeTodayDecision({ ...baseSignals, stepsRatio: 1, workoutRatio: 0, sleepRatio: 0 }).completionPercent
+    ).toBe(35);
+
+    // التمرين وحده مكتمل: 0.45 = 45% — أثقل مؤشر، وهذا مقصود لتطبيق رياضي.
+    expect(
+      computeTodayDecision({ ...baseSignals, stepsRatio: 0, workoutRatio: 1, sleepRatio: 0 }).completionPercent
+    ).toBe(45);
+
+    // النوم وحده مكتمل: 0.20 = 20%.
+    expect(
+      computeTodayDecision({ ...baseSignals, stepsRatio: 0, workoutRatio: 0, sleepRatio: 1 }).completionPercent
+    ).toBe(20);
   });
 
   it('يعيد توزيع وزن النوم على بقية المؤشرات عند غياب بيانات النوم', () => {
-    // بدون بيانات نوم: الأوزان تصبح ماء 20/85، خطوات 30/85، تمرين 35/85
-    // من إجمالي 85 بدل 100. هنا كلها مكتملة فيجب أن تبقى 100%.
+    // بدون بيانات نوم: الأوزان تصبح خطوات 35/80 وتمرين 45/80 من إجمالي
+    // 80 بدل 100. هنا كلاهما مكتمل فيجب أن تبقى 100%.
     const result = computeTodayDecision({
       ...baseSignals,
-      waterRatio: 1,
       stepsRatio: 1,
       workoutRatio: 1,
       sleepRatio: null,
@@ -52,7 +55,6 @@ describe('computeTodayDecision — إنجاز اليوم', () => {
   it('لا يتجاوز 100% حتى لو تخطّى المستخدم أهدافه', () => {
     const result = computeTodayDecision({
       ...baseSignals,
-      waterRatio: 2,
       stepsRatio: 1.5,
       workoutRatio: 3,
       sleepRatio: 1.2,
@@ -72,19 +74,18 @@ describe('computeTodayDecision — قرار اليوم', () => {
       ...baseSignals,
       workoutRatio: 1,
       sleepRatio: 1,
-      waterRatio: 1,
       stepsRatio: 0.85,
     });
     expect(result.decisionTextKey).toBe('decision.stepsCloseText');
   });
 
   it('يهنّئ المستخدم عندما الإنجاز 90% فأكثر', () => {
+    // 0.35 + 0.45 + (0.2 × 0.6) = 92%
     const result = computeTodayDecision({
       ...baseSignals,
-      waterRatio: 1,
       stepsRatio: 1,
       workoutRatio: 1,
-      sleepRatio: 0.4,
+      sleepRatio: 0.6,
     });
     expect(result.completionPercent).toBeGreaterThanOrEqual(90);
     expect(result.decisionTextKey).toBe('decision.greatText');
@@ -114,7 +115,6 @@ describe('computeTodayDecision — وضع الإنقاذ', () => {
   it('يتجاوز رسالة وضع الإنقاذ أي قرار آخر حتى لو تحسّن أداء اليوم فجأة', () => {
     const result = computeTodayDecision({
       ...baseSignals,
-      waterRatio: 1,
       stepsRatio: 1,
       workoutRatio: 1,
       sleepRatio: 1,

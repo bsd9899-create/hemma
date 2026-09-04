@@ -21,14 +21,12 @@ export function getNextTask(summary: TodaySummary): NextTask {
     };
   }
 
-  if (summary.waterMl < summary.waterTargetMl) {
-    const remainingMl = summary.waterTargetMl - summary.waterMl;
+  if (summary.mealsLogged === 0) {
     return {
-      emoji: '💧',
-      titleKey: 'nextTask.waterTitle',
-      subtitleKey: 'nextTask.waterSubtitle',
-      subtitleParams: { amount: remainingMl },
-      ctaLabelKey: 'nextTask.waterCta',
+      emoji: '🍽️',
+      titleKey: 'nextTask.nutritionTitle',
+      subtitleKey: 'nextTask.nutritionSubtitle',
+      ctaLabelKey: 'nextTask.nutritionCta',
     };
   }
 

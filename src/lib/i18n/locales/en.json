@@ -57,13 +57,6 @@
       "S"
     ]
   },
-  "promises": {
-    "workout": "I'll work out today",
-    "steps": "I'll hit my steps",
-    "nutrition": "I'll eat well",
-    "water": "I'll finish my water",
-    "sleep": "I'll sleep better"
-  },
   "decision": {
     "stepsCloseText": "Today: you're so close 👟",
     "greatText": "You're crushing it today 🌟 keep it up",
@@ -76,14 +69,14 @@
     "workoutTitle": "Today's workout",
     "workoutSubtitle": "No workout logged yet",
     "workoutCta": "Start a workout",
-    "waterTitle": "Finish your water",
-    "waterSubtitle": "{{amount}} ml to go",
-    "waterCta": "Add water",
     "stepsTitle": "Finish your steps",
     "stepsSubtitle": "{{amount}} steps to go",
     "stepsCta": "Log your steps",
     "doneTitle": "You've done today's basics",
-    "doneSubtitle": "Keep it up"
+    "doneSubtitle": "Keep it up",
+    "nutritionTitle": "Log a meal",
+    "nutritionSubtitle": "Your first meal completes today's picture",
+    "nutritionCta": "Add a meal"
   },
   "onboarding": {
     "welcome": "Welcome to Hemma 🌿",
@@ -114,8 +107,6 @@
     "workoutValue": "{{minutes}} min",
     "nutrition": "Nutrition",
     "nutritionValue": "{{count}} meals",
-    "water": "Water",
-    "waterValue": "{{amount}}/{{target}} ml",
     "steps": "Steps",
     "stepsValue": "{{steps}}/{{target}}",
     "nextTaskTitle": "Up next",
@@ -126,14 +117,7 @@
     "goToTeams": "Go to teams",
     "loadError": "Couldn't load today's data",
     "recoveryMode": "Recovery mode 🌱",
-    "decisionOfDay": "Today's focus",
-    "promiseQuestion": "What's your promise today?",
-    "promiseOfDay": "Today's promise",
-    "promiseFulfilledQuestion": "Did you keep your promise?",
-    "promiseYes": "Yes 👏",
-    "promiseNotYet": "Not yet",
-    "promiseFulfilled": "✅",
-    "promiseCarryOver": "↻ Try again tomorrow"
+    "decisionOfDay": "Today's focus"
   },
   "progress": {
     "title": "My progress",
@@ -155,7 +139,6 @@
   },
   "weeklyMetrics": {
     "workout": "Workouts 🔥",
-    "water": "Water 💧",
     "steps": "Steps 👟",
     "sleep": "Sleep 💤"
   },
@@ -263,7 +246,6 @@
   },
   "quickAdd": {
     "title": "Quick add",
-    "water": "Water",
     "weight": "Weight",
     "steps": "Steps",
     "nutrition": "Nutrition",
@@ -273,11 +255,6 @@
   "logCommon": {
     "customValueLabel": "Or enter a custom value ({{unit}})",
     "invalidNumber": "Enter a valid number greater than zero"
-  },
-  "logWater": {
-    "title": "Water",
-    "placeholder": "e.g. 300",
-    "unit": "ml"
   },
   "logWeight": {
     "title": "Weight",

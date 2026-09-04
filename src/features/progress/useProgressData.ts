@@ -43,7 +43,6 @@ export function useProgressData(userId: string | undefined) {
           : null;
 
       const weeklyReview = computeWeeklyReview(weeklyRaw, {
-        targetWaterMl: goals.target_water_ml,
         targetSteps: goals.target_steps,
         targetSleepHours: goals.target_sleep_hours,
       });

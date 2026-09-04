@@ -21,8 +21,6 @@ import { useProfileStore } from '@/src/features/auth/profileStore';
 import { useTodayData } from '@/src/features/today/useTodayData';
 import { getNextTask } from '@/src/features/today/nextTask';
 import { MetricTile } from '@/src/features/today/components/MetricTile';
-import { DailyPromiseCard } from '@/src/features/today/components/DailyPromiseCard';
-import { useDailyPromise } from '@/src/features/today/useDailyPromise';
 import { useTeamData } from '@/src/features/teams/useTeamData';
 import { getTimeGreeting } from '@/src/lib/greeting';
 
@@ -33,14 +31,6 @@ export default function TodayScreen() {
   const displayName = useProfileStore((s) => s.profile?.display_name);
   const { summary, isLoading, error, refetch } = useTodayData(userId);
   const { data: team, hasTeam } = useTeamData(userId);
-  const {
-    promise,
-    isSaving: isPromiseSaving,
-    error: promiseError,
-    choose: choosePromise,
-    markFulfilled,
-  } = useDailyPromise(userId);
-
   if (!summary && isLoading) {
     return (
       <Screen edges={['top']}>
@@ -80,14 +70,6 @@ export default function TodayScreen() {
           </Text>
           <Wordmark size="sm" />
         </View>
-
-        <DailyPromiseCard
-          promise={promise}
-          isSaving={isPromiseSaving}
-          error={promiseError}
-          onChoose={choosePromise}
-          onMarkFulfilled={markFulfilled}
-        />
 
         {/* البطاقة الرئيسية — قرار اليوم وإنجاز اليوم معًا، تجيب فورًا على
             "كيف وضعي؟" بدون تفريق بصري بين رقمين مرتبطين بنفس الفكرة. */}
@@ -132,13 +114,6 @@ export default function TodayScreen() {
           />
         </View>
         <View style={{ flexDirection: rowDirection, gap: spacing.sm }}>
-          <MetricTile
-            emoji="💧"
-            label={t('today.water')}
-            valueText={t('today.waterValue', { amount: summary.waterMl, target: summary.waterTargetMl })}
-            progress={summary.waterMl / summary.waterTargetMl}
-            href="/log/water"
-          />
           <MetricTile
             emoji="👟"
             label={t('today.steps')}

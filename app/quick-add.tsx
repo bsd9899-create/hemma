@@ -6,7 +6,6 @@ import { Screen, ScreenHeader, Text, colors, rowDirection } from '@/src/design-s
 import { radius, spacing } from '@/src/design-system/spacing';
 
 const QUICK_ADD_OPTIONS: { emoji: string; labelKey: string; href: Href }[] = [
-  { emoji: '💧', labelKey: 'quickAdd.water', href: '/log/water' },
   { emoji: '⚖️', labelKey: 'quickAdd.weight', href: '/log/weight' },
   { emoji: '👟', labelKey: 'quickAdd.steps', href: '/log/steps' },
   { emoji: '🍽️', labelKey: 'quickAdd.nutrition', href: '/log/nutrition' },

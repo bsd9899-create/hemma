@@ -94,14 +94,12 @@ export const progressRepository = {
     const sinceISO = since.toISOString();
     const sinceKey = toDateKey(since);
 
-    const [water, workouts, steps, sleep] = await Promise.all([
-      supabase.from('water_logs').select('amount_ml').eq('user_id', userId).gte('logged_at', sinceISO),
+    const [workouts, steps, sleep] = await Promise.all([
       supabase.from('workouts').select('duration_minutes').eq('user_id', userId).gte('performed_at', sinceISO),
       supabase.from('steps_logs').select('steps').eq('user_id', userId).gte('date', sinceKey),
       supabase.from('sleep_logs').select('hours').eq('user_id', userId).gte('date', sinceKey),
     ]);
 
-    if (water.error) throw water.error;
     if (workouts.error) throw workouts.error;
     if (steps.error) throw steps.error;
     if (sleep.error) throw sleep.error;
@@ -109,7 +107,6 @@ export const progressRepository = {
     const sum = <T,>(rows: T[] | null, pick: (r: T) => number) => (rows ?? []).reduce((s, r) => s + pick(r), 0);
 
     return {
-      avgWaterMl: sum(water.data, (r) => r.amount_ml) / days,
       avgWorkoutMinutes: sum(workouts.data, (r) => r.duration_minutes) / days,
       avgSteps: sum(steps.data, (r) => r.steps) / days,
       avgSleepHours: sum(sleep.data, (r) => r.hours) / days,

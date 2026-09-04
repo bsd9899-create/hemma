@@ -57,13 +57,6 @@
       "س"
     ]
   },
-  "promises": {
-    "workout": "أتمرن اليوم",
-    "steps": "أكمل خطواتي",
-    "nutrition": "ألتزم بأكلي",
-    "water": "أكمل الماء",
-    "sleep": "أنام بشكل أفضل"
-  },
   "decision": {
     "stepsCloseText": "اليوم: أنت قريب جدًا 👟",
     "greatText": "أنت رائع اليوم 🌟 استمر بهذا الشكل",
@@ -76,14 +69,14 @@
     "workoutTitle": "تمرين اليوم",
     "workoutSubtitle": "ما سجّلت تمرينًا بعد",
     "workoutCta": "ابدأ التمرين",
-    "waterTitle": "أكمل الماء",
-    "waterSubtitle": "{{amount}} مل متبقية",
-    "waterCta": "أضف ماء",
     "stepsTitle": "أكمل خطواتك",
     "stepsSubtitle": "{{amount}} خطوة متبقية",
     "stepsCta": "سجّل خطواتك",
     "doneTitle": "أنجزت أساسيات اليوم",
-    "doneSubtitle": "استمر بهذا الشكل"
+    "doneSubtitle": "استمر بهذا الشكل",
+    "nutritionTitle": "سجّل وجبتك",
+    "nutritionSubtitle": "أول وجبة اليوم تكمّل صورة تقدّمك",
+    "nutritionCta": "أضف وجبة"
   },
   "onboarding": {
     "welcome": "هلا فيك في هِمّة 🌿",
@@ -114,8 +107,6 @@
     "workoutValue": "{{minutes}} د",
     "nutrition": "التغذية",
     "nutritionValue": "{{count}} وجبات",
-    "water": "الماء",
-    "waterValue": "{{amount}}/{{target}} مل",
     "steps": "الخطوات",
     "stepsValue": "{{steps}}/{{target}}",
     "nextTaskTitle": "مهمتك القادمة",
@@ -126,14 +117,7 @@
     "goToTeams": "اذهب إلى الفرق",
     "loadError": "تعذّر تحميل بيانات اليوم",
     "recoveryMode": "وضع الإنقاذ 🌱",
-    "decisionOfDay": "قرار اليوم",
-    "promiseQuestion": "وش وعدك اليوم؟",
-    "promiseOfDay": "وعدك اليوم",
-    "promiseFulfilledQuestion": "وفيت بوعدك؟",
-    "promiseYes": "أيوه 👏",
-    "promiseNotYet": "مو بعد",
-    "promiseFulfilled": "✅",
-    "promiseCarryOver": "↻ نكمل بكرة"
+    "decisionOfDay": "قرار اليوم"
   },
   "progress": {
     "title": "تقدمي",
@@ -155,7 +139,6 @@
   },
   "weeklyMetrics": {
     "workout": "التمارين 🔥",
-    "water": "الماء 💧",
     "steps": "الخطوات 👟",
     "sleep": "النوم 💤"
   },
@@ -263,7 +246,6 @@
   },
   "quickAdd": {
     "title": "إضافة سريعة",
-    "water": "ماء",
     "weight": "وزن",
     "steps": "خطوات",
     "nutrition": "تغذية",
@@ -273,11 +255,6 @@
   "logCommon": {
     "customValueLabel": "أو أدخل قيمة مخصّصة ({{unit}})",
     "invalidNumber": "أدخل رقمًا صحيحًا أكبر من صفر"
-  },
-  "logWater": {
-    "title": "الماء",
-    "placeholder": "مثلاً 300",
-    "unit": "مل"
   },
   "logWeight": {
     "title": "الوزن",
