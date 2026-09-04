@@ -2,7 +2,6 @@
   "nav": {
     "today": "Today",
     "progress": "Progress",
-    "teams": "Teams",
     "profile": "Profile",
     "nutrition": "Nutrition"
   },
@@ -258,7 +257,8 @@
     "tryAgainLater": "Please try again later",
     "version": "Hemma — version {{version}}",
     "linkError": "Couldn't open the link on this device",
-    "goalsEntry": "My goals"
+    "goalsEntry": "My goals",
+    "teamsEntry": "My team"
   },
   "quickAdd": {
     "title": "Quick add",

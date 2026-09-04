@@ -74,6 +74,7 @@ export default function RootLayout() {
             <Stack.Screen name="paywall" options={{ presentation: 'modal' }} />
             <Stack.Screen name="profile-edit" options={{ presentation: 'modal' }} />
             <Stack.Screen name="goals" />
+            <Stack.Screen name="teams/index" />
           </Stack>
         </ErrorBoundary>
       </SafeAreaProvider>

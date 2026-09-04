@@ -174,7 +174,7 @@ export default function TodayScreen() {
                 label={t('today.goToTeams')}
                 variant="secondary"
                 style={{ marginTop: spacing.sm }}
-                onPress={() => router.push('/(tabs)/teams')}
+                onPress={() => router.push('/teams')}
               />
             </>
           )}

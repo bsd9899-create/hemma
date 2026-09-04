@@ -63,15 +63,6 @@ export default function TabsLayout() {
         }}
       />
       <Tabs.Screen
-        name="progress"
-        options={{
-          title: t('nav.progress'),
-          tabBarIcon: ({ focused }) => (
-            <TabIcon name={focused ? 'trending-up' : 'trending-up-outline'} focused={focused} />
-          ),
-        }}
-      />
-      <Tabs.Screen
         name="add"
         options={{
           title: '',
@@ -82,11 +73,11 @@ export default function TabsLayout() {
         }}
       />
       <Tabs.Screen
-        name="teams"
+        name="progress"
         options={{
-          title: t('nav.teams'),
+          title: t('nav.progress'),
           tabBarIcon: ({ focused }) => (
-            <TabIcon name={focused ? 'people' : 'people-outline'} focused={focused} />
+            <TabIcon name={focused ? 'trending-up' : 'trending-up-outline'} focused={focused} />
           ),
         }}
       />

@@ -2,7 +2,6 @@
   "nav": {
     "today": "اليوم",
     "progress": "تقدمي",
-    "teams": "الفرق",
     "profile": "حسابي",
     "nutrition": "التغذية"
   },
@@ -258,7 +257,8 @@
     "tryAgainLater": "حاول مرة أخرى لاحقًا",
     "version": "هِمّة — الإصدار {{version}}",
     "linkError": "تعذّر فتح الرابط على هذا الجهاز",
-    "goalsEntry": "أهدافي"
+    "goalsEntry": "أهدافي",
+    "teamsEntry": "فريقي"
   },
   "quickAdd": {
     "title": "إضافة سريعة",

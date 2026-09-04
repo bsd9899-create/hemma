@@ -8,6 +8,7 @@ import {
   ErrorState,
   ProgressBar,
   Screen,
+  ScreenHeader,
   SectionHeader,
   Text,
   TeamsSkeleton,
@@ -68,12 +69,11 @@ export default function TeamsScreen() {
         showsVerticalScrollIndicator={false}
         refreshControl={<RefreshControl refreshing={isLoading} onRefresh={refetch} tintColor={colors.primary} />}
       >
-        <View style={{ marginTop: spacing.md }}>
-          <Text variant="displayMd">{data.team.name}</Text>
-          <Text variant="caption" color="textSecondary" style={{ marginTop: spacing.xxs }}>
-            {t('teams.inviteCode', { code: data.team.invite_code })}
-          </Text>
-        </View>
+        <ScreenHeader
+          title={data.team.name}
+          subtitle={t('teams.inviteCode', { code: data.team.invite_code })}
+          action="back"
+        />
 
         <Card variant="soft">
           <SectionHeader title={t('teams.pulseToday')} />
