@@ -6,6 +6,7 @@ import * as WebBrowser from 'expo-web-browser';
 import { Platform } from 'react-native';
 import { supabase } from '@/src/data/supabase';
 import { profileRepository } from '@/src/data/repositories/profileRepository';
+import { env } from '@/src/lib/env';
 
 // يُغلق أي جلسة WebBrowser معلّقة تلقائيًا عند عودة التطبيق من الخلفية —
 // موصى به من توثيق expo-web-browser، وإن كان أثره الفعلي هنا محدودًا
@@ -69,10 +70,16 @@ export async function signInWithGoogle(): Promise<SignInResult> {
 
   const result = await WebBrowser.openAuthSessionAsync(data.url, redirectTo);
   if (__DEV__) {
-    console.log('[AUTH-DEBUG] WebBrowser.openAuthSessionAsync نتيجة type:', result.type);
-    if ('url' in result) {
-      console.log('[AUTH-DEBUG] رابط العودة (code مُخفى):', result.url.replace(/([?&]code=)[^&]+/, '$1REDACTED'));
-    }
+    // الوحدة الأصلية (iOS) تُرجع فعليًا حقل "error" عند فشل ASWebAuthenticationSession
+    // (سبب حقيقي، وليس بالضرورة إلغاءً من المستخدم) — لكن نوع TypeScript الرسمي
+    // لحالة "cancel" لا يعرّف هذا الحقل، فنقرأه هنا صراحة عبر cast آمن للتشخيص فقط.
+    const rawResult = result as unknown as { type: string; url?: string | null; error?: string | null };
+    console.log('[AUTH-DEBUG] WebBrowser.openAuthSessionAsync نتيجة type:', rawResult.type);
+    console.log('[AUTH-DEBUG] WebBrowser.openAuthSessionAsync error (من الوحدة الأصلية، إن وُجد):', rawResult.error ?? null);
+    console.log(
+      '[AUTH-DEBUG] رابط العودة (code مُخفى):',
+      rawResult.url ? rawResult.url.replace(/([?&]code=)[^&]+/, '$1REDACTED') : null
+    );
   }
   if (result.type !== 'success') {
     // المستخدم أغلق المتصفح بنفسه — ليست حالة خطأ، فقط إلغاء صامت.
@@ -129,8 +136,35 @@ export async function signInWithApple(): Promise<SignInResult> {
     throw e;
   }
 
+  if (__DEV__) {
+    console.log('[AUTH-DEBUG] هل identityToken موجود؟', Boolean(credential.identityToken));
+    console.log('[AUTH-DEBUG] طول identityToken (بدون طباعة القيمة نفسها):', credential.identityToken?.length ?? 0);
+    console.log('[AUTH-DEBUG] هل authorizationCode موجود؟', Boolean(credential.authorizationCode));
+  }
+
   if (!credential.identityToken) {
     throw new Error('تعذّر الحصول على بيانات الدخول من Apple');
+  }
+
+  if (__DEV__) {
+    // فحص تشخيصي بسيط: هل fetch الخاص بتطبيق JS يصل أصلًا لنفس مضيف Supabase
+    // الذي سيُستخدم فورًا بعده في signInWithIdToken؟ يعزل فشل الشبكة/fetch نفسه
+    // عن أي خطأ منطقي لاحق من GoTrue.
+    const healthUrl = `${env.EXPO_PUBLIC_SUPABASE_URL}/auth/v1/health`;
+    const startedAt = Date.now();
+    try {
+      const healthResponse = await fetch(healthUrl);
+      console.log(
+        '[AUTH-DEBUG] فحص GET /auth/v1/health: نجح fetch، status =',
+        healthResponse.status,
+        `(${Date.now() - startedAt}ms)`
+      );
+    } catch (healthError) {
+      console.log('[AUTH-DEBUG] فحص GET /auth/v1/health: فشل fetch نفسه قبل أي استجابة:', {
+        message: healthError instanceof Error ? healthError.message : String(healthError),
+        cause: healthError instanceof Error ? (healthError as { cause?: unknown }).cause : undefined,
+      });
+    }
   }
 
   const { error } = await supabase.auth.signInWithIdToken({
@@ -139,7 +173,12 @@ export async function signInWithApple(): Promise<SignInResult> {
     nonce: rawNonce,
   });
   if (__DEV__) {
-    console.log('[AUTH-DEBUG] signInWithIdToken (apple) error:', error ? { name: error.name, status: error.status, message: error.message } : null);
+    console.log(
+      '[AUTH-DEBUG] signInWithIdToken (apple) error:',
+      error
+        ? { name: error.name, status: error.status, message: error.message, cause: (error as { cause?: unknown }).cause }
+        : null
+    );
   }
   if (error) throw error;
 
