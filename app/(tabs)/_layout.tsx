@@ -1,5 +1,8 @@
 import { Ionicons } from '@expo/vector-icons';
-import { Tabs, useRouter } from 'expo-router';
+import { useRouter } from 'expo-router';
+// SDK 57: استيراد Tabs من 'expo-router' مهجور صراحةً — نقطة الدخول
+// الصحيحة الآن هي 'expo-router/js-tabs' (نفس المكوّن ونفس الواجهة).
+import { Tabs } from 'expo-router/js-tabs';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
