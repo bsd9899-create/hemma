@@ -253,7 +253,8 @@
     "deleteConfirmAction": "Delete permanently",
     "deleteError": "Couldn't delete your account",
     "tryAgainLater": "Please try again later",
-    "version": "Hemma — version {{version}}"
+    "version": "Hemma — version {{version}}",
+    "linkError": "Couldn't open the link on this device"
   },
   "quickAdd": {
     "title": "Quick add",

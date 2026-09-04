@@ -253,7 +253,8 @@
     "deleteConfirmAction": "حذف نهائي",
     "deleteError": "تعذّر حذف الحساب",
     "tryAgainLater": "حاول مرة أخرى لاحقًا",
-    "version": "هِمّة — الإصدار {{version}}"
+    "version": "هِمّة — الإصدار {{version}}",
+    "linkError": "تعذّر فتح الرابط على هذا الجهاز"
   },
   "quickAdd": {
     "title": "إضافة سريعة",

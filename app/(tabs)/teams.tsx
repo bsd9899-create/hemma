@@ -1,7 +1,19 @@
 import { RefreshControl, ScrollView, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
-import { Button, Card, ProgressBar, Screen, Text, TeamsSkeleton, colors, rowDirection } from '@/src/design-system';
+import {
+  Button,
+  Card,
+  EmptyState,
+  ErrorState,
+  ProgressBar,
+  Screen,
+  SectionHeader,
+  Text,
+  TeamsSkeleton,
+  colors,
+  rowDirection,
+} from '@/src/design-system';
 import { spacing } from '@/src/design-system/spacing';
 import { useAuthStore } from '@/src/features/auth/store';
 import { useTeamData } from '@/src/features/teams/useTeamData';
@@ -23,15 +35,19 @@ export default function TeamsScreen() {
   if (hasTeam === false) {
     return (
       <Screen>
-        <View style={{ flex: 1, justifyContent: 'center', gap: spacing.lg }}>
-          <View>
-            <Text variant="displayMd">{t('teams.title')}</Text>
-            <Text variant="body" color="textSecondary" style={{ marginTop: spacing.xs }}>
-              {t('teams.intro')}
-            </Text>
-          </View>
-          <Button label={t('teams.createTeam')} onPress={() => router.push('/teams/create')} />
-          <Button label={t('teams.joinWithCode')} variant="secondary" onPress={() => router.push('/teams/join')} />
+        <View style={{ flex: 1, justifyContent: 'center', gap: spacing.sm }}>
+          <EmptyState
+            emoji="👥"
+            title={t('teams.title')}
+            description={t('teams.intro')}
+            actionLabel={t('teams.createTeam')}
+            onAction={() => router.push('/teams/create')}
+          />
+          <Button
+            label={t('teams.joinWithCode')}
+            variant="ghost"
+            onPress={() => router.push('/teams/join')}
+          />
         </View>
       </Screen>
     );
@@ -39,11 +55,8 @@ export default function TeamsScreen() {
 
   if (!data) {
     return (
-      <Screen style={{ alignItems: 'center', justifyContent: 'center', gap: spacing.sm }}>
-        <Text variant="body" color="textSecondary">
-          {error ?? t('teams.loadError')}
-        </Text>
-        <Button label={t('common.retry')} variant="secondary" onPress={refetch} />
+      <Screen style={{ flex: 1, justifyContent: 'center' }}>
+        <ErrorState message={error ?? t('teams.loadError')} onRetry={refetch} retryLabel={t('common.retry')} />
       </Screen>
     );
   }
@@ -63,9 +76,7 @@ export default function TeamsScreen() {
         </View>
 
         <Card variant="soft">
-          <Text variant="overline" color="textSecondary">
-            {t('teams.pulseToday')}
-          </Text>
+          <SectionHeader title={t('teams.pulseToday')} />
           <Text variant="displayLg" color="primary" style={{ marginTop: spacing.xxs }}>
             {data.pulsePercent ?? 0}%
           </Text>

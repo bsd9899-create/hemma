@@ -3,7 +3,7 @@ import { Alert, Linking, Pressable, ScrollView, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import Constants from 'expo-constants';
 import { useTranslation } from 'react-i18next';
-import { Button, Card, Screen, Text, colors, rowDirection } from '@/src/design-system';
+import { Button, Card, InlineMessage, Screen, SectionHeader, Text, colors, rowDirection } from '@/src/design-system';
 import { radius, spacing } from '@/src/design-system/spacing';
 import { deleteAccount, signOut } from '@/src/features/auth/api';
 import { useAuthStore } from '@/src/features/auth/store';
@@ -68,6 +68,15 @@ export default function ProfileScreen() {
     // changeLanguage يعيد تشغيل التطبيق فعليًا — لا حاجة لإيقاف isSwitchingLanguage هنا.
   }
 
+  async function handleOpenPrivacyPolicy() {
+    // كان الفشل يُبتلع بصمت: ضغطة بلا أي نتيجة ولا سبب ظاهر.
+    try {
+      await Linking.openURL(PRIVACY_POLICY_URL);
+    } catch {
+      Alert.alert(t('profile.linkError'), PRIVACY_POLICY_URL);
+    }
+  }
+
   return (
     <Screen>
       <ScrollView contentContainerStyle={{ gap: spacing.lg, paddingBottom: spacing.xxxl }} showsVerticalScrollIndicator={false}>
@@ -85,25 +94,23 @@ export default function ProfileScreen() {
         <Button label={t('profile.premium')} variant="secondary" onPress={() => router.push('/paywall')} />
 
         <Card variant="soft">
-          <Text variant="overline" color="textSecondary">
-            {t('profile.appleHealthTitle')}
-          </Text>
+          <SectionHeader title={t('profile.appleHealthTitle')} />
           {isAvailable ? (
             <>
               <Text variant="body" color="textSecondary" style={{ marginTop: spacing.xs }}>
                 {t('profile.appleHealthDescription')}
               </Text>
               <Button
-                label={isSyncing ? t('profile.syncing') : t('profile.syncNow')}
+                label={t('profile.syncNow')}
                 variant="secondary"
                 style={{ marginTop: spacing.sm }}
-                disabled={isSyncing}
+                loading={isSyncing}
                 onPress={syncToday}
               />
               {error ? (
-                <Text variant="caption" color="danger" style={{ marginTop: spacing.xs }}>
-                  {error}
-                </Text>
+                <View style={{ marginTop: spacing.sm }}>
+                  <InlineMessage tone="danger" message={error} />
+                </View>
               ) : null}
             </>
           ) : (
@@ -114,25 +121,32 @@ export default function ProfileScreen() {
         </Card>
 
         <Card variant="soft">
-          <Text variant="overline" color="textSecondary">
-            {t('profile.language')}
-          </Text>
+          <SectionHeader title={t('profile.language')} />
           <View style={{ flexDirection: rowDirection, gap: spacing.sm, marginTop: spacing.sm }}>
             {LANGUAGE_OPTIONS.map((option) => {
               const selected = option.value === i18n.language;
               return (
                 <Pressable
                   key={option.value}
+                  accessibilityRole="radio"
+                  accessibilityState={{ selected, disabled: isSwitchingLanguage }}
                   disabled={isSwitchingLanguage}
                   onPress={() => handleLanguageChange(option.value)}
-                  style={{
-                    flex: 1,
-                    paddingVertical: spacing.sm,
-                    borderRadius: radius.md,
-                    alignItems: 'center',
-                    backgroundColor: selected ? colors.primary : colors.surface,
-                    opacity: isSwitchingLanguage ? 0.6 : 1,
-                  }}
+                  style={({ pressed }) => [
+                    {
+                      flex: 1,
+                      minHeight: 44,
+                      justifyContent: 'center',
+                      paddingVertical: spacing.sm,
+                      borderRadius: radius.md,
+                      alignItems: 'center',
+                      backgroundColor: selected ? colors.primary : colors.surface,
+                      borderWidth: 1,
+                      borderColor: selected ? colors.primary : colors.border,
+                      opacity: isSwitchingLanguage ? 0.6 : 1,
+                    },
+                    pressed && !isSwitchingLanguage && { opacity: 0.8 },
+                  ]}
                 >
                   <Text variant="bodyStrong" color={selected ? 'onPrimary' : 'textPrimary'}>
                     {option.label}
@@ -143,18 +157,18 @@ export default function ProfileScreen() {
           </View>
         </Card>
 
-        <Button label={t('profile.privacyPolicy')} variant="ghost" onPress={() => Linking.openURL(PRIVACY_POLICY_URL).catch(() => {})} />
+        <Button label={t('profile.privacyPolicy')} variant="ghost" onPress={handleOpenPrivacyPolicy} />
         <Button
-          label={isSigningOut ? t('profile.signingOut') : t('profile.signOut')}
+          label={t('profile.signOut')}
           variant="ghost"
-          disabled={isSigningOut}
+          loading={isSigningOut}
           onPress={handleSignOut}
         />
         <Button
-          label={isDeleting ? t('profile.deleting') : t('profile.deleteAccount')}
+          label={t('profile.deleteAccount')}
           variant="ghost"
           danger
-          disabled={isDeleting}
+          loading={isDeleting}
           onPress={confirmDeleteAccount}
         />
 

@@ -1,6 +1,6 @@
 import { RefreshControl, ScrollView, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
-import { Button, Card, ProgressSkeleton, Screen, Text, colors, rowDirection } from '@/src/design-system';
+import { Card, ErrorState, ProgressSkeleton, Screen, Text, colors, rowDirection } from '@/src/design-system';
 import { spacing } from '@/src/design-system/spacing';
 import { useAuthStore } from '@/src/features/auth/store';
 import { useProgressData } from '@/src/features/progress/useProgressData';
@@ -22,11 +22,8 @@ export default function ProgressScreen() {
 
   if (!summary) {
     return (
-      <Screen style={{ alignItems: 'center', justifyContent: 'center', gap: spacing.sm }}>
-        <Text variant="body" color="textSecondary">
-          {error ?? t('progress.loadError')}
-        </Text>
-        <Button label={t('common.retry')} variant="secondary" onPress={refetch} />
+      <Screen style={{ flex: 1, justifyContent: 'center' }}>
+        <ErrorState message={error ?? t('progress.loadError')} onRetry={refetch} retryLabel={t('common.retry')} />
       </Screen>
     );
   }
