@@ -1,6 +1,5 @@
-import { useCallback } from 'react';
 import { RefreshControl, ScrollView, View } from 'react-native';
-import { useFocusEffect, useRouter } from 'expo-router';
+import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { Button, Card, ProgressRing, Screen, Text, TodaySkeleton, colors, palette, rowDirection } from '@/src/design-system';
 import { spacing } from '@/src/design-system/spacing';
@@ -20,25 +19,14 @@ export default function TodayScreen() {
   const userId = useAuthStore((s) => s.session?.user.id);
   const displayName = useProfileStore((s) => s.profile?.display_name);
   const { summary, isLoading, error, refetch } = useTodayData(userId);
-  const { data: team, hasTeam, refetch: refetchTeam } = useTeamData(userId);
+  const { data: team, hasTeam } = useTeamData(userId);
   const {
     promise,
     isSaving: isPromiseSaving,
     error: promiseError,
     choose: choosePromise,
     markFulfilled,
-    refetch: refetchPromise,
   } = useDailyPromise(userId);
-
-  // إعادة الجلب عند الرجوع من الإضافة السريعة أو أي شاشة أخرى — التبويبات
-  // في Expo Router تبقى مثبّتة (لا تُعاد بالكامل) عند التنقل بينها.
-  useFocusEffect(
-    useCallback(() => {
-      refetch();
-      refetchTeam();
-      refetchPromise();
-    }, [refetch, refetchTeam, refetchPromise])
-  );
 
   if (!summary && isLoading) {
     return (

@@ -1,6 +1,4 @@
-import { useCallback } from 'react';
 import { RefreshControl, ScrollView, View } from 'react-native';
-import { useFocusEffect } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { Button, Card, ProgressSkeleton, Screen, Text, colors, rowDirection } from '@/src/design-system';
 import { spacing } from '@/src/design-system/spacing';
@@ -13,12 +11,6 @@ export default function ProgressScreen() {
   const { t } = useTranslation();
   const userId = useAuthStore((s) => s.session?.user.id);
   const { summary, isLoading, error, refetch } = useProgressData(userId);
-
-  useFocusEffect(
-    useCallback(() => {
-      refetch();
-    }, [refetch])
-  );
 
   if (!summary && isLoading) {
     return (

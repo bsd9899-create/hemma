@@ -1,6 +1,5 @@
-import { useCallback } from 'react';
 import { RefreshControl, ScrollView, View } from 'react-native';
-import { useFocusEffect, useRouter } from 'expo-router';
+import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { Button, Card, ProgressBar, Screen, Text, TeamsSkeleton, colors, rowDirection } from '@/src/design-system';
 import { spacing } from '@/src/design-system/spacing';
@@ -12,12 +11,6 @@ export default function TeamsScreen() {
   const router = useRouter();
   const userId = useAuthStore((s) => s.session?.user.id);
   const { data, hasTeam, isLoading, error, refetch } = useTeamData(userId);
-
-  useFocusEffect(
-    useCallback(() => {
-      refetch();
-    }, [refetch])
-  );
 
   if (hasTeam === null && isLoading) {
     return (

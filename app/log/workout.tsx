@@ -19,7 +19,11 @@ export default function LogWorkoutScreen() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   async function handleSubmit() {
-    if (!userId) return;
+    if (isSubmitting) return;
+    if (!userId) {
+      setError(t('common.notSignedIn'));
+      return;
+    }
     if (!title.trim()) {
       setError(t('logWorkout.nameRequired'));
       return;

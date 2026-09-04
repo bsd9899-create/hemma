@@ -27,7 +27,12 @@ export default function LogNutritionScreen() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   async function handleSubmit() {
-    if (!userId) return;
+    if (isSubmitting) return;
+    // بدون هذا كان الزر لا يفعل شيئًا إطلاقًا ولا يعرض سببًا لو غابت الجلسة.
+    if (!userId) {
+      setError(t('common.notSignedIn'));
+      return;
+    }
     if (!description.trim()) {
       setError(t('logNutrition.descriptionRequired'));
       return;

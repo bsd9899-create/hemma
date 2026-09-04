@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
+import { useFocusEffect } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { dailyLogsRepository } from '@/src/data/repositories/dailyLogsRepository';
 import { dailyProgressRepository } from '@/src/data/repositories/dailyProgressRepository';
@@ -26,9 +27,9 @@ export function useTodayData(userId: string | undefined) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const load = useCallback(async () => {
+  const load = useCallback(async (options?: { silent?: boolean }) => {
     if (!userId) return;
-    setIsLoading(true);
+    if (!options?.silent) setIsLoading(true);
     setError(null);
     try {
       const [goals, waterMl, steps, workoutMinutes, mealsLogged, sleepHours, recentProgress] = await Promise.all([
@@ -72,12 +73,17 @@ export function useTodayData(userId: string | undefined) {
     }
   }, [userId, t]);
 
-  useEffect(() => {
-    // جلب أولي عند التركيب (يستدعي setIsLoading داخل load) — نمط قياسي
-    // ومختبَر في هذا المشروع، وليس اشتقاق حالة من props.
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    load();
-  }, [load]);
+  // يُعاد الجلب عند كل عودة للشاشة، وليس عند التركيب فقط: المستخدم قد
+  // يسجّل ماءً/وزنًا أو ينضم لفريق من شاشة أخرى، وبدون هذا تبقى الشاشة
+  // تعرض أرقامًا قديمة حتى يسحب لتحديثها يدويًا. أول جلب يعرض حالة
+  // التحميل، والعودات التالية تُحدِّث بصمت حتى لا تومض الشاشة.
+  const hasLoadedOnceRef = useRef(false);
+  useFocusEffect(
+    useCallback(() => {
+      load({ silent: hasLoadedOnceRef.current });
+      hasLoadedOnceRef.current = true;
+    }, [load])
+  );
 
   return { summary, isLoading, error, refetch: load };
 }
