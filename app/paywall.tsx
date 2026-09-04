@@ -1,12 +1,18 @@
 import { useEffect, useState } from 'react';
-import { View } from 'react-native';
+import { Pressable, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import type { PurchasesPackage } from 'react-native-purchases';
-import { Button, Card, Screen, Skeleton, Text, Wordmark, palette } from '@/src/design-system';
-import { spacing } from '@/src/design-system/spacing';
+import { Button, Card, Screen, Skeleton, Text, Wordmark, colors, palette, rowDirection } from '@/src/design-system';
+import { radius, spacing } from '@/src/design-system/spacing';
 import { useAuthStore } from '@/src/features/auth/store';
-import { getCurrentOfferingPackages, isRevenueCatConfigured, purchasePackage, restorePurchases } from '@/src/subscriptions/revenuecat';
+import {
+  getCurrentOfferingPackages,
+  isPurchaseCancelledError,
+  isRevenueCatConfigured,
+  purchasePackage,
+  restorePurchases,
+} from '@/src/subscriptions/revenuecat';
 import { usePremiumStatus } from '@/src/subscriptions/usePremiumStatus';
 import { getFriendlyErrorMessage } from '@/src/lib/errors';
 
@@ -34,7 +40,10 @@ export default function PaywallScreen() {
       .finally(() => setIsLoading(false));
   }, [t]);
 
+  const isBusy = busyPackageId !== null || isRestoring;
+
   async function handlePurchase(pkg: PurchasesPackage) {
+    if (isBusy) return;
     setBusyPackageId(pkg.identifier);
     setError(null);
     try {
@@ -42,13 +51,17 @@ export default function PaywallScreen() {
       await refresh();
       router.back();
     } catch (e) {
-      setError(getFriendlyErrorMessage(e, t('paywall.purchaseError')));
+      // إغلاق ورقة الدفع تصرّف طبيعي وليس فشلًا — نعود بصمت بلا رسالة حمراء.
+      if (!isPurchaseCancelledError(e)) {
+        setError(getFriendlyErrorMessage(e, t('paywall.purchaseError')));
+      }
     } finally {
       setBusyPackageId(null);
     }
   }
 
   async function handleRestore() {
+    if (isBusy) return;
     setError(null);
     setIsRestoring(true);
     try {
@@ -56,7 +69,9 @@ export default function PaywallScreen() {
       await refresh();
       router.back();
     } catch (e) {
-      setError(getFriendlyErrorMessage(e, t('paywall.restoreError')));
+      if (!isPurchaseCancelledError(e)) {
+        setError(getFriendlyErrorMessage(e, t('paywall.restoreError')));
+      }
     } finally {
       setIsRestoring(false);
     }
@@ -78,6 +93,29 @@ export default function PaywallScreen() {
   return (
     <Screen>
       <View style={{ flex: 1, gap: spacing.lg }}>
+        {/* شاشة الاشتراك تُعرض كنافذة، وكانت بلا وسيلة إغلاق ظاهرة في الحالة
+            غير المشتركة — سحب الورقة وحده لا يكفي، وآبل تتوقّع مخرجًا واضحًا. */}
+        <View style={{ flexDirection: rowDirection, justifyContent: 'flex-end' }}>
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={t('paywall.close')}
+            onPress={() => router.back()}
+            hitSlop={spacing.sm}
+            style={{
+              width: 32,
+              height: 32,
+              borderRadius: radius.pill,
+              backgroundColor: colors.surfaceAlt,
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <Text variant="bodyStrong" color="textSecondary">
+              ✕
+            </Text>
+          </Pressable>
+        </View>
+
         <View style={{ alignItems: 'center', gap: spacing.sm }}>
           <Wordmark />
           <Text variant="title" style={{ textAlign: 'center' }}>
@@ -129,7 +167,7 @@ export default function PaywallScreen() {
                     label={busyPackageId === pkg.identifier ? t('paywall.purchasing') : t('paywall.subscribe')}
                     variant={isAnnual ? 'primary' : 'secondary'}
                     style={{ marginTop: spacing.sm }}
-                    disabled={busyPackageId !== null}
+                    disabled={isBusy}
                     onPress={() => handlePurchase(pkg)}
                   />
                 </Card>
@@ -147,7 +185,7 @@ export default function PaywallScreen() {
         <Button
           label={isRestoring ? t('paywall.restoring') : t('paywall.restorePurchases')}
           variant="ghost"
-          disabled={isRestoring}
+          disabled={isBusy}
           onPress={handleRestore}
         />
       </View>

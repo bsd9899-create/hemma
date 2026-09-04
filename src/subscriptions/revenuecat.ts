@@ -37,6 +37,20 @@ export async function purchasePackage(pkg: PurchasesPackage): Promise<CustomerIn
   return customerInfo;
 }
 
+/**
+ * إغلاق المستخدم لورقة الدفع من آبل ليس خطأً — SDK يرميه كاستثناء يحمل
+ * `userCancelled: true`، وبدون التمييز هذا تظهر رسالة خطأ حمراء لمجرد أن
+ * المستخدم غيّر رأيه.
+ */
+export function isPurchaseCancelledError(error: unknown): boolean {
+  return (
+    typeof error === 'object' &&
+    error !== null &&
+    'userCancelled' in error &&
+    (error as { userCancelled?: unknown }).userCancelled === true
+  );
+}
+
 export async function restorePurchases(): Promise<CustomerInfo> {
   return Purchases.restorePurchases();
 }
