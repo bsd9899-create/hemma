@@ -59,7 +59,12 @@ export async function signInWithGoogle(): Promise<SignInResult> {
     console.log('[AUTH-DEBUG] رابط /authorize الفعلي العائد من Supabase (data.url):', data?.url);
     if (data?.url) {
       try {
-        console.log('[AUTH-DEBUG] redirect_uri المُرسَل لجوجل عبر Supabase:', new URL(data.url).searchParams.get('redirect_uri'));
+        // اسم الحقل في رابط Supabase هو "redirect_to" (وليس "redirect_uri") —
+        // تأكَّدنا من هذا من مصدر @supabase/auth-js نفسه (GoTrueClient.js،
+        // _getUrlForProvider: `redirect_to=${encodeURIComponent(redirectTo)}`).
+        // السطر السابق كان يقرأ مفتاحًا خاطئًا فيطبع null دائمًا بغض النظر عن
+        // صحة الإعداد الفعلي — لا قيمة تشخيصية حقيقية منه.
+        console.log('[AUTH-DEBUG] redirect_to المُرسَل عبر Supabase:', new URL(data.url).searchParams.get('redirect_to'));
       } catch {
         // تجاهل — لو data.url غير قابل للتحليل سيظهر ذلك من السطر أعلاه أصلًا.
       }
