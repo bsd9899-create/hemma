@@ -50,7 +50,7 @@ function testXHR(label: string, url: string): Promise<void> {
 }
 
 export async function runNetworkDiagnostics(): Promise<void> {
-  console.log('[NET-DEBUG] ===== بدء فحص الشبكة =====');
+  console.log('[NET-DEBUG] ===== بدء فحص الشبكة (جولة 1) =====');
   console.log('[NET-DEBUG] typeof global.fetch:', typeof globalThis.fetch);
   console.log('[NET-DEBUG] typeof XMLHttpRequest:', typeof XMLHttpRequest);
 
@@ -60,5 +60,22 @@ export async function runNetworkDiagnostics(): Promise<void> {
   await testXHR('2) Supabase /auth/v1/health', supabaseHealthUrl);
   await testFetch('3) example.com', 'https://example.com');
 
-  console.log('[NET-DEBUG] ===== انتهى فحص الشبكة =====');
+  console.log('[NET-DEBUG] ===== انتهى فحص الشبكة (جولة 1) =====');
+}
+
+/**
+ * جولة 2: عزل هل الفشل خاص بمضيف مشروع Supabase تحديدًا
+ * (zvcynshexffvxskqhet.supabase.co) أم بنطاق supabase.co عمومًا.
+ */
+export async function runHostnameDiagnostics(): Promise<void> {
+  console.log('[NET-DEBUG] ===== بدء فحص الشبكة (جولة 2 — hostname) =====');
+
+  const projectRoot = env.EXPO_PUBLIC_SUPABASE_URL ?? '(EXPO_PUBLIC_SUPABASE_URL غير معرَّف)';
+
+  await testFetch('1) جذر مشروع Supabase', projectRoot);
+  await testFetch('2) supabase.com (النطاق العام)', 'https://supabase.com');
+  await testFetch('3) /rest/v1/ لمشروع Supabase', `${env.EXPO_PUBLIC_SUPABASE_URL}/rest/v1/`);
+  await testFetch('4) /auth/v1/health لمشروع Supabase', `${env.EXPO_PUBLIC_SUPABASE_URL}/auth/v1/health`);
+
+  console.log('[NET-DEBUG] ===== انتهى فحص الشبكة (جولة 2 — hostname) =====');
 }
