@@ -1,8 +1,14 @@
 import { supabase } from '@/src/data/supabase';
+import { useProfileStore } from './profileStore';
 
 export async function signOut() {
   const { error } = await supabase.auth.signOut();
   if (error) throw error;
+
+  // مسح الحالة المحلية فورًا بدل انتظار onAuthStateChange: يمنع وميض
+  // بيانات المستخدم السابق لو تأخّر الحدث، ولا يمسّ أي بيانات في قاعدة
+  // البيانات — الجلسة فقط هي ما يُنهى.
+  useProfileStore.getState().clear();
 }
 
 /**
@@ -14,4 +20,5 @@ export async function deleteAccount() {
   const { error } = await supabase.functions.invoke('delete-account');
   if (error) throw error;
   await supabase.auth.signOut();
+  useProfileStore.getState().clear();
 }

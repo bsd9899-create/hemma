@@ -93,7 +93,12 @@
     "goalLabel": "وش هدفك الأساسي؟",
     "nameRequired": "أدخل اسمك أولًا",
     "goalRequired": "اختر هدفك الأساسي",
-    "start": "ابدأ رحلتك"
+    "start": "ابدأ رحلتك",
+    "signOut": "تسجيل الخروج",
+    "signOutConfirmTitle": "تسجيل الخروج؟",
+    "signOutConfirmMessage": "سنعيدك إلى شاشة تسجيل الدخول. بياناتك محفوظة ولن تُحذف.",
+    "signOutError": "تعذّر تسجيل الخروج",
+    "signedInAs": "مسجَّل دخولك حاليًا"
   },
   "profileEdit": {
     "title": "تعديل ملفي",

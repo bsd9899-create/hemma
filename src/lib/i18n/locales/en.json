@@ -93,7 +93,12 @@
     "goalLabel": "What's your main goal?",
     "nameRequired": "Enter your name first",
     "goalRequired": "Choose your main goal",
-    "start": "Start your journey"
+    "start": "Start your journey",
+    "signOut": "Sign out",
+    "signOutConfirmTitle": "Sign out?",
+    "signOutConfirmMessage": "We'll take you back to the sign-in screen. Your data stays saved.",
+    "signOutError": "Couldn't sign out",
+    "signedInAs": "You're currently signed in"
   },
   "profileEdit": {
     "title": "Edit profile",
