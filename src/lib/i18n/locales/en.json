@@ -30,7 +30,8 @@
       "invalidValue": "One of the values entered isn't valid",
       "notFound": "We couldn't find the requested data",
       "serverError": "The service is temporarily unavailable — try again shortly"
-    }
+    },
+    "back": "Back"
   },
   "goals": {
     "loseWeight": "Lose weight",
@@ -223,7 +224,10 @@
     "respondError": "Couldn't send your response",
     "endError": "Couldn't end the partnership",
     "pingError": "Couldn't send that reaction",
-    "fallbackPartnerName": "Your partner"
+    "fallbackPartnerName": "Your partner",
+    "endPartnershipConfirmTitle": "End this partnership?",
+    "endPartnershipConfirmMessage": "You'll stop nudging each other. You can pair up again later.",
+    "endPartnershipConfirmAction": "End"
   },
   "profile": {
     "fallbackName": "My account",

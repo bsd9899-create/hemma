@@ -30,7 +30,8 @@
       "invalidValue": "إحدى القيم المُدخَلة غير صالحة",
       "notFound": "لم نجد البيانات المطلوبة",
       "serverError": "الخدمة غير متاحة مؤقتًا — حاول بعد قليل"
-    }
+    },
+    "back": "رجوع"
   },
   "goals": {
     "loseWeight": "التنحيف",
@@ -223,7 +224,10 @@
     "respondError": "تعذّر إرسال الرد",
     "endError": "تعذّر إنهاء الشراكة",
     "pingError": "تعذّر إرسال التفاعل",
-    "fallbackPartnerName": "شريكك"
+    "fallbackPartnerName": "شريكك",
+    "endPartnershipConfirmTitle": "إنهاء الشراكة؟",
+    "endPartnershipConfirmMessage": "سيتوقف تبادل التشجيع بينكما، ويمكنكما البدء من جديد لاحقًا.",
+    "endPartnershipConfirmAction": "إنهاء"
   },
   "profile": {
     "fallbackName": "حسابي",
