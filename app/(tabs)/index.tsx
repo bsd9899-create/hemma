@@ -123,7 +123,10 @@ export default function TodayScreen() {
           <MetricTile
             emoji="👟"
             label={t('today.steps')}
-            valueText={t('today.stepsValue', { steps: summary.steps, target: summary.stepsTarget })}
+            valueText={t('today.stepsValue', {
+              steps: formatNumber(summary.steps),
+              target: formatNumber(summary.stepsTarget),
+            })}
             progress={summary.steps / summary.stepsTarget}
             href="/log/steps"
           />

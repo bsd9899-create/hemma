@@ -26,8 +26,8 @@ npx supabase gen types typescript --project-id <project-ref> > src/data/database
 | الملف | المحتوى |
 |---|---|
 | `20260831000001_profiles_and_goals.sql` | profiles + user_goals + trigger إنشاء تلقائي عند التسجيل |
-| `20260831000002_daily_logs.sql` | workouts, nutrition_logs, water_logs, steps_logs, sleep_logs, weight_logs |
-| `20260831000003_daily_promises_and_progress.sql` | daily_promises (وعدك اليوم) + daily_progress (إنجاز اليوم) |
+| `20260831000002_daily_logs.sql` | workouts, nutrition_logs, water_logs (غير مستخدم), steps_logs, sleep_logs, weight_logs |
+| `20260831000003_daily_promises_and_progress.sql` | daily_promises (غير مستخدم في التطبيق) + daily_progress (إنجاز اليوم) |
 | `20260831000004_teams_and_challenges.sql` | teams, team_members, challenges, challenge_progress + `join_team_by_code()` + view `team_roster` |
 | `20260831000005_accountability.sql` | رفيق هِمّة: accountability_pairs + accountability_pings |
 | `20260831000006_points_and_leaderboard.sql` | points_ledger + views: `user_points_totals` (داخلية)، `team_pulse_daily`، `team_leaderboard` |
@@ -52,7 +52,7 @@ bash supabase/scripts/verify-rls.sh
 ## قواعد أمان أساسية مطبَّقة من البداية
 
 - **RLS مفعّلة على كل جدول** بلا استثناء.
-- بيانات صحية شخصية (تمرين/تغذية/ماء/خطوات/نوم/وزن) **خاصة تمامًا بصاحبها**.
+- بيانات صحية شخصية (تمرين/تغذية/خطوات/نوم/وزن) **خاصة تمامًا بصاحبها**.
 - رؤية بيانات زميل الفريق (الاسم/الصورة) تمر حصرًا عبر views مقيّدة
   (`team_roster`, `team_leaderboard`, `team_pulse_daily`) تفرض تقييدها
   صراحة بـ `auth.uid()` — وليس عبر فتح جدول `profiles` نفسه.
@@ -79,3 +79,17 @@ bash supabase/scripts/verify-rls.sh
 ⚠️ لا تُشغّل `apply_all.sql` أكثر من مرة على نفس المشروع (ليس idempotent).
 لأي تعديل مستقبلي على المخطط، أضف ملف migration جديد برقم تسلسلي أحدث
 بدل تعديل الملفات القديمة أو إعادة تشغيل الملف المجمّع.
+
+## جداول باقية بلا استخدام من التطبيق
+
+`water_logs` و`daily_promises` أُخرجت ميزتاهما من المنتج (تتبّع الماء
+ووعد اليوم). الجدولان **لم يُحذفا عمدًا**: حذفهما يعني فقدان بيانات
+مستخدمين حقيقية بلا إمكانية استرجاع، وإبقاؤهما لا يكلّف شيئًا ولا يوسّع
+أي صلاحية. لا يقرأ منهما أي كود في التطبيق الآن.
+
+## Migrations إضافية
+
+| الملف | ماذا يفعل |
+|---|---|
+| `20260904000001_grant_authenticated_privileges.sql` | صلاحيات `authenticated` على الجداول (طبقة GRANT المستقلة عن RLS) |
+| `20260904000002_nutrition_macros_and_targets.sql` | ماكروز الوجبات + أهداف السعرات والماكروز |
