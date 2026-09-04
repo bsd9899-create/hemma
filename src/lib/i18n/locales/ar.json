@@ -118,7 +118,9 @@
     "goToTeams": "اذهب إلى الفرق",
     "loadError": "تعذّر تحميل بيانات اليوم",
     "recoveryMode": "وضع الإنقاذ 🌱",
-    "decisionOfDay": "قرار اليوم"
+    "decisionOfDay": "قرار اليوم",
+    "calories": "السعرات",
+    "caloriesValue": "{{value}} / {{target}}"
   },
   "progress": {
     "title": "تقدمي",

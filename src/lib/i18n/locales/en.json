@@ -118,7 +118,9 @@
     "goToTeams": "Go to teams",
     "loadError": "Couldn't load today's data",
     "recoveryMode": "Recovery mode 🌱",
-    "decisionOfDay": "Today's focus"
+    "decisionOfDay": "Today's focus",
+    "calories": "Calories",
+    "caloriesValue": "{{value}} / {{target}}"
   },
   "progress": {
     "title": "My progress",

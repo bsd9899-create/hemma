@@ -16,6 +16,8 @@ export type TodaySummary = TodayDecision & {
   stepsTarget: number;
   workoutMinutes: number;
   mealsLogged: number;
+  calories: number;
+  caloriesTarget: number;
   goals: UserGoals;
 };
 
@@ -30,11 +32,11 @@ export function useTodayData(userId: string | undefined) {
     if (!options?.silent) setIsLoading(true);
     setError(null);
     try {
-      const [goals, steps, workoutMinutes, mealsLogged, sleepHours, recentProgress] = await Promise.all([
+      const [goals, steps, workoutMinutes, meals, sleepHours, recentProgress] = await Promise.all([
         goalsRepository.getCurrent(userId),
         dailyLogsRepository.getTodaySteps(userId),
         dailyLogsRepository.getTodayWorkoutMinutes(userId),
-        dailyLogsRepository.getTodayMealsCount(userId),
+        dailyLogsRepository.getTodayMeals(userId),
         dailyLogsRepository.getTodaySleepHours(userId),
         dailyLogsRepository.getRecentProgress(userId, RECOVERY_LOOKBACK_DAYS),
       ]);
@@ -57,7 +59,9 @@ export function useTodayData(userId: string | undefined) {
         steps,
         stepsTarget: goals.target_steps,
         workoutMinutes,
-        mealsLogged,
+        mealsLogged: meals.length,
+        calories: meals.reduce((total, meal) => total + (meal.calories ?? 0), 0),
+        caloriesTarget: goals.target_calories,
         goals,
       });
     } catch (e) {

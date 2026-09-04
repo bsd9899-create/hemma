@@ -23,6 +23,7 @@ import { getNextTask } from '@/src/features/today/nextTask';
 import { MetricTile } from '@/src/features/today/components/MetricTile';
 import { useTeamData } from '@/src/features/teams/useTeamData';
 import { getTimeGreeting } from '@/src/lib/greeting';
+import { formatNumber } from '@/src/lib/i18n/format';
 
 export default function TodayScreen() {
   const { t } = useTranslation();
@@ -98,6 +99,9 @@ export default function TodayScreen() {
           <SectionHeader title={t('today.sectionTitle')} />
         </View>
 
+        {/* صف واحد متوازن من ثلاثة مؤشرات — بعد خروج الماء بقيت بطاقة
+            يتيمة في صف ثانٍ، وكانت السعرات (أهم رقم في التغذية) غائبة
+            عن الشاشة الرئيسية تمامًا. */}
         <View style={{ flexDirection: rowDirection, gap: spacing.sm }}>
           <MetricTile
             emoji="🏋️"
@@ -108,12 +112,14 @@ export default function TodayScreen() {
           />
           <MetricTile
             emoji="🍽️"
-            label={t('today.nutrition')}
-            valueText={t('today.nutritionValue', { count: summary.mealsLogged })}
-            href="/log/nutrition"
+            label={t('today.calories')}
+            valueText={t('today.caloriesValue', {
+              value: formatNumber(summary.calories),
+              target: formatNumber(summary.caloriesTarget),
+            })}
+            progress={summary.caloriesTarget > 0 ? summary.calories / summary.caloriesTarget : 0}
+            href="/(tabs)/nutrition"
           />
-        </View>
-        <View style={{ flexDirection: rowDirection, gap: spacing.sm }}>
           <MetricTile
             emoji="👟"
             label={t('today.steps')}
@@ -124,9 +130,7 @@ export default function TodayScreen() {
         </View>
 
         <Card>
-          <Text variant="overline" color="textSecondary">
-            {t('today.nextTaskTitle')}
-          </Text>
+          <SectionHeader title={t('today.nextTaskTitle')} />
           <View style={{ flexDirection: rowDirection, alignItems: 'center', gap: spacing.sm, marginTop: spacing.xs }}>
             <Text variant="displayMd">{nextTask.emoji}</Text>
             <View>
@@ -136,15 +140,17 @@ export default function TodayScreen() {
               </Text>
             </View>
           </View>
-          {nextTask.ctaLabelKey ? (
-            <Button label={t(nextTask.ctaLabelKey)} style={{ marginTop: spacing.md }} onPress={() => router.push('/quick-add')} />
+          {nextTask.ctaLabelKey && nextTask.ctaHref ? (
+            <Button
+              label={t(nextTask.ctaLabelKey)}
+              style={{ marginTop: spacing.md }}
+              onPress={() => router.push(nextTask.ctaHref!)}
+            />
           ) : null}
         </Card>
 
         <Card variant="soft">
-          <Text variant="overline" color="textSecondary">
-            {t('today.teamSectionTitle')}
-          </Text>
+          <SectionHeader title={t('today.teamSectionTitle')} />
           {hasTeam && team ? (
             <>
               <Text variant="bodyStrong" style={{ marginTop: spacing.xs }}>

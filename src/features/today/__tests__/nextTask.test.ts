@@ -10,6 +10,8 @@ function makeSummary(overrides: Partial<TodaySummary>): TodaySummary {
     stepsTarget: 8000,
     workoutMinutes: 30,
     mealsLogged: 2,
+    calories: 1200,
+    caloriesTarget: 2000,
     goals: {
       user_id: 'u1',
       target_water_ml: 2000,

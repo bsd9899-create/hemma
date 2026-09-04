@@ -1,3 +1,4 @@
+import type { Href } from 'expo-router';
 import type { TodaySummary } from './useTodayData';
 
 export type NextTask = {
@@ -8,6 +9,11 @@ export type NextTask = {
   /** قيم للاستيفاء داخل نص العنوان الفرعي المترجَم (مثل {{amount}}). */
   subtitleParams?: Record<string, number>;
   ctaLabelKey: string | null;
+  /**
+   * وجهة الزر. كان الزر يفتح شبكة "الإضافة السريعة" مهما كانت المهمة،
+   * فيضطر المستخدم لاختيار نفس الشيء الذي طُلب منه للتو.
+   */
+  ctaHref: Href | null;
 };
 
 /** أهم مهمة قادمة واحدة — أول عنصر أساسي لم يُنجز بعد، بترتيب أولوية ثابت. */
@@ -18,6 +24,7 @@ export function getNextTask(summary: TodaySummary): NextTask {
       titleKey: 'nextTask.workoutTitle',
       subtitleKey: 'nextTask.workoutSubtitle',
       ctaLabelKey: 'nextTask.workoutCta',
+      ctaHref: '/log/workout',
     };
   }
 
@@ -27,6 +34,7 @@ export function getNextTask(summary: TodaySummary): NextTask {
       titleKey: 'nextTask.nutritionTitle',
       subtitleKey: 'nextTask.nutritionSubtitle',
       ctaLabelKey: 'nextTask.nutritionCta',
+      ctaHref: '/log/nutrition',
     };
   }
 
@@ -38,6 +46,7 @@ export function getNextTask(summary: TodaySummary): NextTask {
       subtitleKey: 'nextTask.stepsSubtitle',
       subtitleParams: { amount: remainingSteps },
       ctaLabelKey: 'nextTask.stepsCta',
+      ctaHref: '/log/steps',
     };
   }
 
@@ -46,5 +55,6 @@ export function getNextTask(summary: TodaySummary): NextTask {
     titleKey: 'nextTask.doneTitle',
     subtitleKey: 'nextTask.doneSubtitle',
     ctaLabelKey: null,
+    ctaHref: null,
   };
 }
