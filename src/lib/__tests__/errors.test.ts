@@ -77,6 +77,15 @@ describe('getFriendlyErrorMessage', () => {
       expect(getFriendlyErrorMessage(error, 'تعذّر الحفظ')).toBe('تعذّر الحفظ');
     });
 
+    it('لا يسرّب كود الخطأ ولا نصه الإنجليزي إلى رسالة المستخدم', () => {
+      const error = postgrestError('42501', 'permission denied for table profiles');
+      const message = getFriendlyErrorMessage(error);
+      expect(message).not.toContain('42501');
+      expect(message).not.toContain('permission denied');
+      expect(message).not.toContain('profiles');
+      expect(message).toBe('ليس لديك صلاحية لتنفيذ هذا الإجراء');
+    });
+
     it('يكتشف انقطاع الشبكة داخل أخطاء Supabase أيضًا', () => {
       const error = Object.assign(new Error('fetch failed: UnexpectedException'), { status: 0 });
       expect(getFriendlyErrorMessage(error)).toContain('غير متصل بالإنترنت');

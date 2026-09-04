@@ -47,7 +47,10 @@ function backendMessageKey(error: BackendError): string | null {
  */
 export function getFriendlyErrorMessage(error: unknown, fallback?: string): string {
   if (__DEV__) {
-    console.error('[error]', error);
+    // console.log وليس console.error عمدًا: console.error في React Native
+    // يرفع LogBox فيظهر للمستخدم شريط أسود بالخطأ التقني الخام فوق الواجهة،
+    // وهو ما نتجنّبه بالضبط. التفاصيل تبقى كاملة في Metro للمطوّر.
+    console.log('[error]', error);
   }
 
   if (isOfflineError(error)) {

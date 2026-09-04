@@ -127,14 +127,17 @@ export default function OnboardingScreen() {
             <GoalPicker value={goalType} onChange={setGoalType} />
           </View>
 
-          {profileLoadError ? (
+          {/* رسالة خطأ واحدة فقط: خطأ الحفظ (أحدث فعل للمستخدم) له الأولوية،
+              وإلا فخطأ تحميل الملف. عرضهما معًا كان يكرّر نفس النص حين يكون
+              السبب واحدًا (رفض صلاحية مثلًا يُفشل الاثنين). */}
+          {error ? (
+            <InlineMessage tone="danger" message={error} />
+          ) : profileLoadError ? (
             <View style={{ gap: spacing.sm }}>
               <InlineMessage tone="danger" message={profileLoadError} />
               <Button label={t('common.retry')} variant="secondary" onPress={() => void fetchProfile()} />
             </View>
           ) : null}
-
-          {error ? <InlineMessage tone="danger" message={error} /> : null}
 
           <Button label={t('onboarding.start')} size="lg" loading={isSubmitting} onPress={handleSubmit} />
 
