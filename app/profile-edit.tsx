@@ -4,7 +4,7 @@ import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import type { GoalType } from '@/src/data/database.types';
 import { profileRepository } from '@/src/data/repositories/profileRepository';
-import { Button, Screen, Text, TextField } from '@/src/design-system';
+import { Button, InlineMessage, Screen, ScreenHeader, Text, TextField } from '@/src/design-system';
 import { spacing } from '@/src/design-system/spacing';
 import { getFriendlyErrorMessage } from '@/src/lib/errors';
 import { useProfileStore } from '@/src/features/auth/profileStore';
@@ -58,7 +58,7 @@ export default function ProfileEditScreen() {
           keyboardShouldPersistTaps="handled"
           keyboardDismissMode="on-drag"
         >
-          <Text variant="displayMd">{t('profileEdit.title')}</Text>
+          <ScreenHeader title={t('profileEdit.title')} action="close" />
 
           <TextField
             label={t('profileEdit.nameLabel')}
@@ -80,17 +80,9 @@ export default function ProfileEditScreen() {
             <GoalPicker value={goalType} onChange={setGoalType} />
           </View>
 
-          {error ? (
-            <Text variant="caption" color="danger">
-              {error}
-            </Text>
-          ) : null}
+          {error ? <InlineMessage tone="danger" message={error} /> : null}
 
-          <Button
-            label={isSubmitting ? t('common.saving') : t('common.save')}
-            onPress={handleSubmit}
-            disabled={isSubmitting}
-          />
+          <Button label={t('common.save')} size="lg" loading={isSubmitting} onPress={handleSubmit} />
         </ScrollView>
       </KeyboardAvoidingView>
     </Screen>

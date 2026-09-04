@@ -4,7 +4,7 @@ import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import type { GoalType } from '@/src/data/database.types';
 import { profileRepository } from '@/src/data/repositories/profileRepository';
-import { Button, Screen, Text, TextField } from '@/src/design-system';
+import { Button, InlineMessage, Screen, Text, TextField, Wordmark } from '@/src/design-system';
 import { spacing } from '@/src/design-system/spacing';
 import { useProfileStore } from '@/src/features/auth/profileStore';
 import { GoalPicker } from '@/src/features/profile/GoalPicker';
@@ -64,9 +64,12 @@ export default function OnboardingScreen() {
           keyboardShouldPersistTaps="handled"
           keyboardDismissMode="on-drag"
         >
-          <View style={{ gap: spacing.xs }}>
-            <Text variant="displayMd">{t('onboarding.welcome')}</Text>
-            <Text variant="body" color="textSecondary">
+          <View style={{ gap: spacing.sm, alignItems: 'center' }}>
+            <Wordmark size="md" />
+            <Text variant="displayMd" style={{ textAlign: 'center' }}>
+              {t('onboarding.welcome')}
+            </Text>
+            <Text variant="body" color="textSecondary" style={{ textAlign: 'center' }}>
               {t('onboarding.intro')}
             </Text>
           </View>
@@ -91,17 +94,9 @@ export default function OnboardingScreen() {
             <GoalPicker value={goalType} onChange={setGoalType} />
           </View>
 
-          {error ? (
-            <Text variant="caption" color="danger">
-              {error}
-            </Text>
-          ) : null}
+          {error ? <InlineMessage tone="danger" message={error} /> : null}
 
-          <Button
-            label={isSubmitting ? t('common.saving') : t('onboarding.start')}
-            onPress={handleSubmit}
-            disabled={isSubmitting}
-          />
+          <Button label={t('onboarding.start')} size="lg" loading={isSubmitting} onPress={handleSubmit} />
         </ScrollView>
       </KeyboardAvoidingView>
     </Screen>

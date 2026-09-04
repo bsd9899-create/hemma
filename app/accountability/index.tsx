@@ -1,8 +1,7 @@
-import { Alert, Pressable, ScrollView, View } from 'react-native';
-import { useRouter } from 'expo-router';
+import { Alert, ScrollView, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
-import { AccountabilitySkeleton, Button, Card, Screen, Text, colors, isRTL, rowDirection } from '@/src/design-system';
-import { radius, spacing } from '@/src/design-system/spacing';
+import { AccountabilitySkeleton, Button, Card, ErrorState, Screen, ScreenHeader, Text, rowDirection } from '@/src/design-system';
+import { spacing } from '@/src/design-system/spacing';
 import { useAuthStore } from '@/src/features/auth/store';
 import { useTeamData } from '@/src/features/teams/useTeamData';
 import { useAccountability } from '@/src/features/accountability/useAccountability';
@@ -17,7 +16,6 @@ const PING_KINDS: { kind: PingKind; labelKey: string }[] = [
 
 export default function AccountabilityScreen() {
   const { t } = useTranslation();
-  const router = useRouter();
   const userId = useAuthStore((s) => s.session?.user.id);
   const { data: team, hasTeam } = useTeamData(userId);
   const {
@@ -60,11 +58,8 @@ export default function AccountabilityScreen() {
   // الاختيار في هذه الحالة، لأنها قد توهم المستخدم بأن كل شيء طبيعي.
   if (error && !pair) {
     return (
-      <Screen style={{ alignItems: 'center', justifyContent: 'center', gap: spacing.sm }}>
-        <Text variant="body" color="textSecondary">
-          {error}
-        </Text>
-        <Button label={t('common.retry')} variant="secondary" onPress={refetch} />
+      <Screen style={{ flex: 1, justifyContent: 'center' }}>
+        <ErrorState message={error} onRetry={refetch} retryLabel={t('common.retry')} />
       </Screen>
     );
   }
@@ -72,32 +67,11 @@ export default function AccountabilityScreen() {
   return (
     <Screen>
       <ScrollView contentContainerStyle={{ gap: spacing.md, paddingBottom: spacing.xxxl }} showsVerticalScrollIndicator={false}>
-        <Pressable
-          accessibilityRole="button"
-          accessibilityLabel={t('common.back')}
-          onPress={() => router.back()}
-          hitSlop={spacing.sm}
-          style={{
-            marginTop: spacing.md,
-            width: 36,
-            height: 36,
-            borderRadius: radius.pill,
-            backgroundColor: colors.surfaceAlt,
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        >
-          <Text variant="bodyStrong" color="textSecondary">
-            {isRTL ? '›' : '‹'}
-          </Text>
-        </Pressable>
-
-        <View>
-          <Text variant="displayMd">{t('accountability.title')}</Text>
-          <Text variant="body" color="textSecondary" style={{ marginTop: spacing.xs }}>
-            {t('accountability.intro')}
-          </Text>
-        </View>
+        <ScreenHeader
+          title={t('accountability.title')}
+          subtitle={t('accountability.intro')}
+          action="back"
+        />
 
         {!pair && (
           <Card variant="soft">

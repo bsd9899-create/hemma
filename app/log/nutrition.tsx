@@ -3,7 +3,7 @@ import { KeyboardAvoidingView, Platform, Pressable, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { dailyLogsRepository } from '@/src/data/repositories/dailyLogsRepository';
-import { Button, Screen, Text, TextField, colors, rowDirection } from '@/src/design-system';
+import { Button, InlineMessage, Screen, ScreenHeader, Text, TextField, colors, rowDirection } from '@/src/design-system';
 import { radius, spacing } from '@/src/design-system/spacing';
 import { useAuthStore } from '@/src/features/auth/store';
 import { getFriendlyErrorMessage } from '@/src/lib/errors';
@@ -62,7 +62,7 @@ export default function LogNutritionScreen() {
   return (
     <Screen>
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1, gap: spacing.lg }}>
-        <Text variant="displayMd">{t('logNutrition.title')}</Text>
+        <ScreenHeader title={`🍽️ ${t('logNutrition.title')}`} action="close" />
 
         <View style={{ flexDirection: rowDirection, flexWrap: 'wrap', gap: spacing.sm }}>
           {MEAL_TYPES.map((meal) => {
@@ -70,13 +70,23 @@ export default function LogNutritionScreen() {
             return (
               <Pressable
                 key={meal.value}
+                accessibilityRole="radio"
+                accessibilityState={{ selected }}
+                disabled={isSubmitting}
                 onPress={() => setMealType(meal.value)}
-                style={{
-                  paddingVertical: spacing.xs,
-                  paddingHorizontal: spacing.md,
-                  borderRadius: radius.pill,
-                  backgroundColor: selected ? colors.primary : colors.surfaceAlt,
-                }}
+                style={({ pressed }) => [
+                  {
+                    minHeight: 40,
+                    justifyContent: 'center',
+                    paddingVertical: spacing.xs,
+                    paddingHorizontal: spacing.md,
+                    borderRadius: radius.pill,
+                    backgroundColor: selected ? colors.primary : colors.surfaceAlt,
+                    borderWidth: 1,
+                    borderColor: selected ? colors.primary : colors.divider,
+                  },
+                  pressed && { opacity: 0.8 },
+                ]}
               >
                 <Text variant="captionStrong" color={selected ? 'onPrimary' : 'textPrimary'}>
                   {t(meal.labelKey)}
@@ -90,8 +100,10 @@ export default function LogNutritionScreen() {
           label={t('logNutrition.descriptionLabel')}
           placeholder={t('logNutrition.descriptionPlaceholder')}
           value={description}
-          onChangeText={setDescription}
-          error={error ?? undefined}
+          onChangeText={(next) => {
+            setDescription(next);
+            if (error) setError(null);
+          }}
           editable={!isSubmitting}
         />
 
@@ -104,7 +116,9 @@ export default function LogNutritionScreen() {
           editable={!isSubmitting}
         />
 
-        <Button label={isSubmitting ? t('common.saving') : t('common.save')} disabled={isSubmitting} onPress={handleSubmit} />
+        {error ? <InlineMessage tone="danger" message={error} /> : null}
+
+        <Button label={t('common.save')} size="lg" loading={isSubmitting} onPress={handleSubmit} />
       </KeyboardAvoidingView>
     </Screen>
   );

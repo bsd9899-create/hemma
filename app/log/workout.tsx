@@ -3,7 +3,7 @@ import { KeyboardAvoidingView, Platform } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { dailyLogsRepository } from '@/src/data/repositories/dailyLogsRepository';
-import { Button, Screen, Text, TextField } from '@/src/design-system';
+import { Button, InlineMessage, Screen, ScreenHeader, TextField } from '@/src/design-system';
 import { spacing } from '@/src/design-system/spacing';
 import { useAuthStore } from '@/src/features/auth/store';
 import { getFriendlyErrorMessage } from '@/src/lib/errors';
@@ -54,13 +54,16 @@ export default function LogWorkoutScreen() {
   return (
     <Screen>
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1, gap: spacing.lg }}>
-        <Text variant="displayMd">{t('logWorkout.title')}</Text>
+        <ScreenHeader title={`🏋️ ${t('logWorkout.title')}`} action="close" />
 
         <TextField
           label={t('logWorkout.nameLabel')}
           placeholder={t('logWorkout.namePlaceholder')}
           value={title}
-          onChangeText={setTitle}
+          onChangeText={(next) => {
+            setTitle(next);
+            if (error) setError(null);
+          }}
           editable={!isSubmitting}
         />
 
@@ -70,11 +73,13 @@ export default function LogWorkoutScreen() {
           value={duration}
           onChangeText={setDuration}
           keyboardType="number-pad"
-          error={error ?? undefined}
           editable={!isSubmitting}
+          returnKeyType="done"
         />
 
-        <Button label={isSubmitting ? t('common.saving') : t('common.save')} disabled={isSubmitting} onPress={handleSubmit} />
+        {error ? <InlineMessage tone="danger" message={error} /> : null}
+
+        <Button label={t('common.save')} size="lg" loading={isSubmitting} onPress={handleSubmit} />
       </KeyboardAvoidingView>
     </Screen>
   );

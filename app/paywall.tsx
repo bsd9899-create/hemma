@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
-import { Pressable, View } from 'react-native';
+import { View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import type { PurchasesPackage } from 'react-native-purchases';
-import { Button, Card, Screen, Skeleton, Text, Wordmark, colors, palette, rowDirection } from '@/src/design-system';
-import { radius, spacing } from '@/src/design-system/spacing';
+import { Badge, Button, Card, InlineMessage, Screen, ScreenHeader, Skeleton, Text, Wordmark, palette } from '@/src/design-system';
+import { spacing } from '@/src/design-system/spacing';
 import { useAuthStore } from '@/src/features/auth/store';
 import {
   getCurrentOfferingPackages,
@@ -93,31 +93,10 @@ export default function PaywallScreen() {
   return (
     <Screen>
       <View style={{ flex: 1, gap: spacing.lg }}>
-        {/* شاشة الاشتراك تُعرض كنافذة، وكانت بلا وسيلة إغلاق ظاهرة في الحالة
-            غير المشتركة — سحب الورقة وحده لا يكفي، وآبل تتوقّع مخرجًا واضحًا. */}
-        <View style={{ flexDirection: rowDirection, justifyContent: 'flex-end' }}>
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel={t('paywall.close')}
-            onPress={() => router.back()}
-            hitSlop={spacing.sm}
-            style={{
-              width: 32,
-              height: 32,
-              borderRadius: radius.pill,
-              backgroundColor: colors.surfaceAlt,
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
-            <Text variant="bodyStrong" color="textSecondary">
-              ✕
-            </Text>
-          </Pressable>
-        </View>
+        <ScreenHeader title="" action="close" />
 
         <View style={{ alignItems: 'center', gap: spacing.sm }}>
-          <Wordmark />
+          <Wordmark size="md" />
           <Text variant="title" style={{ textAlign: 'center' }}>
             {t('paywall.title')}
           </Text>
@@ -152,11 +131,7 @@ export default function PaywallScreen() {
                   key={pkg.identifier}
                   style={isAnnual ? { borderColor: palette.gold500, borderWidth: 2 } : undefined}
                 >
-                  {isAnnual ? (
-                    <Text variant="overline" color="accent">
-                      {t('paywall.bestValue')}
-                    </Text>
-                  ) : null}
+                  {isAnnual ? <Badge label={t('paywall.bestValue')} tone="accent" /> : null}
                   <Text variant="bodyStrong" style={{ marginTop: spacing.xxs }}>
                     {pkg.product.title}
                   </Text>
@@ -164,9 +139,11 @@ export default function PaywallScreen() {
                     {pkg.product.priceString}
                   </Text>
                   <Button
-                    label={busyPackageId === pkg.identifier ? t('paywall.purchasing') : t('paywall.subscribe')}
+                    label={t('paywall.subscribe')}
                     variant={isAnnual ? 'primary' : 'secondary'}
+                    size="lg"
                     style={{ marginTop: spacing.sm }}
+                    loading={busyPackageId === pkg.identifier}
                     disabled={isBusy}
                     onPress={() => handlePurchase(pkg)}
                   />
@@ -176,15 +153,12 @@ export default function PaywallScreen() {
           </View>
         )}
 
-        {error ? (
-          <Text variant="caption" color="danger" style={{ textAlign: 'center' }}>
-            {error}
-          </Text>
-        ) : null}
+        {error ? <InlineMessage tone="danger" message={error} /> : null}
 
         <Button
-          label={isRestoring ? t('paywall.restoring') : t('paywall.restorePurchases')}
+          label={t('paywall.restorePurchases')}
           variant="ghost"
+          loading={isRestoring}
           disabled={isBusy}
           onPress={handleRestore}
         />

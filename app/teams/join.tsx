@@ -3,7 +3,7 @@ import { KeyboardAvoidingView, Platform } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { teamsRepository } from '@/src/data/repositories/teamsRepository';
-import { Button, Screen, Text, TextField } from '@/src/design-system';
+import { Button, InlineMessage, Screen, ScreenHeader, TextField } from '@/src/design-system';
 import { spacing } from '@/src/design-system/spacing';
 import { getFriendlyErrorMessage } from '@/src/lib/errors';
 
@@ -36,17 +36,18 @@ export default function JoinTeamScreen() {
   return (
     <Screen>
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1, gap: spacing.lg }}>
-        <Text variant="displayMd">{t('teamJoin.title')}</Text>
+        <ScreenHeader title={t('teamJoin.title')} action="close" />
         <TextField
           label={t('teamJoin.codeLabel')}
           placeholder={t('teamJoin.codePlaceholder')}
           value={code}
           onChangeText={setCode}
           autoCapitalize="none"
-          error={error ?? undefined}
           editable={!isSubmitting}
         />
-        <Button label={isSubmitting ? t('teamJoin.joining') : t('teamJoin.join')} disabled={isSubmitting} onPress={handleSubmit} />
+        {error ? <InlineMessage tone="danger" message={error} /> : null}
+
+        <Button label={t('teamJoin.join')} size="lg" loading={isSubmitting} onPress={handleSubmit} />
       </KeyboardAvoidingView>
     </Screen>
   );
