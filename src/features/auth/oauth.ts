@@ -7,6 +7,7 @@ import { Platform } from 'react-native';
 import { supabase } from '@/src/data/supabase';
 import { profileRepository } from '@/src/data/repositories/profileRepository';
 import { env } from '@/src/lib/env';
+import { inspectGoogleAuthorizeUrl } from './oauthDiagnostics';
 
 // يُغلق أي جلسة WebBrowser معلّقة تلقائيًا عند عودة التطبيق من الخلفية —
 // موصى به من توثيق expo-web-browser، وإن كان أثره الفعلي هنا محدودًا
@@ -72,6 +73,12 @@ export async function signInWithGoogle(): Promise<SignInResult> {
   }
   if (error) throw error;
   if (!data.url) throw new Error('تعذّر بدء تسجيل الدخول عبر Google');
+
+  if (__DEV__) {
+    // يكشف client_id وredirect_uri اللذين يبنيهما خادم Supabase ويرسلهما
+    // إلى Google — وهما مصدر خطأ redirect_uri_mismatch، ولا يظهران في كودنا.
+    await inspectGoogleAuthorizeUrl(data.url);
+  }
 
   const result = await WebBrowser.openAuthSessionAsync(data.url, redirectTo);
   if (__DEV__) {

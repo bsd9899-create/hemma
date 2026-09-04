@@ -36,6 +36,12 @@ export const palette = {
   success: '#3F8F6B',
   warning: '#D98C3D',
   danger: '#C1503F',
+
+  // خلفيات خفيفة لحالات الرسائل — نفس الصبغة بإضاءة عالية، حتى تبقى
+  // الرسالة واضحة دون أن تصرخ في وجه المستخدم.
+  successSoft: '#E7F1EC',
+  warningSoft: '#FBEEDF',
+  dangerSoft: '#F7E4E1',
 } as const;
 
 export const colors = {
@@ -61,6 +67,10 @@ export const colors = {
   success: palette.success,
   warning: palette.warning,
   danger: palette.danger,
+
+  successSoft: palette.successSoft,
+  warningSoft: palette.warningSoft,
+  dangerSoft: palette.dangerSoft,
 } as const;
 
 export type ColorToken = keyof typeof colors;

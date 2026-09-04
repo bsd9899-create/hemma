@@ -1,19 +1,31 @@
-import { useTranslation } from 'react-i18next';
-import { Text } from './Text';
+import { View } from 'react-native';
+import { SvgXml } from 'react-native-svg';
+import { HEMMA_LOGO_ASPECT_RATIO, HEMMA_LOGO_SVG } from './logoSvg';
+
+type WordmarkSize = 'sm' | 'md' | 'lg';
+
+const WIDTHS: Record<WordmarkSize, number> = {
+  sm: 96,
+  md: 150,
+  lg: 210,
+};
+
+type WordmarkProps = {
+  size?: WordmarkSize;
+};
 
 /**
- * علامة نصية مؤقتة لاسم "هِمّة" بخط Tajawal الغامق ولون العلامة، إلى
- * حين توفّر ملف الشعار الرسمي الفعلي (راجع assets/branding/README.md)
- * لاستبدالها بصورة حقيقية. اسم العلامة نفسه لا يُترجَم حرفيًا — "هِمّة"
- * بالعربي و"HEMMA" بالإنجليزي، كما تفعل أغلب العلامات التجارية.
+ * شعار هِمّة الرسمي — يُعرض من ملف SVG الأصلي كما هو تمامًا (نفس الشكل
+ * والألوان والنسب). العرض فقط هو ما يتغيّر، والارتفاع يُحسب من نسبة
+ * viewBox الأصلية حتى لا يتشوّه الشعار في أي مقاس.
  */
-export function Wordmark() {
-  const { i18n } = useTranslation();
-  const label = i18n.language === 'en' ? 'HEMMA' : 'هِمّة';
+export function Wordmark({ size = 'md' }: WordmarkProps) {
+  const width = WIDTHS[size];
+  const height = width / HEMMA_LOGO_ASPECT_RATIO;
 
   return (
-    <Text variant="displayLg" color="primary" style={{ textAlign: 'center' }}>
-      {label}
-    </Text>
+    <View accessibilityRole="image" accessibilityLabel="هِمّة" style={{ width, height, alignSelf: 'center' }}>
+      <SvgXml xml={HEMMA_LOGO_SVG} width={width} height={height} />
+    </View>
   );
 }
