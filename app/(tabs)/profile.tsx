@@ -166,6 +166,12 @@ export default function ProfileScreen() {
           </View>
         </Card>
 
+        <Button
+          label={t('exercises.entry')}
+          variant="ghost"
+          onPress={() => router.push('/exercises')}
+        />
+
         {/* إخفاء الزر راحة للمستخدم العادي لا حماية: الـ views تفرض
             is_admin() في قاعدة البيانات، فمن يفتح /admin بلا صلاحية
             يجد شاشة فارغة لا بيانات. */}

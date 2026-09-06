@@ -21,7 +21,12 @@ export function ProgressRing({
   fillColor = colors.primary,
   children,
 }: ProgressRingProps) {
-  const clamped = Math.max(0, Math.min(1, progress));
+  // NaN لا يُقصّ: Math.max(0, Math.min(1, NaN)) يساوي NaN، فيصل إلى SVG
+  // فتتوقف الحلقة/الشريط عن الرسم **بلا أي رسالة خطأ**. القسمة على
+  // هدف غائب (عمود ناقص في قاعدة البيانات) تنتج NaN بالضبط، لذلك
+  // التعقيم هنا لا في كل موضع استدعاء.
+  const safe = Number.isFinite(progress) ? progress : 0;
+  const clamped = Math.max(0, Math.min(1, safe));
   const radius = (size - strokeWidth) / 2;
   const circumference = 2 * Math.PI * radius;
   const dashOffset = circumference * (1 - clamped);

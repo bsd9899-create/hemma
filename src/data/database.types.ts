@@ -26,6 +26,16 @@ export type SubscriptionStore = 'app_store' | 'play_store';
  */
 export type TargetsSource = 'reference' | 'calculated' | 'manual';
 
+export type MuscleGroup =
+  | 'chest' | 'back' | 'shoulders' | 'biceps' | 'triceps' | 'forearms'
+  | 'quads' | 'hamstrings' | 'glutes' | 'calves' | 'core' | 'full_body' | 'cardio';
+
+export type ExerciseEquipment =
+  | 'bodyweight' | 'barbell' | 'dumbbell' | 'machine' | 'cable' | 'kettlebell' | 'band' | 'other';
+
+/** كيف يُقاس التمرين — يحدّد حقول التسجيل وشكل الرقم القياسي. */
+export type ExerciseMetric = 'weight_reps' | 'reps_only' | 'duration' | 'distance_duration';
+
 export interface Database {
   public: {
     Tables: {
@@ -268,6 +278,56 @@ export interface Database {
         };
         Update: Partial<Database['public']['Tables']['notifications']['Row']>;
       } & NoRelationships;
+      exercises: {
+        Row: {
+          id: string;
+          slug: string;
+          name_ar: string;
+          name_en: string;
+          primary_muscle: MuscleGroup;
+          secondary_muscles: MuscleGroup[];
+          equipment: ExerciseEquipment;
+          metric: ExerciseMetric;
+          instructions_ar: string[];
+          instructions_en: string[];
+          cues_ar: string[];
+          media_url: string | null;
+          media_license: string | null;
+          media_attribution: string | null;
+          is_active: boolean;
+          created_at: string;
+        };
+        Insert: never;
+        Update: never;
+      } & NoRelationships;
+      workout_sets: {
+        Row: {
+          id: string;
+          user_id: string;
+          workout_id: string | null;
+          exercise_id: string;
+          set_number: number;
+          weight_kg: number | null;
+          reps: number | null;
+          duration_seconds: number | null;
+          distance_m: number | null;
+          is_warmup: boolean;
+          rpe: number | null;
+          performed_at: string;
+          created_at: string;
+        };
+        Insert: Partial<Database['public']['Tables']['workout_sets']['Row']> & {
+          user_id: string;
+          exercise_id: string;
+          set_number: number;
+        };
+        Update: Partial<Database['public']['Tables']['workout_sets']['Row']>;
+      } & NoRelationships;
+      exercise_favorites: {
+        Row: { user_id: string; exercise_id: string; created_at: string };
+        Insert: { user_id: string; exercise_id: string };
+        Update: never;
+      } & NoRelationships;
       subscriptions: {
         Row: {
           user_id: string;
@@ -326,6 +386,19 @@ export interface Database {
           expired: number;
         };
       } & NoRelationships;
+      exercise_personal_records: {
+        Row: {
+          user_id: string;
+          exercise_id: string;
+          max_weight_kg: number | null;
+          max_reps: number | null;
+          max_duration_seconds: number | null;
+          /** تقدير Epley (1985)، لا قياس مباشر. */
+          estimated_1rm_kg: number | null;
+          last_performed_at: string | null;
+          total_sets: number;
+        };
+      } & NoRelationships;
       admin_daily_activity: {
         Row: { date: string; active_users: number; avg_completion_percent: number };
       } & NoRelationships;
@@ -353,6 +426,9 @@ export interface Database {
       ping_kind: PingKind;
       subscription_store: SubscriptionStore;
       targets_source: TargetsSource;
+      muscle_group: MuscleGroup;
+      exercise_equipment: ExerciseEquipment;
+      exercise_metric: ExerciseMetric;
     };
   };
 }

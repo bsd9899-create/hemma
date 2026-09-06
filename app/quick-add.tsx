@@ -10,6 +10,7 @@ const QUICK_ADD_OPTIONS: { emoji: string; labelKey: string; href: Href }[] = [
   { emoji: '👟', labelKey: 'quickAdd.steps', href: '/log/steps' },
   { emoji: '🍽️', labelKey: 'quickAdd.nutrition', href: '/log/nutrition' },
   { emoji: '🏋️', labelKey: 'quickAdd.workout', href: '/log/workout' },
+  { emoji: '💪', labelKey: 'exercises.entry', href: '/exercises' },
   { emoji: '💤', labelKey: 'quickAdd.sleep', href: '/log/sleep' },
 ];
 

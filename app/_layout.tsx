@@ -76,6 +76,9 @@ export default function RootLayout() {
             <Stack.Screen name="goals" />
             <Stack.Screen name="teams/index" />
             <Stack.Screen name="admin" />
+            <Stack.Screen name="exercises/index" />
+            <Stack.Screen name="exercises/[id]" />
+            <Stack.Screen name="exercises/[id]/log" options={{ presentation: 'modal' }} />
           </Stack>
         </ErrorBoundary>
       </SafeAreaProvider>

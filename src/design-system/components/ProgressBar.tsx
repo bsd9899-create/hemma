@@ -17,7 +17,12 @@ export function ProgressBar({
   trackColor = colors.divider,
   fillColor = colors.primary,
 }: ProgressBarProps) {
-  const clamped = Math.max(0, Math.min(1, progress));
+  // NaN لا يُقصّ: Math.max(0, Math.min(1, NaN)) يساوي NaN، فيصل إلى SVG
+  // فتتوقف الحلقة/الشريط عن الرسم **بلا أي رسالة خطأ**. القسمة على
+  // هدف غائب (عمود ناقص في قاعدة البيانات) تنتج NaN بالضبط، لذلك
+  // التعقيم هنا لا في كل موضع استدعاء.
+  const safe = Number.isFinite(progress) ? progress : 0;
+  const clamped = Math.max(0, Math.min(1, safe));
   return (
     <View style={[styles.track, { height, backgroundColor: trackColor }]}>
       <View
