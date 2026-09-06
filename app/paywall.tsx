@@ -14,6 +14,7 @@ import {
   Text,
   Wordmark,
   palette,
+  rowDirection,
 } from '@/src/design-system';
 import { spacing } from '@/src/design-system/spacing';
 import { useAuthStore } from '@/src/features/auth/store';
@@ -243,7 +244,7 @@ export default function PaywallScreen() {
           {t('paywall.renewalTerms')}
         </Text>
 
-        <View style={{ flexDirection: 'row', justifyContent: 'center', gap: spacing.md }}>
+        <View style={{ flexDirection: rowDirection, justifyContent: 'center', gap: spacing.md }}>
           <Button label={t('paywall.termsOfUse')} variant="ghost" onPress={() => openLink(TERMS_URL)} />
           <Button label={t('paywall.privacyPolicy')} variant="ghost" onPress={() => openLink(PRIVACY_URL)} />
         </View>

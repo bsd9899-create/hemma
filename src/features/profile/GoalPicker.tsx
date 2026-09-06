@@ -25,7 +25,17 @@ export function GoalPicker({ value, onChange }: GoalPickerProps) {
       {GOAL_OPTIONS.map((option) => {
         const selected = value === option.value;
         return (
-          <Pressable key={option.value} onPress={() => onChange(option.value)}>
+          // مجموعة اختيار واحد: بدون radio + checked يقرأ VoiceOver
+          // البطاقات كنصوص متجاورة، فلا يعرف المستخدم أنها قابلة
+          // للاختيار ولا أيّها مختار الآن. نفس نمط BodyDetailsFields.
+          <Pressable
+            key={option.value}
+            accessibilityRole="radio"
+            accessibilityState={{ selected, checked: selected }}
+            accessibilityLabel={t(option.labelKey)}
+            onPress={() => onChange(option.value)}
+            style={({ pressed }) => (pressed ? { opacity: 0.85 } : undefined)}
+          >
             <Card
               variant={selected ? 'surface' : 'soft'}
               style={selected ? { borderColor: colors.primary, borderWidth: 2 } : undefined}

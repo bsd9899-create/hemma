@@ -452,5 +452,13 @@
     "noActivity": "لا يوجد نشاط مسجّل بعد.",
     "avgCompletion": "متوسط الإنجاز {{value}}%",
     "entry": "لوحة الإدارة"
+  },
+  "signIn": {
+    "welcome": "هلا فيك 👋",
+    "subtitle": "سجّل دخولك بضغطة واحدة لتبدأ رحلتك مع هِمّة",
+    "continueWithGoogle": "المتابعة عبر Google",
+    "googleError": "تعذّر تسجيل الدخول عبر Google",
+    "appleError": "تعذّر تسجيل الدخول عبر Apple",
+    "legalPrefix": "بالمتابعة، أنت توافق على:"
   }
 }

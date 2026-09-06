@@ -1,12 +1,17 @@
 import { useState } from 'react';
-import { Platform, View } from 'react-native';
+import { Linking, Platform, Pressable, View } from 'react-native';
 import * as AppleAuthentication from 'expo-apple-authentication';
-import { Button, InlineMessage, Screen, Text, Wordmark } from '@/src/design-system';
+import { useTranslation } from 'react-i18next';
+import { Button, InlineMessage, Screen, Text, Wordmark, rowDirection } from '@/src/design-system';
 import { radius, spacing } from '@/src/design-system/spacing';
 import { signInWithApple, signInWithGoogle } from '@/src/features/auth/oauth';
 import { getFriendlyErrorMessage } from '@/src/lib/errors';
 
+const PRIVACY_URL = 'https://himmah.online/privacy.html';
+const TERMS_URL = 'https://himmah.online/terms.html';
+
 export default function SignInScreen() {
+  const { t } = useTranslation();
   const [error, setError] = useState<string | null>(null);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const [isAppleLoading, setIsAppleLoading] = useState(false);
@@ -23,7 +28,7 @@ export default function SignInScreen() {
       // للمتصفح بنفسه ليس خطأ يستحق رسالة، فقط عودة صامتة لهذه الشاشة.
       await signInWithGoogle();
     } catch (e) {
-      setError(getFriendlyErrorMessage(e, 'تعذّر تسجيل الدخول عبر Google'));
+      setError(getFriendlyErrorMessage(e, t('signIn.googleError')));
     } finally {
       setIsGoogleLoading(false);
     }
@@ -36,10 +41,14 @@ export default function SignInScreen() {
     try {
       await signInWithApple();
     } catch (e) {
-      setError(getFriendlyErrorMessage(e, 'تعذّر تسجيل الدخول عبر Apple'));
+      setError(getFriendlyErrorMessage(e, t('signIn.appleError')));
     } finally {
       setIsAppleLoading(false);
     }
+  }
+
+  function openLink(url: string) {
+    Linking.openURL(url).catch(() => setError(t('profile.linkError')));
   }
 
   return (
@@ -48,16 +57,16 @@ export default function SignInScreen() {
         <Wordmark size="lg" />
         <View style={{ gap: spacing.xs }}>
           <Text variant="title" style={{ textAlign: 'center' }}>
-            هلا فيك 👋
+            {t('signIn.welcome')}
           </Text>
           <Text variant="body" color="textSecondary" style={{ textAlign: 'center' }}>
-            سجّل دخولك بضغطة واحدة لتبدأ رحلتك مع هِمّة
+            {t('signIn.subtitle')}
           </Text>
         </View>
 
         <View style={{ gap: spacing.sm }}>
           <Button
-            label="المتابعة عبر Google"
+            label={t('signIn.continueWithGoogle')}
             variant="secondary"
             size="lg"
             loading={isGoogleLoading}
@@ -80,9 +89,33 @@ export default function SignInScreen() {
           {error ? <InlineMessage tone="danger" message={error} /> : null}
         </View>
 
-        <Text variant="caption" color="textSecondary" style={{ textAlign: 'center' }}>
-          بالمتابعة، أنت توافق على سياسة الخصوصية وشروط استخدام هِمّة
-        </Text>
+        {/* كانت جملة ميتة: تُحيل إلى مستندين لا سبيل لفتحهما. الموافقة
+            على شروط لا يستطيع المستخدم قراءتها ليست موافقة، والرابطان
+            مطلوبان لمراجعة App Store أيضًا. */}
+        <View style={{ alignItems: 'center', gap: spacing.xxs }}>
+          <Text variant="caption" color="textSecondary" style={{ textAlign: 'center' }}>
+            {t('signIn.legalPrefix')}
+          </Text>
+          <View style={{ flexDirection: rowDirection, gap: spacing.sm }}>
+            <Pressable
+              accessibilityRole="link"
+              hitSlop={8}
+              onPress={() => openLink(PRIVACY_URL)}
+            >
+              <Text variant="captionStrong" color="primary">
+                {t('profile.privacyPolicy')}
+              </Text>
+            </Pressable>
+            <Text variant="caption" color="textSecondary">
+              ·
+            </Text>
+            <Pressable accessibilityRole="link" hitSlop={8} onPress={() => openLink(TERMS_URL)}>
+              <Text variant="captionStrong" color="primary">
+                {t('profile.termsOfUse')}
+              </Text>
+            </Pressable>
+          </View>
+        </View>
       </View>
     </Screen>
   );

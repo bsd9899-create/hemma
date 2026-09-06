@@ -439,5 +439,13 @@
     "noActivity": "No activity recorded yet.",
     "avgCompletion": "avg completion {{value}}%",
     "entry": "Admin dashboard"
+  },
+  "signIn": {
+    "welcome": "Welcome 👋",
+    "subtitle": "Sign in with one tap and start your journey with HEMMA",
+    "continueWithGoogle": "Continue with Google",
+    "googleError": "Could not sign in with Google",
+    "appleError": "Could not sign in with Apple",
+    "legalPrefix": "By continuing, you agree to:"
   }
 }
