@@ -40,6 +40,7 @@ export interface Database {
           height_cm: number | null;
           activity_level: 'sedentary' | 'light' | 'moderate' | 'active' | 'very_active' | null;
           onboarding_completed_at: string | null;
+          is_admin: boolean;
           created_at: string;
           updated_at: string;
         };
@@ -304,8 +305,36 @@ export interface Database {
           total_points: number;
         };
       } & NoRelationships;
+      /**
+       * Views الإدارة — تجميعات فقط، بلا أي بيانات شخصية. تُرجع صفرًا
+       * من الصفوف لغير الأدمن (الشرط داخل الـ view نفسها، لا في العميل).
+       */
+      admin_user_stats: {
+        Row: {
+          total_users: number;
+          onboarded_users: number;
+          new_last_7_days: number;
+          new_last_30_days: number;
+        };
+      } & NoRelationships;
+      admin_subscription_stats: {
+        Row: {
+          active_premium: number;
+          renewing: number;
+          app_store: number;
+          play_store: number;
+          expired: number;
+        };
+      } & NoRelationships;
+      admin_daily_activity: {
+        Row: { date: string; active_users: number; avg_completion_percent: number };
+      } & NoRelationships;
     };
     Functions: {
+      is_admin: {
+        Args: Record<string, never>;
+        Returns: boolean;
+      };
       join_team_by_code: {
         Args: { p_invite_code: string };
         Returns: string;

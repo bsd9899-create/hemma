@@ -75,6 +75,7 @@ export default function RootLayout() {
             <Stack.Screen name="profile-edit" options={{ presentation: 'modal' }} />
             <Stack.Screen name="goals" />
             <Stack.Screen name="teams/index" />
+            <Stack.Screen name="admin" />
           </Stack>
         </ErrorBoundary>
       </SafeAreaProvider>

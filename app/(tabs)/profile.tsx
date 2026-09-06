@@ -166,6 +166,13 @@ export default function ProfileScreen() {
           </View>
         </Card>
 
+        {/* إخفاء الزر راحة للمستخدم العادي لا حماية: الـ views تفرض
+            is_admin() في قاعدة البيانات، فمن يفتح /admin بلا صلاحية
+            يجد شاشة فارغة لا بيانات. */}
+        {profile?.is_admin ? (
+          <Button label={t('admin.entry')} variant="ghost" onPress={() => router.push('/admin')} />
+        ) : null}
+
         <Button
           label={t('profile.privacyPolicy')}
           variant="ghost"

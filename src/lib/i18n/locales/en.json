@@ -421,5 +421,23 @@
     "referenceTargetsTitle": "These are general reference numbers",
     "referenceTargetsBody": "The values shown are the FDA daily reference values printed on food labels, not calculated for you. Add your body details and we will work out a target that is actually yours.",
     "setMyTargets": "Calculate my target"
+  },
+  "admin": {
+    "title": "Admin dashboard",
+    "notAuthorized": "This screen is for administrators only.",
+    "loadError": "Could not load admin data",
+    "usersTitle": "Users",
+    "totalUsers": "Total",
+    "onboarded": "Completed onboarding",
+    "new7": "New in 7 days",
+    "new30": "New in 30 days",
+    "subscriptionsTitle": "Subscriptions",
+    "activePremium": "Active premium",
+    "renewing": "Renewing",
+    "expired": "Expired",
+    "activityTitle": "Daily activity (30 days)",
+    "noActivity": "No activity recorded yet.",
+    "avgCompletion": "avg completion {{value}}%",
+    "entry": "Admin dashboard"
   }
 }
