@@ -33,7 +33,9 @@
     },
     "back": "Back",
     "kg": "kg",
-    "meters": "m"
+    "meters": "m",
+    "grams": "g",
+    "kcal": "kcal"
   },
   "goals": {
     "title": "My goals",
@@ -521,6 +523,37 @@
       "kettlebell": "Kettlebell",
       "band": "Band",
       "other": "Other"
+    }
+  },
+  "foodPhoto": {
+    "title": "Analyse a meal photo",
+    "howItWorksTitle": "How it works",
+    "howItWorksBody": "Photograph your meal and we estimate its calories and macros. The result is an **estimate** you review before saving, not a measurement — add a note about the ingredients to improve accuracy.",
+    "takePhoto": "Take photo",
+    "choosePhoto": "From library",
+    "photoAlt": "Meal photo",
+    "hintLabel": "Note (optional)",
+    "hintPlaceholder": "e.g. grilled chicken breast with rice",
+    "permissionDenied": "We need permission to use your camera or photos. You can enable it in your device settings.",
+    "estimateDisclaimer": "Rough estimate — review before saving.",
+    "nothingDetected": "We couldn't identify food clearly. Try a clearer photo or add a note.",
+    "fallbackDescription": "Meal from photo",
+    "total": "Total",
+    "macros": "Protein {{protein}} · carbs {{carbs}} · fat {{fat}} (g)",
+    "confirmAndSave": "Confirm and save",
+    "confidence": {
+      "high": "High confidence",
+      "medium": "Medium confidence",
+      "low": "Low confidence"
+    },
+    "errors": {
+      "not_configured": "Photo analysis is not enabled in this build yet.",
+      "daily_limit_reached": "You've reached today's photo analysis limit. Try tomorrow or log the meal manually.",
+      "invalid_image": "Unsupported image format. Use JPEG or PNG.",
+      "image_too_large": "That image is too large. Try a smaller one.",
+      "unparseable_result": "Couldn't read the analysis result. Please try again.",
+      "upstream_unavailable": "Couldn't reach the analysis service. Check your connection.",
+      "unknown": "Couldn't analyse the photo"
     }
   }
 }

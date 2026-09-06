@@ -67,6 +67,7 @@ export default function RootLayout() {
             <Stack.Screen name="log/nutrition" options={{ presentation: 'modal' }} />
             <Stack.Screen name="log/workout" options={{ presentation: 'modal' }} />
             <Stack.Screen name="log/sleep" options={{ presentation: 'modal' }} />
+            <Stack.Screen name="log/food-photo" options={{ presentation: 'modal' }} />
             <Stack.Screen name="teams/create" options={{ presentation: 'modal' }} />
             <Stack.Screen name="teams/join" options={{ presentation: 'modal' }} />
             <Stack.Screen name="teams/new-challenge" options={{ presentation: 'modal' }} />

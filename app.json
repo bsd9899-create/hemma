@@ -56,7 +56,14 @@
         }
       ],
       "expo-web-browser",
-      "expo-apple-authentication"
+      "expo-apple-authentication",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "تستخدم هِمّة صور وجباتك لتقدير سعراتها — بموافقتك وعند اختيارك للصورة فقط.",
+          "cameraPermission": "تستخدم هِمّة الكاميرا لتصوير وجبتك وتقدير سعراتها — بموافقتك فقط."
+        }
+      ]
     ],
     "extra": {
       "router": {},
