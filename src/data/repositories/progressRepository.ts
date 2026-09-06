@@ -112,4 +112,16 @@ export const progressRepository = {
       avgSleepHours: sum(sleep.data, (r) => r.hours) / days,
     };
   },
+
+  /** آخر وزن مسجّل — مُدخَل إلزامي لحساب أهداف السعرات. */
+  async getLatestWeightKg(userId: string): Promise<number | null> {
+    const { data, error } = await supabase
+      .from('weight_logs')
+      .select('weight_kg')
+      .eq('user_id', userId)
+      .order('logged_at', { ascending: false })
+      .limit(1);
+    if (error) throw error;
+    return data?.[0]?.weight_kg ?? null;
+  },
 };

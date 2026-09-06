@@ -11,11 +11,17 @@ import {
   ScreenHeader,
   SectionHeader,
   Skeleton,
+  Text,
   TextField,
   rowDirection,
 } from '@/src/design-system';
 import { spacing } from '@/src/design-system/spacing';
 import { goalsRepository, type GoalTargets } from '@/src/data/repositories/goalsRepository';
+import { progressRepository } from '@/src/data/repositories/progressRepository';
+import { getSuggestedTargets } from '@/src/features/goals/suggestedTargets';
+import { useProfileStore } from '@/src/features/auth/profileStore';
+import type { EnergyTargets } from '@/src/domain/nutritionTargets';
+import { formatNumber } from '@/src/lib/i18n/format';
 import { useAuthStore } from '@/src/features/auth/store';
 import { getFriendlyErrorMessage } from '@/src/lib/errors';
 
@@ -50,6 +56,8 @@ function parsePositive(raw: string): number | null {
 export default function GoalsScreen() {
   const { t } = useTranslation();
   const userId = useAuthStore((s) => s.session?.user.id);
+  const profile = useProfileStore((s) => s.profile);
+  const [suggested, setSuggested] = useState<EnergyTargets | null>(null);
 
   const [fields, setFields] = useState<GoalFields>(EMPTY_FIELDS);
   const [isLoading, setIsLoading] = useState(false);
@@ -64,7 +72,11 @@ export default function GoalsScreen() {
     setIsLoading(true);
     setLoadError(null);
     try {
-      const goals = await goalsRepository.getCurrent(userId);
+      const [goals, latestWeightKg] = await Promise.all([
+        goalsRepository.getCurrent(userId),
+        progressRepository.getLatestWeightKg(userId),
+      ]);
+      setSuggested(getSuggestedTargets(profile, latestWeightKg));
       setFields({
         target_steps: String(goals.target_steps),
         target_sleep_hours: String(goals.target_sleep_hours),
@@ -82,7 +94,7 @@ export default function GoalsScreen() {
     } finally {
       setIsLoading(false);
     }
-  }, [userId, t]);
+  }, [userId, t, profile]);
 
   const hasLoadedOnceRef = useRef(false);
   useFocusEffect(
@@ -92,6 +104,20 @@ export default function GoalsScreen() {
       void load();
     }, [load])
   );
+
+  /** يملأ حقول التغذية بالأرقام المحسوبة — يبقى الحفظ بيد المستخدم. */
+  function applySuggested() {
+    if (!suggested) return;
+    setFields((current) => ({
+      ...current,
+      target_calories: String(suggested.calories),
+      target_protein_g: String(suggested.proteinG),
+      target_carbs_g: String(suggested.carbsG),
+      target_fat_g: String(suggested.fatG),
+    }));
+    setSaveError(null);
+    setSavedAt(null);
+  }
 
   function setField(key: keyof GoalFields, value: string) {
     setFields((current) => ({ ...current, [key]: value }));
@@ -193,6 +219,36 @@ export default function GoalsScreen() {
             </View>
             {numberField('target_workouts_per_week', t('goals.workoutsPerWeek'))}
           </Card>
+
+          {suggested ? (
+            <Card variant="soft" style={{ gap: spacing.sm }}>
+              <SectionHeader title={t('goals.suggestedTitle')} />
+              <Text variant="body">
+                {t('goals.suggestedBody', {
+                  calories: formatNumber(suggested.calories),
+                  protein: formatNumber(suggested.proteinG),
+                  carbs: formatNumber(suggested.carbsG),
+                  fat: formatNumber(suggested.fatG),
+                })}
+              </Text>
+              <Text variant="caption" color="textSecondary">
+                {t('goals.suggestedBasis', {
+                  bmr: formatNumber(suggested.bmr),
+                  tdee: formatNumber(suggested.tdee),
+                })}
+              </Text>
+              {suggested.deficitLimitedBySafetyFloor ? (
+                <InlineMessage tone="success" message={t('goals.suggestedFloor')} />
+              ) : null}
+              <Button label={t('goals.suggestedApply')} variant="secondary" onPress={applySuggested} />
+            </Card>
+          ) : (
+            <Card variant="soft">
+              <Text variant="caption" color="textSecondary">
+                {t('goals.suggestedMissing')}
+              </Text>
+            </Card>
+          )}
 
           <Card style={{ gap: spacing.md }}>
             <SectionHeader title={t('goals.nutritionSection')} />

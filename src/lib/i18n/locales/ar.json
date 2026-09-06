@@ -50,7 +50,13 @@
     "targetWeightOptional": "اتركه فارغًا إن ما عندك وزن مستهدف",
     "saved": "تم حفظ أهدافك",
     "loadError": "تعذّر تحميل أهدافك",
-    "invalidValue": "تأكد من الأرقام المدخلة"
+    "invalidValue": "تأكد من الأرقام المدخلة",
+    "suggestedTitle": "أهداف محسوبة لك",
+    "suggestedBody": "بناءً على جسمك ونشاطك وهدفك: {{calories}} سعرة · بروتين {{protein}} · كارب {{carbs}} · دهون {{fat}} جم",
+    "suggestedApply": "استخدم هذه الأرقام",
+    "suggestedBasis": "الأساس: أيض الراحة {{bmr}} × نشاطك = {{tdee}} سعرة صرف يومي",
+    "suggestedFloor": "قلّلنا العجز ليبقى ضمن الحد الآمن للسعرات",
+    "suggestedMissing": "أكمل جنسك وتاريخ ميلادك وطولك ومستوى نشاطك وسجّل وزنك، ونحسب لك أهدافك تلقائيًا"
   },
   "greeting": {
     "late": "الوقت متأخر 🌙",
@@ -112,7 +118,24 @@
     "namePlaceholder": "اسمك",
     "goalLabel": "هدفك الأساسي",
     "nameRequired": "أدخل اسمك أولًا",
-    "goalRequired": "اختر هدفك الأساسي"
+    "goalRequired": "اختر هدفك الأساسي",
+    "bodySection": "بيانات الجسم",
+    "bodyWhy": "نستخدمها فقط لحساب أهداف السعرات والماكروز بدقة",
+    "sexLabel": "الجنس",
+    "sexMale": "ذكر",
+    "sexFemale": "أنثى",
+    "birthDateLabel": "تاريخ الميلاد (سنة-شهر-يوم)",
+    "heightLabel": "الطول (سم)",
+    "activityLabel": "مستوى النشاط",
+    "activity": {
+      "sedentary": "خامل",
+      "light": "خفيف",
+      "moderate": "متوسط",
+      "active": "نشيط",
+      "very_active": "نشيط جدًا"
+    },
+    "invalidBirthDate": "أدخل التاريخ بصيغة 1996-05-20",
+    "invalidHeight": "أدخل طولًا بين 90 و250 سم"
   },
   "today": {
     "sectionTitle": "أساسيات اليوم",

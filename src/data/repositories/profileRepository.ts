@@ -22,7 +22,19 @@ export const profileRepository = {
   },
 
   async updateCurrent(
-    patch: Partial<Pick<Profile, 'display_name' | 'avatar_url' | 'goal_type' | 'onboarding_completed_at'>>
+    patch: Partial<
+      Pick<
+        Profile,
+        | 'display_name'
+        | 'avatar_url'
+        | 'goal_type'
+        | 'onboarding_completed_at'
+        | 'sex'
+        | 'birth_date'
+        | 'height_cm'
+        | 'activity_level'
+      >
+    >
   ) {
     const {
       data: { user },

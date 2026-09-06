@@ -29,6 +29,10 @@ export interface Database {
           display_name: string;
           avatar_url: string | null;
           goal_type: GoalType;
+          sex: 'male' | 'female' | null;
+          birth_date: string | null;
+          height_cm: number | null;
+          activity_level: 'sedentary' | 'light' | 'moderate' | 'active' | 'very_active' | null;
           onboarding_completed_at: string | null;
           created_at: string;
           updated_at: string;

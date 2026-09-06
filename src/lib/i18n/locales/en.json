@@ -50,7 +50,13 @@
     "targetWeightOptional": "Leave empty if you have no target weight",
     "saved": "Your goals are saved",
     "loadError": "Couldn't load your goals",
-    "invalidValue": "Please check the numbers you entered"
+    "invalidValue": "Please check the numbers you entered",
+    "suggestedTitle": "Targets calculated for you",
+    "suggestedBody": "From your body, activity and goal: {{calories}} kcal · protein {{protein}} · carbs {{carbs}} · fat {{fat}} g",
+    "suggestedApply": "Use these numbers",
+    "suggestedBasis": "Basis: resting metabolism {{bmr}} × your activity = {{tdee}} kcal burned daily",
+    "suggestedFloor": "We reduced the deficit to stay above the safe calorie floor",
+    "suggestedMissing": "Add your sex, birth date, height and activity level, and log your weight — we'll calculate your targets automatically"
   },
   "greeting": {
     "late": "It's getting late 🌙",
@@ -112,7 +118,24 @@
     "namePlaceholder": "Your name",
     "goalLabel": "Main goal",
     "nameRequired": "Enter your name first",
-    "goalRequired": "Choose your main goal"
+    "goalRequired": "Choose your main goal",
+    "bodySection": "Body details",
+    "bodyWhy": "Used only to calculate your calorie and macro targets accurately",
+    "sexLabel": "Sex",
+    "sexMale": "Male",
+    "sexFemale": "Female",
+    "birthDateLabel": "Birth date (YYYY-MM-DD)",
+    "heightLabel": "Height (cm)",
+    "activityLabel": "Activity level",
+    "activity": {
+      "sedentary": "Sedentary",
+      "light": "Light",
+      "moderate": "Moderate",
+      "active": "Active",
+      "very_active": "Very active"
+    },
+    "invalidBirthDate": "Use the format 1996-05-20",
+    "invalidHeight": "Enter a height between 90 and 250 cm"
   },
   "today": {
     "sectionTitle": "Today's basics",
