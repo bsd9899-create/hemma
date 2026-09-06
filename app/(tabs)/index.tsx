@@ -12,7 +12,6 @@ import {
   TodaySkeleton,
   Wordmark,
   colors,
-  palette,
   rowDirection,
 } from '@/src/design-system';
 import { radius, spacing } from '@/src/design-system/spacing';
@@ -113,7 +112,9 @@ export default function TodayScreen() {
               progress={summary.completionPercent / 100}
               size={92}
               strokeWidth={9}
-              fillColor={summary.completionPercent >= 90 ? palette.green900 : colors.primary}
+              // ≥٩٠٪ إنجاز حالة إيجابية تستحق تمييزًا؛ اللون نفسه على
+              // الفرعين يلغي المكافأة البصرية بلا أن يلاحظ أحد.
+              fillColor={summary.completionPercent >= 90 ? colors.success : colors.primary}
             >
               <Text variant="title" color={summary.completionPercent >= 90 ? 'accent' : 'primary'}>
                 {summary.completionPercent}%

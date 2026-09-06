@@ -72,6 +72,40 @@ describe('الهوية البصرية', () => {
 });
 
 /**
+ * بعد اختصار اللوحة من خمسة ألوان إلى ثلاثة، صار من السهل جدًا أن
+ * ينتهي فرعا شرط بلون واحد فيختفي التمييز بلا أن يلاحظه أحد — وهذا ما
+ * حدث فعلًا في أربعة مواضع. هذه الاختبارات تمنع تكراره.
+ */
+describe('التمييز البصري بعد اختصار اللوحة', () => {
+  it('ألوان الماكروز الثلاثة متمايزة', () => {
+    const { MACRO_COLORS } = require('@/src/features/nutrition/components/MacroRow');
+    const used = Object.values(MACRO_COLORS) as string[];
+    expect(new Set(used).size).toBe(used.length);
+  });
+
+  it('accent وprimary متطابقان عمدًا — فلا يُستخدم accent للتمييز عن primary', () => {
+    // في هذه الهوية لا يوجد لون رابع؛ accent = primary. أي شرط يختار
+    // بينهما فرع ميت. التمييز يكون بـ success أو secondary.
+    expect(colors.accent).toBe(colors.primary);
+  });
+
+  it('success وsecondary متمايزان عن primary — هما أداتا التمييز', () => {
+    expect(colors.success).not.toBe(colors.primary);
+    expect(colors.secondary).not.toBe(colors.primary);
+    expect(colors.success).not.toBe(colors.secondary);
+  });
+
+  it('لا شاشة تختار بين primary وaccent في شرط واحد', () => {
+    const offenders = execSync(
+      `grep -rlE "colors\\.primary.*colors\\.accent|colors\\.accent.*colors\\.primary" app src ` +
+      `--include=*.tsx | grep -v __tests__ || true`,
+      { cwd: process.cwd(), encoding: 'utf8', shell: '/bin/bash' }
+    ).trim();
+    expect(offenders).toBe('');
+  });
+});
+
+/**
  * فحص شامل لكل الشاشات — لا الرئيسية وحدها.
  *
  * السؤال الذي يجيب عنه: هل الهوية مطبَّقة فعلًا في كل مكان، أم أن

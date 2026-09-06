@@ -23,7 +23,7 @@
     "android": {
       "package": "com.hemma.himah",
       "adaptiveIcon": {
-        "backgroundColor": "#F7F3EE",
+        "backgroundColor": "#0F2D23",
         "foregroundImage": "./assets/android-icon-foreground.png",
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"

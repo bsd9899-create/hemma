@@ -29,7 +29,9 @@ export function TrialTimeline({ trialDays }: { trialDays: number }) {
                   width: 14,
                   height: 14,
                   borderRadius: radius.pill,
-                  backgroundColor: stage.isCharge ? colors.primary : colors.accent,
+                  // محطة الخصم داكنة (نهائية)، وما قبلها خافت — التمييز
+                  // بالدرجة لأن الهوية بثلاثة ألوان بلا accent مستقل.
+                  backgroundColor: stage.isCharge ? colors.primary : colors.secondary,
                 }}
               />
               {!isLast ? (

@@ -12,7 +12,6 @@ import {
   Skeleton,
   Text,
   colors,
-  palette,
   rowDirection,
 } from '@/src/design-system';
 import { spacing } from '@/src/design-system/spacing';
@@ -53,7 +52,11 @@ export default function NutritionScreen() {
   const isOverTarget = caloriesRemaining < 0;
   // الحلقة تُقصّ عند 100% بصريًا، بينما تبقى النسبة الخام في المنطق —
   // التجاوز يُبلَّغ عنه بالنص واللون بدل حلقة تلتفّ على نفسها.
-  const ringColor = isOverTarget ? colors.warning : calorieRatio >= 0.9 ? palette.green900 : colors.primary;
+  // ثلاث حالات بثلاث درجات متمايزة فعلًا: تجاوز (تحذير)، اقتراب من
+  // الهدف (أخضر النجاح الأفتح)، وعادي (الأخضر الأساسي). بعد اختصار
+  // اللوحة إلى ثلاثة ألوان صارت الحالتان الأخيرتان بلون واحد، فاختفى
+  // التمييز تمامًا — التدرّج هنا بالدرجة لا بالصبغة.
+  const ringColor = isOverTarget ? colors.warning : calorieRatio >= 0.9 ? colors.success : colors.primary;
 
   return (
     <Screen>

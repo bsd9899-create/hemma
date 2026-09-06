@@ -10,12 +10,15 @@ import type { MacroKey } from '@/src/domain/nutrition';
  * البروتين بالتيل الأساسي (الأهم لبناء العضل)، الكارب بالذهبي المميّز،
  * الدهون بدرجة تيل أفتح لتبقى الثلاثة عائلة واحدة بصريًا.
  */
-const MACRO_COLORS: Record<MacroKey, string> = {
+export const MACRO_COLORS: Record<MacroKey, string> = {
   // ألوان الهوية الثلاثة: الأخضر الأساسي، الأخضر الثانوي، البيج —
   // فيتمايز الماكروز بصريًا بلا إدخال أي لون خارج الملف.
+  // ثلاث درجات متمايزة من الهوية نفسها: الأخضر الأساسي، أخضر النجاح
+  // الأفتح، والرمادي الثانوي. كان البروتين والدهون بلون واحد بعد
+  // اختصار اللوحة، فبدا الماكرو الثالث تكرارًا للأول.
   protein: palette.green900,
-  carbs: palette.sage400,
-  fat: palette.green900,
+  carbs: palette.success,
+  fat: palette.sage400,
 };
 
 type MacroRowProps = {
