@@ -19,6 +19,21 @@ export function formatNumber(value: number | null | undefined): string {
 }
 
 /**
+ * تاريخ مقروء بلغة المستخدم (٩ سبتمبر ٢٠٢٦ / 9 September 2026).
+ *
+ * يُستخدم في الإفصاح عن تاريخ بدء الخصم بعد التجربة المجانية: "بعد ٣
+ * أيام" تترك المستخدم يحسب بنفسه، والتاريخ الصريح لا يترك مجالًا للشك.
+ */
+export function formatLongDate(date: Date): string {
+  if (Number.isNaN(date.getTime())) return '';
+  return date.toLocaleDateString(i18n.language === 'en' ? 'en' : 'ar', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  });
+}
+
+/**
  * وقت قصير حسب اللغة (٧:٣٠ م / 7:30 PM). نستخدم Intl مباشرة بدل
  * تنسيق يدوي حتى يتبع التطبيق تفضيلات المنطقة تلقائيًا.
  */

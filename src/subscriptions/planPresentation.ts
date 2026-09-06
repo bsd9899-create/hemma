@@ -23,7 +23,7 @@ import type { PurchasesPackage } from 'react-native-purchases';
  * مطابقة تمامًا لمقارنة العضو، ويبقى `type` وحده مستوردًا (يُمحى عند
  * الترجمة) فتُحفظ سلامة الأنواع كاملة.
  */
-const ANNUAL = 'ANNUAL';
+const THREE_MONTH = 'THREE_MONTH';
 const MONTHLY = 'MONTHLY';
 
 /** فترة التجربة المجانية كما أعلنها المتجر فعليًا. */
@@ -49,12 +49,12 @@ export function getTrialOffer(pkg: PurchasesPackage): TrialOffer | null {
 }
 
 /**
- * ترتيب العرض: السنوي أولًا لأنه الخيار المُوصى به (الأفضل قيمة)، ثم
- * الشهري، ثم أي باقة أخرى بترتيبها الأصلي. لا نعتمد على ترتيب
+ * ترتيب العرض: باقة الثلاثة أشهر أولًا لأنها الخيار المُوصى به (الأفضل
+ * قيمة)، ثم الشهري، ثم أي باقة أخرى بترتيبها الأصلي. لا نعتمد على ترتيب
  * RevenueCat لأنه يتبع ترتيب اللوحة وقد يتغيّر بلا قصد.
  */
 const PACKAGE_ORDER: Record<string, number> = {
-  [ANNUAL]: 0,
+  [THREE_MONTH]: 0,
   [MONTHLY]: 1,
 };
 
@@ -64,10 +64,33 @@ export function sortPackagesForDisplay(packages: PurchasesPackage[]): PurchasesP
   );
 }
 
-/** الباقة المميَّزة بشارة "الأفضل قيمة" — السنوية، إن وُجدت. */
+/** الباقة المميَّزة بشارة "الأفضل قيمة" — باقة الثلاثة أشهر. */
 export function isBestValue(pkg: PurchasesPackage): boolean {
-  return pkg.packageType === ANNUAL;
+  return pkg.packageType === THREE_MONTH;
 }
+
+/**
+ * السعر مقسومًا على عدد أشهر الباقة.
+ *
+ * باقة ٣ أشهر بسعر إجمالي لا تُقارَن ذهنيًا بباقة شهرية: المستخدم يرى
+ * رقمًا أكبر فيبدو أغلى وهو أرخص. عرض المكافئ الشهري إلى جانب الإجمالي
+ * يجعل المقارنة صحيحة بلا أي ادّعاء تسويقي.
+ *
+ * نُرجع الرقم فقط؛ التنسيق بعملة المستخدم مسؤولية الواجهة، لأن
+ * `priceString` وحده يحمل رمز العملة الصحيح لبلده.
+ */
+export function monthlyEquivalent(pkg: PurchasesPackage): number | null {
+  const months = MONTHS_IN_PACKAGE[pkg.packageType];
+  if (!months || months <= 1) return null;
+  const price = pkg.product.price;
+  if (typeof price !== 'number' || !Number.isFinite(price) || price <= 0) return null;
+  return Math.round((price / months) * 100) / 100;
+}
+
+const MONTHS_IN_PACKAGE: Record<string, number> = {
+  [MONTHLY]: 1,
+  [THREE_MONTH]: 3,
+};
 
 /**
  * مفتاح ترجمة مدة التجديد ("شهريًا" / "سنويًا"). نُرجع مفتاحًا لا نصًا
@@ -75,8 +98,8 @@ export function isBestValue(pkg: PurchasesPackage): boolean {
  */
 export function renewalPeriodKey(pkg: PurchasesPackage): string | null {
   switch (pkg.packageType) {
-    case ANNUAL:
-      return 'paywall.perYear';
+    case THREE_MONTH:
+      return 'paywall.perThreeMonths';
     case MONTHLY:
       return 'paywall.perMonth';
     default:

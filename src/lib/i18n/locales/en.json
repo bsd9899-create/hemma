@@ -362,7 +362,6 @@
     "purchaseError": "Couldn't complete the purchase",
     "restoreError": "Couldn't restore purchases",
     "perMonth": "/ month",
-    "perYear": "/ year",
     "startTrial": "Start free trial",
     "trialLine": "Free for {{count}} {{unit}}, then {{price}} {{period}} automatically. Cancel anytime.",
     "trialUnit": {
@@ -378,7 +377,20 @@
     "renewalTerms": "Subscription renews automatically unless cancelled at least 24 hours before the end of the current period. Manage or cancel in your device Settings → Subscriptions.",
     "termsOfUse": "Terms of Use",
     "privacyPolicy": "Privacy Policy",
-    "nothingToRestore": "No previous purchases found on this Apple account. Make sure you are signed in with the account you purchased with."
+    "nothingToRestore": "No previous purchases found on this Apple account. Make sure you are signed in with the account you purchased with.",
+    "perThreeMonths": "/ 3 months",
+    "perMonthEquivalent": "Works out to {{value}} SAR a month",
+    "noChargeToday": "You won't be charged today",
+    "timeline": {
+      "heading_one": "How the {{count}}-day free trial works",
+      "heading_other": "How the {{count}}-day free trial works",
+      "todayTitle": "Today",
+      "todayBody": "Every HEMMA+ feature unlocks straight away — no charge.",
+      "reminderTitle": "Reminder",
+      "reminderBody": "We remind you a full day before the trial ends, so you decide unhurried.",
+      "chargeTitle": "Subscription starts",
+      "chargeBody": "You'll be charged on {{date}} unless you cancel before then."
+    }
   },
   "health": {
     "permissionDenied": "Apple Health access wasn't granted",

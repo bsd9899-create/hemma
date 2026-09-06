@@ -29,11 +29,14 @@ import {
 import {
   getTrialOffer,
   isBestValue,
+  monthlyEquivalent,
   renewalPeriodKey,
   sortPackagesForDisplay,
   trialUnitKey,
 } from '@/src/subscriptions/planPresentation';
+import { TrialTimeline } from '@/src/features/subscription/TrialTimeline';
 import { usePremiumStatus } from '@/src/subscriptions/usePremiumStatus';
+import { formatNumber } from '@/src/lib/i18n/format';
 import { getFriendlyErrorMessage } from '@/src/lib/errors';
 
 /**
@@ -71,6 +74,17 @@ export default function PaywallScreen() {
   }, [t]);
 
   const isBusy = busyPackageId !== null || isRestoring;
+
+  /**
+   * طول التجربة كما أعلنه المتجر — لا رقم مكتوب في الكود.
+   * نأخذ أطول تجربة معروضة: الخط الزمني واحد لكل الباقات، وعرض أقصر
+   * مدة سيقصّر الوعد على من اختار الباقة الأطول.
+   */
+  const trialDays = packages.reduce<number | null>((longest, pkg) => {
+    const offer = getTrialOffer(pkg);
+    if (!offer || offer.unit.toUpperCase() !== 'DAY') return longest;
+    return longest === null || offer.count > longest ? offer.count : longest;
+  }, null);
 
   async function handlePurchase(pkg: PurchasesPackage) {
     if (isBusy) return;
@@ -185,10 +199,20 @@ export default function PaywallScreen() {
           </Card>
         ) : (
           <View style={{ gap: spacing.sm }}>
+            {/* الخط الزمني مرة واحدة فوق الباقات لا داخل كل بطاقة:
+                التسلسل واحد مهما اختار المستخدم، وتكراره ضجيج. */}
+            {trialDays !== null ? (
+              <Card variant="soft" style={{ gap: spacing.sm }}>
+                <Text variant="bodyStrong">{t('paywall.timeline.heading', { count: trialDays })}</Text>
+                <TrialTimeline trialDays={trialDays} />
+              </Card>
+            ) : null}
+
             {packages.map((pkg) => {
               const featured = isBestValue(pkg);
               const trial = getTrialOffer(pkg);
               const periodKey = renewalPeriodKey(pkg);
+              const perMonth = monthlyEquivalent(pkg);
               return (
                 <Card
                   key={pkg.identifier}
@@ -211,6 +235,14 @@ export default function PaywallScreen() {
                       </Text>
                     ) : null}
                   </Text>
+
+                  {/* المكافئ الشهري: باقة ٣ أشهر بسعر إجمالي تبدو أغلى
+                      من الشهرية وهي أرخص. المقارنة الصحيحة تحتاج القسمة. */}
+                  {perMonth !== null ? (
+                    <Text variant="caption" color="textSecondary" style={{ marginTop: spacing.xxs }}>
+                      {t('paywall.perMonthEquivalent', { value: formatNumber(perMonth) })}
+                    </Text>
+                  ) : null}
 
                   {/* إفصاح التجربة المجانية: مدتها، ثم ماذا يحدث بعدها.
                       عرض المدة بلا ذكر التجديد التلقائي مخالفة صريحة. */}
@@ -239,6 +271,13 @@ export default function PaywallScreen() {
             })}
           </View>
         )}
+
+        {/* الطمأنة قبل الزر لا بعده: القلق يسبق الضغط. */}
+        {trialDays !== null ? (
+          <Text variant="captionStrong" color="success" style={{ textAlign: 'center' }}>
+            ✓ {t('paywall.noChargeToday')}
+          </Text>
+        ) : null}
 
         {error ? <InlineMessage tone="danger" message={error} /> : null}
         {notice ? <InlineMessage tone="info" message={notice} /> : null}

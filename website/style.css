@@ -198,3 +198,6 @@ details p { margin: 0.625rem 0 0; color: var(--neutral-500); font-size: 0.9375re
   .plan .price { color: var(--gold-500); }
   .steps li::before { background: var(--gold-500); color: var(--teal-900); }
 }
+
+.plan .price-note { margin: 0.25rem 0 0; font-size: 0.875rem; color: var(--neutral-500); }
+@media (prefers-color-scheme: dark) { .plan .price-note { color: #B9C4C2; } }
