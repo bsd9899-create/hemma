@@ -283,7 +283,8 @@
     "version": "هِمّة — الإصدار {{version}}",
     "linkError": "تعذّر فتح الرابط على هذا الجهاز",
     "goalsEntry": "أهدافي",
-    "teamsEntry": "فريقي"
+    "teamsEntry": "فريقي",
+    "termsOfUse": "شروط الاستخدام"
   },
   "quickAdd": {
     "title": "إضافة سريعة",
@@ -353,7 +354,38 @@
     "restoring": "جارِ الاستعادة...",
     "loadError": "تعذّر تحميل الخطط",
     "purchaseError": "تعذّر إتمام الشراء",
-    "restoreError": "تعذّر استعادة المشتريات"
+    "restoreError": "تعذّر استعادة المشتريات",
+    "perMonth": "/ شهريًا",
+    "perYear": "/ سنويًا",
+    "startTrial": "ابدأ التجربة المجانية",
+    "trialLine": "مجانًا {{count}} {{unit}}، ثم {{price}} {{period}} تلقائيًا. يمكنك الإلغاء في أي وقت.",
+    "trialUnit": {
+      "day_zero": "يوم",
+      "day_one": "يوم",
+      "day_two": "يومين",
+      "day_few": "أيام",
+      "day_many": "يومًا",
+      "day_other": "يوم",
+      "week_one": "أسبوع",
+      "week_two": "أسبوعين",
+      "week_few": "أسابيع",
+      "week_many": "أسبوعًا",
+      "week_other": "أسبوع",
+      "month_one": "شهر",
+      "month_two": "شهرين",
+      "month_few": "أشهر",
+      "month_many": "شهرًا",
+      "month_other": "شهر",
+      "year_one": "سنة",
+      "year_two": "سنتين",
+      "year_few": "سنوات",
+      "year_many": "سنة",
+      "year_other": "سنة"
+    },
+    "renewalTerms": "يتجدد الاشتراك تلقائيًا ما لم تُلغِ التجديد قبل نهاية الفترة الحالية بـ 24 ساعة على الأقل. الإلغاء وإدارة الاشتراك من إعدادات جهازك ← الاشتراكات.",
+    "termsOfUse": "شروط الاستخدام",
+    "privacyPolicy": "سياسة الخصوصية",
+    "nothingToRestore": "لم نجد أي مشتريات سابقة على حساب Apple هذا. تأكد أنك مسجّل بنفس الحساب الذي اشتريت به."
   },
   "health": {
     "permissionDenied": "لم يُسمح بالوصول لبيانات Apple Health",

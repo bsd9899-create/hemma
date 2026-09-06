@@ -60,21 +60,32 @@ export function ErrorState({ message, onRetry, retryLabel }: ErrorStateProps) {
 }
 
 type InlineMessageProps = {
-  /** danger لأخطاء الحفظ، success لتأكيد نجاح العملية. */
-  tone: 'danger' | 'success';
+  /**
+   * danger لأخطاء الحفظ، success لتأكيد نجاح العملية، info لنتيجة
+   * محايدة ليست الاثنين — مثل "لم نجد مشتريات لاستعادتها": ليست خطأ
+   * (لم يفشل شيء) وليست نجاحًا (لم يُستعد شيء)، وإظهارها بأحدهما يكذب
+   * على المستخدم بلونٍ قبل أن يقرأ الكلمة.
+   */
+  tone: 'danger' | 'success' | 'info';
   message: string;
 };
 
+const INLINE_TONES = {
+  danger: { background: colors.dangerSoft, text: 'danger', icon: '⚠️' },
+  success: { background: colors.successSoft, text: 'success', icon: '✓' },
+  info: { background: colors.surfaceAlt, text: 'textSecondary', icon: 'ℹ️' },
+} as const;
+
 /** رسالة سطرية أسفل النماذج — بديل موحّد لنص أحمر عائم بلا سياق. */
 export function InlineMessage({ tone, message }: InlineMessageProps) {
-  const isDanger = tone === 'danger';
+  const style = INLINE_TONES[tone];
   return (
     <View
       accessibilityLiveRegion="polite"
-      style={[styles.inline, { backgroundColor: isDanger ? colors.dangerSoft : colors.successSoft }]}
+      style={[styles.inline, { backgroundColor: style.background }]}
     >
-      <Text variant="captionStrong" color={isDanger ? 'danger' : 'success'} style={styles.inlineText}>
-        {isDanger ? '⚠️' : '✓'}  {message}
+      <Text variant="captionStrong" color={style.text} style={styles.inlineText}>
+        {style.icon}  {message}
       </Text>
     </View>
   );

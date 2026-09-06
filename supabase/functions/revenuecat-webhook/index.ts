@@ -4,10 +4,13 @@
 // supabase/migrations/20260831000008_subscriptions.sql).
 //
 // النشر لاحقًا (يحتاج مشروع RevenueCat فعلي):
-//   supabase functions deploy revenuecat-webhook
+//   supabase functions deploy revenuecat-webhook --no-verify-jwt
 //   supabase secrets set REVENUECAT_WEBHOOK_AUTH_HEADER=<قيمة سرية تُضبط أيضًا في RevenueCat>
 // ثم في RevenueCat Dashboard → Integrations → Webhooks: أضف رابط الدالة
 // وضع نفس القيمة في Authorization header.
+//
+// ملاحظة: --no-verify-jwt ضرورية لأن RevenueCat ليس مستخدمًا في
+// Supabase ولا يملك JWT؛ المصادقة هنا بالسر المشترك أدناه وحده.
 
 import { createClient } from 'npm:@supabase/supabase-js@2';
 
@@ -21,6 +24,7 @@ type RevenueCatEvent = {
   product_id?: string;
   store?: 'APP_STORE' | 'PLAY_STORE' | string;
   expiration_at_ms?: number | null;
+  event_timestamp_ms?: number | null;
 };
 
 /** أحداث RevenueCat التي تعني "أصبح/بقي مشتركًا فعليًا". */
@@ -28,20 +32,58 @@ const PREMIUM_ACTIVE_EVENTS = new Set(['INITIAL_PURCHASE', 'RENEWAL', 'PRODUCT_C
 /** CANCELLATION فقط تعني إيقاف التجديد التلقائي وليس انتهاء الاشتراك فورًا. */
 const PREMIUM_INACTIVE_EVENTS = new Set(['EXPIRATION', 'BILLING_ISSUE']);
 
+/** app_user_id لدينا هو auth.users.id دائمًا — أي UUID. */
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
+/**
+ * مقارنة ثابتة الزمن للسر المشترك.
+ *
+ * المقارنة بـ !== تتوقف عند أول حرف مختلف، فيتسرّب طول البادئة الصحيحة
+ * عبر زمن الاستجابة. الفارق ضئيل عبر الشبكة لكن تصحيحه سطران، وهذه
+ * الدالة تحرس الجدول الوحيد الذي يمنح Premium مجانًا لو اختُرق.
+ */
+function safeEqual(a: string, b: string): boolean {
+  const encoder = new TextEncoder();
+  const bufA = encoder.encode(a);
+  const bufB = encoder.encode(b);
+  // الطول نفسه ليس سرًا، لكن المقارنة يجب أن تمرّ على كل البايتات.
+  let mismatch = bufA.length ^ bufB.length;
+  const max = Math.max(bufA.length, bufB.length);
+  for (let i = 0; i < max; i++) {
+    mismatch |= (bufA[i] ?? 0) ^ (bufB[i] ?? 0);
+  }
+  return mismatch === 0;
+}
+
 Deno.serve(async (req) => {
   // فشل مغلق (fail closed) عمدًا: لو REVENUECAT_WEBHOOK_AUTH_HEADER غير
   // مضبوط بعد (سيناريو متوقع قبل ربط RevenueCat فعليًا)، يجب رفض كل
   // الطلبات — وليس قبولها كلها. القبول الصامت هنا كان يسمح لأي طرف
   // يعرف رابط الدالة بتغيير is_premium لأي مستخدم بدون أي مصادقة.
-  if (!WEBHOOK_AUTH_HEADER || req.headers.get('Authorization') !== WEBHOOK_AUTH_HEADER) {
+  const provided = req.headers.get('Authorization');
+  if (!WEBHOOK_AUTH_HEADER || !provided || !safeEqual(provided, WEBHOOK_AUTH_HEADER)) {
     return new Response('Unauthorized', { status: 401 });
   }
 
-  const body = await req.json();
-  const event: RevenueCatEvent = body.event;
+  let event: RevenueCatEvent | undefined;
+  try {
+    const body = await req.json();
+    event = body?.event;
+  } catch {
+    return new Response('Malformed JSON', { status: 400 });
+  }
 
   if (!event?.app_user_id) {
     return new Response('Missing app_user_id', { status: 400 });
+  }
+
+  // RevenueCat يرسل معرّفات مجهولة بصيغة "$RCAnonymousID:..." لمستخدمين
+  // لم يُعرَّفوا بعد، وهي ليست UUID. تمريرها إلى عمود uuid يرفع خطأ
+  // 22P02 فنُرجع 500، فيعيد RevenueCat المحاولة إلى الأبد على حدث لن
+  // ينجح أبدًا. 200 هنا تعني "استُلم وتقرر تجاهله"، وهو الصحيح.
+  if (!UUID_RE.test(event.app_user_id)) {
+    console.log('revenuecat-webhook: ignoring non-UUID app_user_id', event.type);
+    return new Response('Ignored: anonymous app_user_id', { status: 200 });
   }
 
   const supabase = createClient(SUPABASE_URL, SERVICE_ROLE_KEY);
@@ -67,14 +109,29 @@ Deno.serve(async (req) => {
   // app_user_id في RevenueCat = auth.users.id (نمرّره كـ appUserID عند
   // initPurchases في src/subscriptions/revenuecat.ts) — لذلك user_id
   // هو نفسه event.app_user_id مباشرة.
-  const { error } = await supabase
-    .from('subscriptions')
-    .update(patch)
-    .eq('user_id', event.app_user_id);
+  //
+  // الشرط الزمني حرج: webhooks تصل بلا ترتيب مضمون وتُعاد عند أي فشل.
+  // بدونه يستطيع حدث EXPIRATION قديم يصل متأخرًا أن يلغي اشتراكًا
+  // جُدِّد للتو، أو إعادة إرسال INITIAL_PURCHASE أن تُحيي اشتراكًا
+  // منتهيًا. نرفض أي حدث أقدم من آخر مزامنة مسجّلة.
+  let query = supabase.from('subscriptions').update(patch).eq('user_id', event.app_user_id);
+  if (event.event_timestamp_ms) {
+    query = query.lt('last_synced_at', new Date(event.event_timestamp_ms).toISOString());
+  }
+
+  const { data, error } = await query.select('user_id');
 
   if (error) {
-    console.error('revenuecat-webhook update failed', error);
+    console.error('revenuecat-webhook update failed', error.code, error.message);
     return new Response('Internal error', { status: 500 });
+  }
+
+  // 0 صفوف ليست خطأ بالضرورة (حدث أقدم من حالتنا، أو حساب محذوف)، لكن
+  // ابتلاعها بصمت كان يخفي الحالة المهمة: مستخدم دفع فعلًا ولم يُفعَّل
+  // اشتراكه أبدًا. نسجّلها صراحةً ليظهر ذلك في سجلات الدالة.
+  if (!data || data.length === 0) {
+    console.log('revenuecat-webhook: no row updated', event.type, '— stale event or unknown user');
+    return new Response('No matching subscription row', { status: 200 });
   }
 
   return new Response('OK', { status: 200 });

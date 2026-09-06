@@ -30,9 +30,11 @@ yarn-error.*
 .DS_Store
 *.pem
 
-# local env files
-.env
-.env*.local
+# local env files — النمط الشامل ثم استثناء المثال وحده.
+# الأنماط السابقة (.env و .env*.local) كانت تترك .env.production
+# و.env.staging غير متجاهلة، وهي أخطر الملفات على الإطلاق.
+.env*
+!.env.example
 
 # Apple Sign In client secret (generated locally by generate-apple-secret.mjs)
 apple-client-secret.txt

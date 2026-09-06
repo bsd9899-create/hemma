@@ -13,7 +13,14 @@ import { getFriendlyErrorMessage } from '@/src/lib/errors';
 import { changeLanguage, type AppLanguage } from '@/src/lib/i18n';
 import { GOAL_OPTIONS } from '@/src/features/profile/GoalPicker';
 
-const PRIVACY_POLICY_URL = 'https://github.com/bsd9899-create/hemma/blob/main/docs/PRIVACY_POLICY.md';
+/**
+ * الموقع الرسمي — لا رابط GitHub. رابط blob على GitHub كان سيفشل مراجعة
+ * App Store: يشترط Apple رابطًا عامًا مستقرًا لسياسة الخصوصية، ورابط
+ * المستودع ينكسر بمجرد إعادة تسمية فرع أو جعل المستودع خاصًا.
+ * المصدر: مجلد website/ في هذا المستودع.
+ */
+const PRIVACY_POLICY_URL = 'https://himmah.online/privacy.html';
+const TERMS_URL = 'https://himmah.online/terms.html';
 
 const LANGUAGE_OPTIONS: { value: AppLanguage; label: string }[] = [
   { value: 'ar', label: 'العربية' },
@@ -68,12 +75,12 @@ export default function ProfileScreen() {
     // changeLanguage يعيد تشغيل التطبيق فعليًا — لا حاجة لإيقاف isSwitchingLanguage هنا.
   }
 
-  async function handleOpenPrivacyPolicy() {
+  async function openLink(url: string) {
     // كان الفشل يُبتلع بصمت: ضغطة بلا أي نتيجة ولا سبب ظاهر.
     try {
-      await Linking.openURL(PRIVACY_POLICY_URL);
+      await Linking.openURL(url);
     } catch {
-      Alert.alert(t('profile.linkError'), PRIVACY_POLICY_URL);
+      Alert.alert(t('profile.linkError'), url);
     }
   }
 
@@ -159,7 +166,16 @@ export default function ProfileScreen() {
           </View>
         </Card>
 
-        <Button label={t('profile.privacyPolicy')} variant="ghost" onPress={handleOpenPrivacyPolicy} />
+        <Button
+          label={t('profile.privacyPolicy')}
+          variant="ghost"
+          onPress={() => void openLink(PRIVACY_POLICY_URL)}
+        />
+        <Button
+          label={t('profile.termsOfUse')}
+          variant="ghost"
+          onPress={() => void openLink(TERMS_URL)}
+        />
         <Button
           label={t('profile.signOut')}
           variant="ghost"

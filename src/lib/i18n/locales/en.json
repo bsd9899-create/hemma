@@ -283,7 +283,8 @@
     "version": "Hemma — version {{version}}",
     "linkError": "Couldn't open the link on this device",
     "goalsEntry": "My goals",
-    "teamsEntry": "My team"
+    "teamsEntry": "My team",
+    "termsOfUse": "Terms of Use"
   },
   "quickAdd": {
     "title": "Quick add",
@@ -353,7 +354,25 @@
     "restoring": "Restoring...",
     "loadError": "Couldn't load plans",
     "purchaseError": "Couldn't complete the purchase",
-    "restoreError": "Couldn't restore purchases"
+    "restoreError": "Couldn't restore purchases",
+    "perMonth": "/ month",
+    "perYear": "/ year",
+    "startTrial": "Start free trial",
+    "trialLine": "Free for {{count}} {{unit}}, then {{price}} {{period}} automatically. Cancel anytime.",
+    "trialUnit": {
+      "day_one": "day",
+      "day_other": "days",
+      "week_one": "week",
+      "week_other": "weeks",
+      "month_one": "month",
+      "month_other": "months",
+      "year_one": "year",
+      "year_other": "years"
+    },
+    "renewalTerms": "Subscription renews automatically unless cancelled at least 24 hours before the end of the current period. Manage or cancel in your device Settings → Subscriptions.",
+    "termsOfUse": "Terms of Use",
+    "privacyPolicy": "Privacy Policy",
+    "nothingToRestore": "No previous purchases found on this Apple account. Make sure you are signed in with the account you purchased with."
   },
   "health": {
     "permissionDenied": "Apple Health access wasn't granted",

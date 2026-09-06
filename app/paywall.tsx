@@ -1,20 +1,48 @@
 import { useEffect, useState } from 'react';
-import { View } from 'react-native';
+import { Linking, ScrollView, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import type { PurchasesPackage } from 'react-native-purchases';
-import { Badge, Button, Card, InlineMessage, Screen, ScreenHeader, Skeleton, Text, Wordmark, palette } from '@/src/design-system';
+import {
+  Badge,
+  Button,
+  Card,
+  InlineMessage,
+  Screen,
+  ScreenHeader,
+  Skeleton,
+  Text,
+  Wordmark,
+  palette,
+} from '@/src/design-system';
 import { spacing } from '@/src/design-system/spacing';
 import { useAuthStore } from '@/src/features/auth/store';
 import {
   getCurrentOfferingPackages,
+  hasPremiumEntitlement,
   isPurchaseCancelledError,
   isRevenueCatConfigured,
   purchasePackage,
   restorePurchases,
 } from '@/src/subscriptions/revenuecat';
+import {
+  getTrialOffer,
+  isBestValue,
+  renewalPeriodKey,
+  sortPackagesForDisplay,
+  trialUnitKey,
+} from '@/src/subscriptions/planPresentation';
 import { usePremiumStatus } from '@/src/subscriptions/usePremiumStatus';
 import { getFriendlyErrorMessage } from '@/src/lib/errors';
+
+/**
+ * الرابطان إلزاميان داخل هذه الشاشة تحديدًا — لا يكفي وجودهما في
+ * "حسابي". Apple تشترط ظهور اتفاقية الترخيص وسياسة الخصوصية في نفس
+ * الشاشة التي تعرض اشتراكًا متجددًا (App Store Review Guideline 3.1.2)،
+ * وغيابهما سبب رفض متكرر ومعروف.
+ */
+const TERMS_URL = 'https://himmah.online/terms.html';
+const PRIVACY_URL = 'https://himmah.online/privacy.html';
 
 export default function PaywallScreen() {
   const { t } = useTranslation();
@@ -27,6 +55,7 @@ export default function PaywallScreen() {
   const [busyPackageId, setBusyPackageId] = useState<string | null>(null);
   const [isRestoring, setIsRestoring] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
 
   useEffect(() => {
     if (!isRevenueCatConfigured) {
@@ -35,7 +64,7 @@ export default function PaywallScreen() {
       return;
     }
     getCurrentOfferingPackages()
-      .then(setPackages)
+      .then((fetched) => setPackages(sortPackagesForDisplay(fetched)))
       .catch((e) => setError(getFriendlyErrorMessage(e, t('paywall.loadError'))))
       .finally(() => setIsLoading(false));
   }, [t]);
@@ -46,6 +75,7 @@ export default function PaywallScreen() {
     if (isBusy) return;
     setBusyPackageId(pkg.identifier);
     setError(null);
+    setNotice(null);
     try {
       await purchasePackage(pkg);
       await refresh();
@@ -63,11 +93,19 @@ export default function PaywallScreen() {
   async function handleRestore() {
     if (isBusy) return;
     setError(null);
+    setNotice(null);
     setIsRestoring(true);
     try {
-      await restorePurchases();
-      await refresh();
-      router.back();
+      const customerInfo = await restorePurchases();
+      // الاستعادة "تنجح" تقنيًا حتى حين لا يوجد شيء يُستعاد. الإغلاق
+      // الصامت هنا كان يترك المستخدم يظن أن اشتراكه عاد بينما لم يعد،
+      // فنفحص الاستحقاق فعليًا ونقول له النتيجة.
+      if (hasPremiumEntitlement(customerInfo)) {
+        await refresh();
+        router.back();
+        return;
+      }
+      setNotice(t('paywall.nothingToRestore'));
     } catch (e) {
       if (!isPurchaseCancelledError(e)) {
         setError(getFriendlyErrorMessage(e, t('paywall.restoreError')));
@@ -75,6 +113,10 @@ export default function PaywallScreen() {
     } finally {
       setIsRestoring(false);
     }
+  }
+
+  function openLink(url: string) {
+    Linking.openURL(url).catch(() => setError(t('profile.linkError')));
   }
 
   if (isPremium) {
@@ -92,7 +134,13 @@ export default function PaywallScreen() {
 
   return (
     <Screen>
-      <View style={{ flex: 1, gap: spacing.lg }}>
+      {/* الشاشة أطول من الجهاز بعد إضافة إفصاح التجربة وشروط التجديد
+          والروابط القانونية — بلا تمرير تُقتطع الروابط الإلزامية على
+          الأجهزة الصغيرة، وهي بالضبط ما يبحث عنه مراجع App Store. */}
+      <ScrollView
+        contentContainerStyle={{ gap: spacing.lg, paddingBottom: spacing.xl }}
+        showsVerticalScrollIndicator={false}
+      >
         <ScreenHeader title="" action="close" />
 
         <View style={{ alignItems: 'center', gap: spacing.sm }}>
@@ -113,8 +161,8 @@ export default function PaywallScreen() {
           </Card>
         ) : isLoading ? (
           <View style={{ gap: spacing.sm }}>
-            <Skeleton height={100} />
-            <Skeleton height={100} />
+            <Skeleton height={140} />
+            <Skeleton height={140} />
           </View>
         ) : packages.length === 0 ? (
           <Card variant="soft">
@@ -125,22 +173,48 @@ export default function PaywallScreen() {
         ) : (
           <View style={{ gap: spacing.sm }}>
             {packages.map((pkg) => {
-              const isAnnual = pkg.packageType === 'ANNUAL';
+              const featured = isBestValue(pkg);
+              const trial = getTrialOffer(pkg);
+              const periodKey = renewalPeriodKey(pkg);
               return (
                 <Card
                   key={pkg.identifier}
-                  style={isAnnual ? { borderColor: palette.gold500, borderWidth: 2 } : undefined}
+                  style={featured ? { borderColor: palette.gold500, borderWidth: 2 } : undefined}
                 >
-                  {isAnnual ? <Badge label={t('paywall.bestValue')} tone="accent" /> : null}
+                  {featured ? <Badge label={t('paywall.bestValue')} tone="accent" /> : null}
+
                   <Text variant="bodyStrong" style={{ marginTop: spacing.xxs }}>
                     {pkg.product.title}
                   </Text>
+
+                  {/* السعر يأتي من المتجر (priceString) بعملة المستخدم
+                      وضريبته — لا رقم مكتوب في الكود. */}
                   <Text variant="title" color="primary" style={{ marginTop: spacing.xxs }}>
                     {pkg.product.priceString}
+                    {periodKey ? (
+                      <Text variant="body" color="textSecondary">
+                        {' '}
+                        {t(periodKey)}
+                      </Text>
+                    ) : null}
                   </Text>
+
+                  {/* إفصاح التجربة المجانية: مدتها، ثم ماذا يحدث بعدها.
+                      عرض المدة بلا ذكر التجديد التلقائي مخالفة صريحة. */}
+                  {trial ? (
+                    <Text variant="caption" color="textSecondary" style={{ marginTop: spacing.xxs }}>
+                      {t('paywall.trialLine', {
+                        count: trial.count,
+                        unit: t(trialUnitKey(trial), { count: trial.count }),
+                        price: pkg.product.priceString,
+                        period: periodKey ? t(periodKey) : '',
+                      })}
+                    </Text>
+                  ) : null}
+
                   <Button
-                    label={t('paywall.subscribe')}
-                    variant={isAnnual ? 'primary' : 'secondary'}
+                    label={trial ? t('paywall.startTrial') : t('paywall.subscribe')}
+                    variant={featured ? 'primary' : 'secondary'}
                     size="lg"
                     style={{ marginTop: spacing.sm }}
                     loading={busyPackageId === pkg.identifier}
@@ -154,6 +228,7 @@ export default function PaywallScreen() {
         )}
 
         {error ? <InlineMessage tone="danger" message={error} /> : null}
+        {notice ? <InlineMessage tone="info" message={notice} /> : null}
 
         <Button
           label={t('paywall.restorePurchases')}
@@ -162,7 +237,17 @@ export default function PaywallScreen() {
           disabled={isBusy}
           onPress={handleRestore}
         />
-      </View>
+
+        {/* شروط التجديد التلقائي — نص ثابت مطلوب بغضّ النظر عن وجود تجربة. */}
+        <Text variant="caption" color="textSecondary" style={{ textAlign: 'center' }}>
+          {t('paywall.renewalTerms')}
+        </Text>
+
+        <View style={{ flexDirection: 'row', justifyContent: 'center', gap: spacing.md }}>
+          <Button label={t('paywall.termsOfUse')} variant="ghost" onPress={() => openLink(TERMS_URL)} />
+          <Button label={t('paywall.privacyPolicy')} variant="ghost" onPress={() => openLink(PRIVACY_URL)} />
+        </View>
+      </ScrollView>
     </Screen>
   );
 }
