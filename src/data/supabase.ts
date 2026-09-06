@@ -1,8 +1,8 @@
 import 'react-native-url-polyfill/auto';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createClient } from '@supabase/supabase-js';
 import { AppState } from 'react-native';
 import { env, isSupabaseConfigured } from '@/src/lib/env';
+import { secureSessionStorage } from './secureSessionStorage';
 import type { Database } from './database.types';
 
 if (!isSupabaseConfigured) {
@@ -23,7 +23,16 @@ export const supabase = createClient<Database>(
   env.EXPO_PUBLIC_SUPABASE_ANON_KEY ?? 'placeholder-anon-key',
   {
     auth: {
-      storage: AsyncStorage,
+      // Keychain/Keystore بدل AsyncStorage.
+      //
+      // الجلسة تحوي refresh token طويل العمر يمنح حاملَه وصولًا كاملًا
+      // للحساب، وAsyncStorage ملف غير مشفَّر داخل حاوية التطبيق ومشمول
+      // في النسخ الاحتياطية — أي نسخة احتياطية غير مشفَّرة أو جهاز مكسور
+      // الحماية يكشفه نصًا صريحًا.
+      //
+      // المحوّل يقرأ من AsyncStorage عند غياب القيمة في Keychain ثم
+      // يهاجرها، فلا يخرج أي مستخدم مسجَّل من حسابه عند الترقية.
+      storage: secureSessionStorage,
       autoRefreshToken: true,
       persistSession: true,
       detectSessionInUrl: false,
