@@ -133,11 +133,13 @@ footer.site nav { display: flex; gap: 1.125rem; flex-wrap: wrap; }
   .feature { border-color: rgba(255, 255, 255, 0.14); }
   th, td { border-color: rgba(255, 255, 255, 0.14); }
   main.doc h2, footer.site { border-color: rgba(255, 255, 255, 0.14); }
-  a { color: var(--green-900); }
-  a:hover { color: var(--green-50); }
-  .hero p.lead, .feature p, footer.site { color: #B9C4C2; }
-  .callout { background: rgba(255, 255, 255, 0.05); border-inline-start-color: var(--green-900); }
-  .updated { background: rgba(200, 161, 90, 0.18); color: var(--green-50); }
+  /* الروابط على أرضية خضراء داكنة: كانت بلون الخلفية نفسها بعد تبديل
+     اللوحة، أي غير مرئية إطلاقًا. الرمادي الثانوي مصمَّم لهذا الدور. */
+  a { color: var(--sage-400); }
+  a:hover { color: var(--ivory-50); }
+  .hero p.lead, .feature p, footer.site { color: var(--sage-400); }
+  .callout { background: rgba(255, 255, 255, 0.05); border-inline-start-color: var(--sage-400); }
+  .updated { background: rgba(167, 184, 177, 0.16); color: var(--ivory-50); }
 }
 
 /* ---------- خطوات "كيف تعمل" ---------- */

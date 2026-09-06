@@ -151,3 +151,31 @@ describe('تطبيق الهوية على كل الشاشات', () => {
     expect(offenders).toEqual([]);
   });
 });
+
+/**
+ * تباين WCAG لكل زوج نص/خلفية يستعمله نظام التصميم فعلًا.
+ *
+ * ليست شكليات: لون تحذير يمرّ للنص الكبير وحده يُستخدم في نص بحجم
+ * عادي ("تجاوزت ٣٠٠ سعرة") فيقرؤه بعض المستخدمين بصعوبة ولا يشتكي
+ * أحد — لأن الشكوى من التباين نادرة والهجر ليس كذلك.
+ */
+describe('تباين الألوان (WCAG AA)', () => {
+  const textPairs: [string, string][] = [
+    ['textPrimary', 'background'], ['textSecondary', 'background'],
+    ['textPrimary', 'surface'], ['textSecondary', 'surface'],
+    ['textPrimary', 'surfaceAlt'], ['textSecondary', 'surfaceAlt'],
+    ['onPrimary', 'primary'], ['onAccent', 'accent'],
+    ['success', 'successSoft'], ['warning', 'warningSoft'], ['danger', 'dangerSoft'],
+    ['success', 'background'], ['warning', 'background'], ['danger', 'background'],
+  ];
+
+  it.each(textPairs)('%s على %s يجتاز 4.5:1', (fg, bg) => {
+    const c = colors as Record<string, string>;
+    expect(contrast(c[fg], c[bg])).toBeGreaterThanOrEqual(4.5);
+  });
+
+  it('الرمادي الثانوي مستثنى صراحةً — لون حدود لا نص', () => {
+    // نوثّق ضعفه بدل أن نتجاهله: 1.88:1، ولهذا يُمنع استخدامه نصًّا.
+    expect(contrast(colors.secondary, colors.background)).toBeLessThan(3);
+  });
+});
