@@ -27,7 +27,7 @@ export default function NutritionScreen() {
   const { t } = useTranslation();
   const router = useRouter();
   const userId = useAuthStore((s) => s.session?.user.id);
-  const { summary, isLoading, error, refetch } = useNutritionData(userId);
+  const { summary, isReferenceTargets, isLoading, error, refetch } = useNutritionData(userId);
 
   if (!summary && isLoading) {
     return (
@@ -92,6 +92,22 @@ export default function NutritionScreen() {
             </View>
           </View>
         </Card>
+
+        {/* الرقم المعروض قيمة مرجعية عامة، لا هدف محسوب لهذا المستخدم.
+            عرضه بلا هذا التوضيح يوهمه أن التطبيق حسب له شيئًا لم يحسبه. */}
+        {isReferenceTargets ? (
+          <Card variant="soft" style={{ gap: spacing.sm }}>
+            <Text variant="captionStrong">{t('nutrition.referenceTargetsTitle')}</Text>
+            <Text variant="caption" color="textSecondary">
+              {t('nutrition.referenceTargetsBody')}
+            </Text>
+            <Button
+              label={t('nutrition.setMyTargets')}
+              variant="secondary"
+              onPress={() => router.push('/goals')}
+            />
+          </Card>
+        ) : null}
 
         <Card variant="soft" style={{ gap: spacing.md }}>
           <SectionHeader title={t('nutrition.macrosTitle')} />

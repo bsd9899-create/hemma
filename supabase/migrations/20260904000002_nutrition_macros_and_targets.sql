@@ -19,17 +19,44 @@ comment on column public.nutrition_logs.carbs_g is 'كربوهيدرات الو�
 comment on column public.nutrition_logs.fat_g is 'دهون الوجبة بالجرام — اختياري.';
 
 -- ---------------------------------------------------------------
--- أهداف التغذية اليومية — قيم افتراضية معقولة لبالغ متوسط النشاط،
--- يعدّلها المستخدم من شاشة الأهداف. لا تُفرض على أحد ولا تُستخدم
--- كنصيحة طبية، فقط كمرجع لعرض التقدّم.
+-- أهداف التغذية اليومية.
+--
+-- القيم الافتراضية هي **القيم اليومية المرجعية (Daily Values)** التي
+-- تفرضها FDA على ملصقات الأغذية: 2000 سعرة، 50 جم بروتين، 275 جم
+-- كربوهيدرات، 78 جم دهون — المصدر 21 CFR 101.9(c)(9).
+--
+-- اخترناها تحديدًا لأنها **رقم مرجعي منشور**، لا تقدير داخلي. الأرقام
+-- التي كانت هنا سابقًا (2000/120/220/65) لم يكن لها أي مصدر: بدت
+-- معقولة فقط. وتطبيق يعرض رقمًا مخترعًا في خانة "هدفك" يكذب على
+-- المستخدم بثقة، وهو ما يمنعه docs/SCIENTIFIC_FOUNDATION.md صراحةً.
+--
+-- القيمة المرجعية ليست هدفًا شخصيًا وليست المقصودة للاستخدام الدائم:
+-- الهدف الحقيقي يُحسب من بيانات جسم المستخدم عبر
+-- src/domain/nutritionTargets.ts. يميّز targets_source بين الحالتين
+-- حتى لا تعرض الواجهة رقمًا مرجعيًا عامًا وكأنه محسوب له هو.
 -- ---------------------------------------------------------------
 alter table public.user_goals
   add column if not exists target_calories  integer     not null default 2000 check (target_calories > 0),
-  add column if not exists target_protein_g integer     not null default 120  check (target_protein_g >= 0),
-  add column if not exists target_carbs_g   integer     not null default 220  check (target_carbs_g >= 0),
-  add column if not exists target_fat_g     integer     not null default 65   check (target_fat_g >= 0);
+  add column if not exists target_protein_g integer     not null default 50   check (target_protein_g >= 0),
+  add column if not exists target_carbs_g   integer     not null default 275  check (target_carbs_g >= 0),
+  add column if not exists target_fat_g     integer     not null default 78   check (target_fat_g >= 0);
 
-comment on column public.user_goals.target_calories is 'هدف السعرات اليومي — مرجع لعرض التقدّم وليس وصفة طبية.';
+-- من أين جاء الرقم المعروض؟ reference = قيمة FDA المرجعية العامة (لم
+-- يضبط المستخدم شيئًا بعد)، calculated = محسوب من بيانات جسمه،
+-- manual = أدخله بنفسه. بدون هذا التمييز تبدو الثلاثة متطابقة في
+-- الواجهة، فيظن المستخدم أن الرقم المرجعي العام هدف شخصي له.
+do $$
+begin
+  if not exists (select 1 from pg_type where typname = 'targets_source') then
+    create type public.targets_source as enum ('reference', 'calculated', 'manual');
+  end if;
+end $$;
+
+alter table public.user_goals
+  add column if not exists targets_source public.targets_source not null default 'reference';
+
+comment on column public.user_goals.target_calories is 'هدف السعرات اليومي. الافتراضي = القيمة المرجعية من FDA (21 CFR 101.9)، وليس هدفًا شخصيًا — راجع targets_source.';
+comment on column public.user_goals.targets_source is 'مصدر أرقام الأهداف: reference (قيمة FDA عامة) / calculated (محسوبة من بيانات الجسم) / manual (أدخلها المستخدم).';
 
 -- ---------------------------------------------------------------
 -- فهرس لجلب وجبات يوم واحد بسرعة (شاشة التغذية تستعلم عن اليوم فقط).

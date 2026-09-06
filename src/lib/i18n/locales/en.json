@@ -417,6 +417,9 @@
       "lunch": "Lunch",
       "dinner": "Dinner",
       "snack": "Snack"
-    }
+    },
+    "referenceTargetsTitle": "These are general reference numbers",
+    "referenceTargetsBody": "The values shown are the FDA daily reference values printed on food labels, not calculated for you. Add your body details and we will work out a target that is actually yours.",
+    "setMyTargets": "Calculate my target"
   }
 }

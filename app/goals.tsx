@@ -17,6 +17,7 @@ import {
 } from '@/src/design-system';
 import { spacing } from '@/src/design-system/spacing';
 import { goalsRepository, type GoalTargets } from '@/src/data/repositories/goalsRepository';
+import type { TargetsSource } from '@/src/data/database.types';
 import { progressRepository } from '@/src/data/repositories/progressRepository';
 import { getSuggestedTargets } from '@/src/features/goals/suggestedTargets';
 import { useProfileStore } from '@/src/features/auth/profileStore';
@@ -36,6 +37,14 @@ type GoalFields = {
   target_fat_g: string;
   target_weight_kg: string;
 };
+
+/** أرقام التغذية وحدها — تعديل أيٍّ منها يجعل المصدر يدويًا. */
+const NUTRITION_FIELDS: (keyof GoalFields)[] = [
+  'target_calories',
+  'target_protein_g',
+  'target_carbs_g',
+  'target_fat_g',
+];
 
 const EMPTY_FIELDS: GoalFields = {
   target_steps: '',
@@ -66,6 +75,13 @@ export default function GoalsScreen() {
   const [saveError, setSaveError] = useState<string | null>(null);
   const [savedAt, setSavedAt] = useState<number | null>(null);
   const [isSaving, setIsSaving] = useState(false);
+  /**
+   * مصدر أرقام التغذية التي ستُحفظ. يبدأ بما هو مخزَّن، ويتغيّر إلى
+   * calculated عند الضغط على "استخدم هذه الأرقام" أو manual عند أي
+   * تعديل يدوي — حتى تعرف بقية الشاشات هل الرقم هدف شخصي فعلًا أم
+   * القيمة المرجعية العامة التي لم يلمسها أحد.
+   */
+  const [pendingSource, setPendingSource] = useState<TargetsSource>('reference');
 
   const load = useCallback(async () => {
     if (!userId) return;
@@ -87,6 +103,7 @@ export default function GoalsScreen() {
         target_fat_g: String(goals.target_fat_g),
         target_weight_kg: goals.target_weight_kg === null ? '' : String(goals.target_weight_kg),
       });
+      setPendingSource(goals.targets_source);
       setHasLoaded(true);
     } catch (e) {
       setLoadError(getFriendlyErrorMessage(e, t('goals.loadError')));
@@ -108,6 +125,9 @@ export default function GoalsScreen() {
   /** يملأ حقول التغذية بالأرقام المحسوبة — يبقى الحفظ بيد المستخدم. */
   function applySuggested() {
     if (!suggested) return;
+    // نسجّل أن هذه الأرقام محسوبة لا مُدخلة يدويًا، حتى تعرف الواجهات
+    // الأخرى أنها هدف شخصي حقيقي وليست القيمة المرجعية العامة.
+    setPendingSource('calculated');
     setFields((current) => ({
       ...current,
       target_calories: String(suggested.calories),
@@ -120,6 +140,9 @@ export default function GoalsScreen() {
   }
 
   function setField(key: keyof GoalFields, value: string) {
+    // أي تعديل يدوي على أرقام التغذية يجعل المصدر "manual" — حتى لو
+    // بدأ من الأرقام المحسوبة، فالرقم النهائي صار اختيار المستخدم.
+    if (NUTRITION_FIELDS.includes(key)) setPendingSource('manual');
     setFields((current) => ({ ...current, [key]: value }));
     if (saveError) setSaveError(null);
     if (savedAt) setSavedAt(null);
@@ -154,6 +177,7 @@ export default function GoalsScreen() {
       target_carbs_g: Math.round(carbs),
       target_fat_g: Math.round(fat),
       target_weight_kg: weight,
+      targets_source: pendingSource,
     };
 
     setSaveError(null);

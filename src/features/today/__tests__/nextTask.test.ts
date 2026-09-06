@@ -23,6 +23,7 @@ function makeSummary(overrides: Partial<TodaySummary>): TodaySummary {
       target_protein_g: 120,
       target_carbs_g: 220,
       target_fat_g: 65,
+      targets_source: 'manual' as const,
       updated_at: '',
     },
     ...overrides,

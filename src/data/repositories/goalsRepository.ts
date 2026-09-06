@@ -14,6 +14,7 @@ export type GoalTargets = Pick<
   | 'target_protein_g'
   | 'target_carbs_g'
   | 'target_fat_g'
+  | 'targets_source'
 >;
 
 export const goalsRepository = {

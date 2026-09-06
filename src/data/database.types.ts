@@ -19,6 +19,12 @@ export type TeamRole = 'owner' | 'member';
 export type PairStatus = 'pending' | 'active' | 'ended';
 export type PingKind = 'lets_go' | 'almost_there' | 'well_done' | 'with_you';
 export type SubscriptionStore = 'app_store' | 'play_store';
+/**
+ * من أين جاء رقم الهدف المعروض: reference = قيمة FDA المرجعية العامة،
+ * calculated = محسوب من بيانات جسم المستخدم، manual = أدخله بنفسه.
+ * تعرضه الواجهة حتى لا يبدو رقم مرجعي عام وكأنه هدف شخصي محسوب.
+ */
+export type TargetsSource = 'reference' | 'calculated' | 'manual';
 
 export interface Database {
   public: {
@@ -52,6 +58,7 @@ export interface Database {
           target_protein_g: number;
           target_carbs_g: number;
           target_fat_g: number;
+          targets_source: TargetsSource;
           updated_at: string;
         };
         Insert: Partial<Database['public']['Tables']['user_goals']['Row']> & { user_id: string };
@@ -316,6 +323,7 @@ export interface Database {
       pair_status: PairStatus;
       ping_kind: PingKind;
       subscription_store: SubscriptionStore;
+      targets_source: TargetsSource;
     };
   };
 }

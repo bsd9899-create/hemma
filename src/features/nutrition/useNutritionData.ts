@@ -14,6 +14,12 @@ import { getFriendlyErrorMessage } from '@/src/lib/errors';
 export function useNutritionData(userId: string | undefined) {
   const { t } = useTranslation();
   const [summary, setSummary] = useState<NutritionSummary | null>(null);
+  /**
+   * true عندما تكون الأهداف المعروضة القيمة المرجعية العامة (FDA) ولم
+   * يضبط المستخدم شيئًا بعد. الشاشة تقولها صراحةً بدل أن تعرض 2000
+   * سعرة وكأنها هدفه هو.
+   */
+  const [isReferenceTargets, setIsReferenceTargets] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -28,6 +34,7 @@ export function useNutritionData(userId: string | undefined) {
           goalsRepository.getCurrent(userId),
         ]);
 
+        setIsReferenceTargets(goals.targets_source === 'reference');
         setSummary(
           summarizeNutrition(meals, {
             calories: goals.target_calories,
@@ -55,5 +62,5 @@ export function useNutritionData(userId: string | undefined) {
     }, [load])
   );
 
-  return { summary, isLoading, error, refetch: load };
+  return { summary, isReferenceTargets, isLoading, error, refetch: load };
 }
