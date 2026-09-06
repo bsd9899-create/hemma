@@ -159,7 +159,13 @@
     "decisionOfDay": "Today's focus",
     "calories": "Calories",
     "caloriesValue": "{{value}} / {{target}}",
-    "caloriesValueNoTarget": "{{value}} kcal"
+    "caloriesValueNoTarget": "{{value}} kcal",
+    "caloriesRemaining": "{{value}} left",
+    "caloriesOver": "{{value}} over",
+    "stepsRemaining": "{{value}} left",
+    "stepsDone": "Done ✅",
+    "streakLabel_one": "{{count}}-day streak",
+    "streakLabel_other": "{{count}}-day streak"
   },
   "progress": {
     "title": "My progress",

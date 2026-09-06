@@ -15,7 +15,7 @@ import {
   palette,
   rowDirection,
 } from '@/src/design-system';
-import { spacing } from '@/src/design-system/spacing';
+import { radius, spacing } from '@/src/design-system/spacing';
 import { useAuthStore } from '@/src/features/auth/store';
 import { useProfileStore } from '@/src/features/auth/profileStore';
 import { useTodayData } from '@/src/features/today/useTodayData';
@@ -48,6 +48,13 @@ export default function TodayScreen() {
     );
   }
 
+  /**
+   * الأرقام المتبقية — تُحسب مرة واحدة هنا لا داخل JSX، حتى يبقى
+   * العرض قراءةً لا حسابًا.
+   */
+  const caloriesLeft = summary.caloriesTarget === null ? null : summary.caloriesTarget - summary.calories;
+  const stepsLeft = Math.max(0, summary.stepsTarget - summary.steps);
+
   const nextTask = getNextTask(summary);
 
   return (
@@ -69,6 +76,26 @@ export default function TodayScreen() {
           <Text variant="displayMd" style={{ flex: 1 }}>
             {getTimeGreeting(t)} {displayName ?? ''} 👋
           </Text>
+          {/* السلسلة تظهر فقط حين توجد: شارة "٠ 🔥" في اليوم الأول
+              تفتتح التجربة بصفر، وهي أول ما يراه المستخدم الجديد. */}
+          {summary.streak > 0 ? (
+            <View
+              accessibilityRole="text"
+              accessibilityLabel={t('today.streakLabel', { count: summary.streak })}
+              style={{
+                flexDirection: rowDirection,
+                alignItems: 'center',
+                gap: spacing.xxs,
+                backgroundColor: colors.accentSoft,
+                paddingHorizontal: spacing.sm,
+                paddingVertical: spacing.xxs,
+                borderRadius: radius.pill,
+              }}
+            >
+              <Text variant="captionStrong">{formatNumber(summary.streak)}</Text>
+              <Text variant="caption">🔥</Text>
+            </View>
+          ) : null}
           <Wordmark size="sm" />
         </View>
 
@@ -110,18 +137,20 @@ export default function TodayScreen() {
             progress={summary.workoutMinutes / 30}
             href="/log/workout"
           />
-          {/* بلا هدف سعرات محفوظ نعرض المُستهلَك وحده بلا "من ٠" وبلا
-              حلقة تقدّم — نسبة إلى هدف غير موجود رقم بلا معنى. */}
+          {/* المتبقي لا المستهلك.
+              "أكلت ١٢٠٠ من ٢٠٠٠" يطلب من المستخدم أن يطرح ليعرف ماذا
+              يفعل الآن؛ "باقي لك ٨٠٠" يجيبه مباشرة. والرقم نفسه، لكن
+              الأول تقرير والثاني قرار.
+              بلا هدف محفوظ نعرض المستهلك وحده — لا "من ٠" ولا حلقة. */}
           <MetricTile
             emoji="🍽️"
             label={t('today.calories')}
             valueText={
-              summary.caloriesTarget === null
+              caloriesLeft === null
                 ? t('today.caloriesValueNoTarget', { value: formatNumber(summary.calories) })
-                : t('today.caloriesValue', {
-                    value: formatNumber(summary.calories),
-                    target: formatNumber(summary.caloriesTarget),
-                  })
+                : caloriesLeft >= 0
+                  ? t('today.caloriesRemaining', { value: formatNumber(caloriesLeft) })
+                  : t('today.caloriesOver', { value: formatNumber(Math.abs(caloriesLeft)) })
             }
             progress={summary.caloriesTarget ? summary.calories / summary.caloriesTarget : 0}
             href="/(tabs)/nutrition"
@@ -129,10 +158,11 @@ export default function TodayScreen() {
           <MetricTile
             emoji="👟"
             label={t('today.steps')}
-            valueText={t('today.stepsValue', {
-              steps: formatNumber(summary.steps),
-              target: formatNumber(summary.stepsTarget),
-            })}
+            valueText={
+              stepsLeft > 0
+                ? t('today.stepsRemaining', { value: formatNumber(stepsLeft) })
+                : t('today.stepsDone')
+            }
             progress={summary.steps / summary.stepsTarget}
             href="/log/steps"
           />

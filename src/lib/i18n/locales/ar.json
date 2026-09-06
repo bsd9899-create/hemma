@@ -159,7 +159,16 @@
     "decisionOfDay": "قرار اليوم",
     "calories": "السعرات",
     "caloriesValue": "{{value}} / {{target}}",
-    "caloriesValueNoTarget": "{{value}} سعرة"
+    "caloriesValueNoTarget": "{{value}} سعرة",
+    "caloriesRemaining": "باقي {{value}}",
+    "caloriesOver": "تجاوزت {{value}}",
+    "stepsRemaining": "باقي {{value}}",
+    "stepsDone": "خلصت ✅",
+    "streakLabel_one": "سلسلة يوم واحد",
+    "streakLabel_two": "سلسلة يومين",
+    "streakLabel_few": "سلسلة {{count}} أيام",
+    "streakLabel_many": "سلسلة {{count}} يومًا",
+    "streakLabel_other": "سلسلة {{count}} يوم"
   },
   "progress": {
     "title": "تقدمي",
