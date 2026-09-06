@@ -1,6 +1,6 @@
-import { Alert, ScrollView, View } from 'react-native';
+import { Alert, RefreshControl, ScrollView, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
-import { AccountabilitySkeleton, Button, Card, ErrorState, Screen, ScreenHeader, Text, rowDirection } from '@/src/design-system';
+import { AccountabilitySkeleton, Button, Card, ErrorState, Screen, ScreenHeader, Text, rowDirection, colors } from '@/src/design-system';
 import { spacing } from '@/src/design-system/spacing';
 import { useAuthStore } from '@/src/features/auth/store';
 import { useTeamData } from '@/src/features/teams/useTeamData';
@@ -66,7 +66,13 @@ export default function AccountabilityScreen() {
 
   return (
     <Screen>
-      <ScrollView contentContainerStyle={{ gap: spacing.md, paddingBottom: spacing.xxxl }} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        contentContainerStyle={{ gap: spacing.md, paddingBottom: spacing.xxxl }}
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl refreshing={isLoading} onRefresh={() => void refetch()} tintColor={colors.primary} />
+        }
+      >
         <ScreenHeader
           title={t('accountability.title')}
           subtitle={t('accountability.intro')}

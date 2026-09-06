@@ -15,6 +15,7 @@ export function useExerciseLibrary(userId: string | undefined) {
   const [favourites, setFavourites] = useState<Set<string>>(new Set());
   const [filter, setFilter] = useState<ExerciseFilter>({});
   const [isLoading, setIsLoading] = useState(true);
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const load = useCallback(
@@ -85,5 +86,15 @@ export function useExerciseLibrary(userId: string | undefined) {
     [exercises, favourites, filter.favouritesOnly]
   );
 
-  return { exercises: visible, favourites, filter, setFilter, toggleFavourite, isLoading, error };
+  /** سحب للتحديث — حالة منفصلة عن التحميل الأول حتى لا يومض الهيكل. */
+  const refresh = useCallback(async () => {
+    setIsRefreshing(true);
+    await load(filter);
+    setIsRefreshing(false);
+  }, [load, filter]);
+
+  return {
+    exercises: visible, favourites, filter, setFilter, toggleFavourite,
+    isLoading, isRefreshing, refresh, error,
+  };
 }

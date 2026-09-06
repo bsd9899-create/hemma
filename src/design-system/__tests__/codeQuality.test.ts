@@ -43,6 +43,19 @@ describe('جودة الكود — قواعد مستخلَصة من أعطال و
     expect(grep('debugger;|FIXME|XXX:')).toBe('');
   });
 
+  it('كل شاشة تجلب بيانات من الخادم فيها سحب للتحديث', () => {
+    // شاشة تعرض بيانات خادم بلا سحب للتحديث تترك المستخدم يسحب فلا
+    // يحدث شيء، ولا يملك طريقة لمعرفة إن كان ما يراه قديمًا. اكتُشفت
+    // ثلاث شاشات كذلك (المكتبة، تفاصيل التمرين، رفيق الالتزام).
+    const cmd =
+      'for f in $(grep -rl "useFocusEffect\|refetch" app --include=*.tsx); do ' +
+      '  grep -q "ScrollView\|FlatList" "$f" || continue; ' +
+      '  grep -q "RefreshControl" "$f" || echo "$f"; ' +
+      'done';
+    const missing = execSync(cmd, { cwd: process.cwd(), encoding: 'utf8', shell: '/bin/bash' }).trim();
+    expect(missing).toBe('');
+  });
+
   it('لا سعر اشتراك مكتوب يدويًا — السعر من المتجر وحده', () => {
     // العملة والضريبة تختلفان بالبلد؛ أي رقم ثابت يكذب على جزء من
     // المستخدمين ويخالف قواعد المتجر.

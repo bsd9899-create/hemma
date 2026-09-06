@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { FlatList, Pressable, View } from 'react-native';
+import { FlatList, Pressable, RefreshControl, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import {
@@ -25,7 +25,7 @@ export default function ExerciseLibraryScreen() {
   const { t, i18n } = useTranslation();
   const router = useRouter();
   const userId = useAuthStore((s) => s.session?.user.id);
-  const { exercises, favourites, filter, setFilter, toggleFavourite, isLoading, error } =
+  const { exercises, favourites, filter, setFilter, toggleFavourite, isLoading, isRefreshing, refresh, error } =
     useExerciseLibrary(userId);
   const [search, setSearch] = useState('');
 
@@ -117,6 +117,9 @@ export default function ExerciseLibraryScreen() {
           keyExtractor={(e) => e.id}
           contentContainerStyle={{ gap: spacing.sm, paddingBottom: spacing.xxxl }}
           showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl refreshing={isRefreshing} onRefresh={() => void refresh()} tintColor={colors.primary} />
+          }
           renderItem={({ item }) => {
             const isFavourite = favourites.has(item.id);
             return (

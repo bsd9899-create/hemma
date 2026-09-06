@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react';
-import { ScrollView, View } from 'react-native';
+import { RefreshControl, ScrollView, View } from 'react-native';
 import { useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import {
@@ -105,6 +105,11 @@ export default function ExerciseDetailScreen() {
       <ScrollView
         contentContainerStyle={{ gap: spacing.md, paddingBottom: spacing.xxxl }}
         showsVerticalScrollIndicator={false}
+        refreshControl={
+          // الأرقام القياسية وآخر أداء يتغيّران بعد تسجيل مجموعات من
+          // شاشة أخرى — بلا سحب للتحديث يبقى الرقم قديمًا بلا سبب ظاهر.
+          <RefreshControl refreshing={isLoading} onRefresh={() => void load()} tintColor={colors.primary} />
+        }
       >
         {/* العضلات المستهدفة */}
         <Card style={{ gap: spacing.sm }}>
