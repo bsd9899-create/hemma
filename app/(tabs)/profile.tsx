@@ -1,6 +1,6 @@
-import { useState } from 'react';
-import { Alert, Linking, Pressable, ScrollView, View } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useCallback, useState } from 'react';
+import { Alert, Linking, Pressable, ScrollView, Share, View } from 'react-native';
+import { useFocusEffect, useRouter } from 'expo-router';
 import Constants from 'expo-constants';
 import { useTranslation } from 'react-i18next';
 import { Button, Card, InlineMessage, Screen, SectionHeader, Text, colors, rowDirection } from '@/src/design-system';
@@ -12,6 +12,9 @@ import { useHealthSync } from '@/src/integrations/health/useHealthSync';
 import { getFriendlyErrorMessage } from '@/src/lib/errors';
 import { changeLanguage, type AppLanguage } from '@/src/lib/i18n';
 import { GOAL_OPTIONS } from '@/src/features/profile/GoalPicker';
+import { SummaryCard } from '@/src/features/profile/SummaryCard';
+import { goalsRepository } from '@/src/data/repositories/goalsRepository';
+import { formatNumber } from '@/src/lib/i18n/format';
 
 /**
  * الموقع الرسمي — لا رابط GitHub. رابط blob على GitHub كان سيفشل مراجعة
@@ -75,6 +78,51 @@ export default function ProfileScreen() {
     // changeLanguage يعيد تشغيل التطبيق فعليًا — لا حاجة لإيقاف isSwitchingLanguage هنا.
   }
 
+  /**
+   * ملخّص الأهداف للبطاقة. نجلبه هنا لا في الخطاف العام: هذه الشاشة
+   * وحدها تحتاجه، وجلبه في مكان مشترك يحمّل بقية الشاشات طلبًا زائدًا.
+   */
+  const [goalRows, setGoalRows] = useState({ calories: '—', protein: '—', steps: '—' });
+  useFocusEffect(
+    useCallback(() => {
+      if (!userId) return;
+      let cancelled = false;
+      goalsRepository
+        .getCurrent(userId)
+        .then((goals) => {
+          if (cancelled) return;
+          const targets = goalsRepository.toNutritionTargets(goals);
+          setGoalRows({
+            calories: targets.calories === null ? '—' : formatNumber(targets.calories),
+            protein: targets.proteinG === null ? '—' : formatNumber(targets.proteinG),
+            steps: formatNumber(goals.target_steps),
+          });
+        })
+        .catch(() => {
+          // بطاقة الملخّص تحسين لا شرط: فشلها يترك الشرطات ولا يمنع الشاشة.
+        });
+      return () => {
+        cancelled = true;
+      };
+    }, [userId])
+  );
+
+  const [copiedId, setCopiedId] = useState(false);
+
+  /**
+   * لا نعتمد على Clipboard: expo-clipboard وحدة أصلية إضافية تتطلب
+   * بناءً جديدًا. ورقة المشاركة تؤدي الغرض (نسخ/إرسال) بلا اعتمادية.
+   */
+  async function copyUserId() {
+    if (!userId) return;
+    try {
+      await Share.share({ message: userId });
+      setCopiedId(true);
+    } catch {
+      // إلغاء المستخدم لورقة المشاركة ليس خطأ.
+    }
+  }
+
   async function openLink(url: string) {
     // كان الفشل يُبتلع بصمت: ضغطة بلا أي نتيجة ولا سبب ظاهر.
     try {
@@ -96,10 +144,37 @@ export default function ProfileScreen() {
           </Text>
         </View>
 
-        <Button label={t('profile.editProfile')} variant="secondary" onPress={() => router.push('/profile-edit')} />
-        <Button label={t('profile.goalsEntry')} variant="secondary" onPress={() => router.push('/goals')} />
+        {/* بطاقتا ملخّص بدل رصّ أزرار.
+            كومة أزرار متطابقة تجعل المستخدم يقرأ كل عنوان ليجد ما يريد؛
+            البطاقة تعرض ما بداخلها فعلًا (هدفه، بياناته) فيعرف بنظرة
+            إن كان يحتاج فتحها أصلًا — و"تعديل" تأخذه للمكان الصحيح
+            مباشرة بدل شاشة إعدادات عامة. */}
+        <SummaryCard
+          title={t('profile.planCard')}
+          onEdit={() => router.push('/goals')}
+          rows={[
+            { label: t('goals.calories'), value: goalRows.calories },
+            { label: t('goals.protein'), value: goalRows.protein },
+            { label: t('goals.steps'), value: goalRows.steps },
+          ]}
+        />
+
+        <SummaryCard
+          title={t('profile.bodyCard')}
+          onEdit={() => router.push('/profile-edit')}
+          rows={[
+            { label: t('profileEdit.birthDateLabel'), value: profile?.birth_date ?? '—' },
+            { label: t('profileEdit.heightLabel'), value: profile?.height_cm ? `${formatNumber(profile.height_cm)}` : '—' },
+            {
+              label: t('profileEdit.activityLabel'),
+              value: profile?.activity_level ? t(`activityLevel.${profile.activity_level}`) : '—',
+            },
+          ]}
+        />
+
         <Button label={t('profile.teamsEntry')} variant="secondary" onPress={() => router.push('/teams')} />
         <Button label={t('profile.accountabilityPartner')} variant="secondary" onPress={() => router.push('/accountability')} />
+        <Button label={t('exercises.entry')} variant="secondary" onPress={() => router.push('/exercises')} />
         <Button label={t('profile.premium')} variant="secondary" onPress={() => router.push('/paywall')} />
 
         <Card variant="soft">
@@ -166,17 +241,27 @@ export default function ProfileScreen() {
           </View>
         </Card>
 
-        <Button
-          label={t('exercises.entry')}
-          variant="ghost"
-          onPress={() => router.push('/exercises')}
-        />
-
         {/* إخفاء الزر راحة للمستخدم العادي لا حماية: الـ views تفرض
             is_admin() في قاعدة البيانات، فمن يفتح /admin بلا صلاحية
             يجد شاشة فارغة لا بيانات. */}
         {profile?.is_admin ? (
           <Button label={t('admin.entry')} variant="ghost" onPress={() => router.push('/admin')} />
+        ) : null}
+
+        {/* معرّف الحساب قابل للنسخ: حين يراسلنا المستخدم عن مشكلة، هذا
+            أول ما نطلبه، وبلا زر نسخ يقرؤه حرفًا حرفًا أو لا يرسله. */}
+        {userId ? (
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={t('profile.copyUserId')}
+            onPress={() => void copyUserId()}
+            hitSlop={8}
+            style={({ pressed }) => (pressed ? { opacity: 0.7 } : undefined)}
+          >
+            <Text variant="caption" color="textSecondary" style={{ textAlign: 'center' }}>
+              {copiedId ? t('profile.userIdCopied') : `${t('profile.userId')}: ${userId}`}
+            </Text>
+          </Pressable>
         ) : null}
 
         <Button

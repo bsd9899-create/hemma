@@ -36,7 +36,8 @@
     "meters": "m",
     "grams": "g",
     "kcal": "kcal",
-    "next": "Next"
+    "next": "Next",
+    "edit": "Edit"
   },
   "goals": {
     "title": "My goals",
@@ -346,7 +347,12 @@
     "linkError": "Couldn't open the link on this device",
     "goalsEntry": "My goals",
     "teamsEntry": "My team",
-    "termsOfUse": "Terms of Use"
+    "termsOfUse": "Terms of Use",
+    "planCard": "Your plan",
+    "bodyCard": "Your details",
+    "userId": "Account ID",
+    "userIdCopied": "Copied — paste it into your support message",
+    "copyUserId": "Copy account ID"
   },
   "quickAdd": {
     "title": "Quick add",

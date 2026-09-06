@@ -36,7 +36,8 @@
     "meters": "متر",
     "grams": "جم",
     "kcal": "سعرة",
-    "next": "التالي"
+    "next": "التالي",
+    "edit": "تعديل"
   },
   "goals": {
     "title": "أهدافي",
@@ -349,7 +350,12 @@
     "linkError": "تعذّر فتح الرابط على هذا الجهاز",
     "goalsEntry": "أهدافي",
     "teamsEntry": "فريقي",
-    "termsOfUse": "شروط الاستخدام"
+    "termsOfUse": "شروط الاستخدام",
+    "planCard": "خطتك",
+    "bodyCard": "بياناتك",
+    "userId": "معرّف حسابك",
+    "userIdCopied": "تم — الصقه في رسالتك للدعم",
+    "copyUserId": "نسخ معرّف الحساب"
   },
   "quickAdd": {
     "title": "إضافة سريعة",
