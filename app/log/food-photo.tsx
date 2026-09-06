@@ -263,7 +263,7 @@ export default function FoodPhotoScreen() {
                 ))}
 
                 {totals ? (
-                  <View style={{ borderTopWidth: 1, borderTopColor: '#DAD2C4', paddingTop: spacing.sm, gap: spacing.xxs }}>
+                  <View style={{ borderTopWidth: 1, borderTopColor: colors.divider, paddingTop: spacing.sm, gap: spacing.xxs }}>
                     <Text variant="bodyStrong">
                       {t('foodPhoto.total')}: {formatNumber(Math.round(totals.calories))} {t('common.kcal')}
                     </Text>

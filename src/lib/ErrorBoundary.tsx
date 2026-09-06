@@ -24,7 +24,10 @@ export class ErrorBoundary extends Component<PropsWithChildren, ErrorBoundarySta
 
   componentDidCatch(error: Error, info: { componentStack?: string | null }) {
     if (__DEV__) {
-      console.error('[ErrorBoundary]', error, info.componentStack);
+      // console.log لا console.error: الأخيرة ترفع LogBox، وهو هنا
+      // يغطّي بالضبط شاشة الخطأ التي صمّمناها ليراها المستخدم. الأثر
+      // الكامل يبقى ظاهرًا في Metro على أي حال.
+      console.log('[ErrorBoundary]', error, info.componentStack);
     }
   }
 
