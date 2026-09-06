@@ -9,9 +9,9 @@ import { act, fireEvent } from '@testing-library/react-native';
 import { calculateTargets } from '@/src/domain/nutritionTargets';
 
 const mockRouter = { replace: jest.fn(), push: jest.fn(), back: jest.fn() };
-const mockUpdateProfile = jest.fn(async () => undefined);
-const mockUpdateTargets = jest.fn(async () => undefined);
-const mockAddWeight = jest.fn(async () => undefined);
+const mockUpdateProfile = jest.fn(async (..._args: unknown[]) => undefined);
+const mockUpdateTargets = jest.fn(async (..._args: unknown[]) => undefined);
+const mockAddWeight = jest.fn(async (..._args: unknown[]) => undefined);
 
 jest.mock('expo-router', () => ({
   useRouter: () => mockRouter,
@@ -150,7 +150,7 @@ describe('تدفّق التسجيل — تشغيل فعلي لكل الخطوا�
   it('يسجّل المصدر calculated لا reference — الرقم محسوب لا مرجعي', async () => {
     const view = await walkToPlan();
     await press(view, 'ابدأ رحلتي');
-    const [, targets] = mockUpdateTargets.mock.calls[0] as [string, { targets_source: string }];
+    const targets = mockUpdateTargets.mock.calls[0][1] as { targets_source: string };
     expect(targets.targets_source).toBe('calculated');
   });
 });
