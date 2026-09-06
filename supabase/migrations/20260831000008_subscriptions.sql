@@ -6,9 +6,16 @@
 -- webhook وتستخدم service role key (يتجاوز RLS). لو سمحنا للعميل
 -- بتعديل هذا الجدول لأمكن لأي مستخدم منح نفسه Premium مجانًا.
 
-create type public.subscription_store as enum ('app_store', 'play_store');
+do $$
+begin
+  if not exists (select 1 from pg_type t
+    join pg_namespace n on n.oid = t.typnamespace
+    where t.typname = 'subscription_store' and n.nspname = 'public') then
+    create type public.subscription_store as enum ('app_store', 'play_store');
+  end if;
+end $$;
 
-create table public.subscriptions (
+create table if not exists public.subscriptions (
   user_id uuid primary key references public.profiles (id) on delete cascade,
   is_premium boolean not null default false,
   product_id text,
@@ -24,6 +31,7 @@ comment on table public.subscriptions is
 
 alter table public.subscriptions enable row level security;
 
+drop policy if exists "subscriptions_select_own" on public.subscriptions;
 create policy "subscriptions_select_own" on public.subscriptions
   for select using (auth.uid() = user_id);
 

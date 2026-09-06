@@ -1,6 +1,17 @@
--- تشغيل يدوي مُجمَّع لكل الـ migrations دفعة واحدة عبر Supabase SQL Editor.
--- هذا الملف مساعد فقط وليس migration متتبَّعًا بحد ذاته — لا تضعه داخل
--- مجلد migrations الحقيقي، ولا تشغّله مرتين على نفس المشروع.
+-- ============================================================
+-- هِمّة — المخطط الكامل، آمن للتشغيل على أي حالة
+-- ============================================================
+-- كل الترحيلات مُجمَّعة للتشغيل عبر Supabase SQL Editor.
+--
+-- ✅ آمن على قاعدة فارغة **وعلى قاعدة مطبَّقة جزئيًا**: كل جملة إما
+--    IF NOT EXISTS، أو OR REPLACE، أو مسبوقة بـ DROP IF EXISTS، أو
+--    داخل حارس DO يفحص الحالة أولًا. اختُبر فعليًا على PostgreSQL 16
+--    بتشغيله مرتين متتاليتين وبتشغيله فوق قاعدة تحمل الترحيلات 1..10.
+--
+-- ⚠️ لا يحذف جدولًا ولا عمودًا ولا صفًا، ولا يعطّل RLS، ولا يمسّ
+--    مخطط auth.
+--
+-- إن أردت الترحيلات الناقصة فقط، استخدم supabase/apply_pending.sql.
 
 -- ============================================================
 -- 20260831000001_profiles_and_goals.sql
@@ -11,14 +22,21 @@
 -- profiles تمتد من auth.users (Supabase Auth). صف واحد لكل مستخدم
 -- يُنشأ تلقائيًا عبر trigger عند التسجيل.
 
-create type public.goal_type as enum (
-  'lose_weight',
-  'gain_muscle',
-  'increase_activity',
-  'general_health'
-);
+do $$
+begin
+  if not exists (select 1 from pg_type t
+    join pg_namespace n on n.oid = t.typnamespace
+    where t.typname = 'goal_type' and n.nspname = 'public') then
+    create type public.goal_type as enum (
+      'lose_weight',
+      'gain_muscle',
+      'increase_activity',
+      'general_health'
+    );
+  end if;
+end $$;
 
-create table public.profiles (
+create table if not exists public.profiles (
   id uuid primary key references auth.users (id) on delete cascade,
   display_name text not null,
   avatar_url text,
@@ -31,7 +49,7 @@ comment on table public.profiles is 'ملف شخصي عام لكل مستخدم 
 
 -- أهداف قابلة للقياس يوميًا (تُستخدم لحساب "إنجاز اليوم" و% الالتزام
 -- بالفريق — راجع 20260831000006_points_and_leaderboard.sql).
-create table public.user_goals (
+create table if not exists public.user_goals (
   user_id uuid primary key references public.profiles (id) on delete cascade,
   target_water_ml integer not null default 2000,
   target_steps integer not null default 8000,
@@ -44,7 +62,7 @@ create table public.user_goals (
 comment on table public.user_goals is 'أهداف قابلة للقياس لكل مستخدم — أساس حساب نسبة الالتزام الشخصية.';
 
 -- إنشاء profile + user_goals تلقائيًا عند تسجيل مستخدم جديد.
-create function public.handle_new_user()
+create or replace function public.handle_new_user()
 returns trigger
 language plpgsql
 security definer set search_path = public
@@ -59,11 +77,12 @@ begin
 end;
 $$;
 
+drop trigger if exists on_auth_user_created on auth.users;
 create trigger on_auth_user_created
   after insert on auth.users
   for each row execute function public.handle_new_user();
 
-create function public.set_updated_at()
+create or replace function public.set_updated_at()
 returns trigger
 language plpgsql
 as $$
@@ -73,10 +92,12 @@ begin
 end;
 $$;
 
+drop trigger if exists set_profiles_updated_at on public.profiles;
 create trigger set_profiles_updated_at
   before update on public.profiles
   for each row execute function public.set_updated_at();
 
+drop trigger if exists set_user_goals_updated_at on public.user_goals;
 create trigger set_user_goals_updated_at
   before update on public.user_goals
   for each row execute function public.set_updated_at();
@@ -89,18 +110,23 @@ create trigger set_user_goals_updated_at
 alter table public.profiles enable row level security;
 alter table public.user_goals enable row level security;
 
+drop policy if exists "profiles_select_own" on public.profiles;
 create policy "profiles_select_own" on public.profiles
   for select using (auth.uid() = id);
 
+drop policy if exists "profiles_update_own" on public.profiles;
 create policy "profiles_update_own" on public.profiles
   for update using (auth.uid() = id);
 
+drop policy if exists "user_goals_select_own" on public.user_goals;
 create policy "user_goals_select_own" on public.user_goals
   for select using (auth.uid() = user_id);
 
+drop policy if exists "user_goals_upsert_own" on public.user_goals;
 create policy "user_goals_upsert_own" on public.user_goals
   for insert with check (auth.uid() = user_id);
 
+drop policy if exists "user_goals_update_own" on public.user_goals;
 create policy "user_goals_update_own" on public.user_goals
   for update using (auth.uid() = user_id);
 
@@ -113,9 +139,16 @@ create policy "user_goals_update_own" on public.user_goals
 -- كل جدول يحمل source ('manual' | 'healthkit') لأن المرحلة 10 ستضيف
 -- مزامنة HealthKit دون الحاجة لأي تغيير هيكلي هنا.
 
-create type public.log_source as enum ('manual', 'healthkit');
+do $$
+begin
+  if not exists (select 1 from pg_type t
+    join pg_namespace n on n.oid = t.typnamespace
+    where t.typname = 'log_source' and n.nspname = 'public') then
+    create type public.log_source as enum ('manual', 'healthkit');
+  end if;
+end $$;
 
-create table public.workouts (
+create table if not exists public.workouts (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null references public.profiles (id) on delete cascade,
   title text not null,
@@ -126,7 +159,7 @@ create table public.workouts (
   created_at timestamptz not null default now()
 );
 
-create table public.nutrition_logs (
+create table if not exists public.nutrition_logs (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null references public.profiles (id) on delete cascade,
   meal_type text not null check (meal_type in ('breakfast', 'lunch', 'dinner', 'snack')),
@@ -137,7 +170,7 @@ create table public.nutrition_logs (
   created_at timestamptz not null default now()
 );
 
-create table public.water_logs (
+create table if not exists public.water_logs (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null references public.profiles (id) on delete cascade,
   amount_ml integer not null check (amount_ml > 0),
@@ -146,7 +179,7 @@ create table public.water_logs (
 );
 
 -- الخطوات والنوم إجمالي يومي واحد (وليس أحداثًا متعددة) — upsert لكل يوم.
-create table public.steps_logs (
+create table if not exists public.steps_logs (
   user_id uuid not null references public.profiles (id) on delete cascade,
   date date not null,
   steps integer not null check (steps >= 0),
@@ -155,7 +188,7 @@ create table public.steps_logs (
   primary key (user_id, date)
 );
 
-create table public.sleep_logs (
+create table if not exists public.sleep_logs (
   user_id uuid not null references public.profiles (id) on delete cascade,
   date date not null,
   hours numeric(3, 1) not null check (hours >= 0 and hours <= 24),
@@ -164,7 +197,7 @@ create table public.sleep_logs (
   primary key (user_id, date)
 );
 
-create table public.weight_logs (
+create table if not exists public.weight_logs (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null references public.profiles (id) on delete cascade,
   weight_kg numeric(5, 1) not null check (weight_kg > 0),
@@ -173,10 +206,10 @@ create table public.weight_logs (
   created_at timestamptz not null default now()
 );
 
-create index workouts_user_performed_idx on public.workouts (user_id, performed_at desc);
-create index nutrition_logs_user_logged_idx on public.nutrition_logs (user_id, logged_at desc);
-create index water_logs_user_logged_idx on public.water_logs (user_id, logged_at desc);
-create index weight_logs_user_logged_idx on public.weight_logs (user_id, logged_at desc);
+create index if not exists workouts_user_performed_idx on public.workouts (user_id, performed_at desc);
+create index if not exists nutrition_logs_user_logged_idx on public.nutrition_logs (user_id, logged_at desc);
+create index if not exists water_logs_user_logged_idx on public.water_logs (user_id, logged_at desc);
+create index if not exists weight_logs_user_logged_idx on public.weight_logs (user_id, logged_at desc);
 
 -- ---------------------------------------------------------------
 -- RLS: كل سجلات هذه الشاشة خاصة تمامًا بصاحبها — بيانات صحية حسّاسة.
@@ -196,6 +229,9 @@ begin
     'workouts', 'nutrition_logs', 'water_logs', 'steps_logs', 'sleep_logs', 'weight_logs'
   ]
   loop
+    -- الحذف قبل الإنشاء: بدونه تفشل إعادة التشغيل بـ 42710 عند أول
+    -- جدول، فتتوقف بقية الترحيلات كلها قبل أن تصل إلى الناقص فعلًا.
+    execute format('drop policy if exists "%1$s_owner_all" on public.%1$s;', t);
     execute format(
       'create policy "%1$s_owner_all" on public.%1$s for all using (auth.uid() = user_id) with check (auth.uid() = user_id);',
       t
@@ -212,15 +248,22 @@ end $$;
 -- والتقييم الأسبوعي، وليس منطق القرار نفسه).
 -- ============================================================
 
-create type public.promise_type as enum (
-  'workout',
-  'steps',
-  'nutrition',
-  'water',
-  'sleep'
-);
+do $$
+begin
+  if not exists (select 1 from pg_type t
+    join pg_namespace n on n.oid = t.typnamespace
+    where t.typname = 'promise_type' and n.nspname = 'public') then
+    create type public.promise_type as enum (
+      'workout',
+      'steps',
+      'nutrition',
+      'water',
+      'sleep'
+    );
+  end if;
+end $$;
 
-create table public.daily_promises (
+create table if not exists public.daily_promises (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null references public.profiles (id) on delete cascade,
   date date not null,
@@ -230,7 +273,7 @@ create table public.daily_promises (
   unique (user_id, date)
 );
 
-create table public.daily_progress (
+create table if not exists public.daily_progress (
   user_id uuid not null references public.profiles (id) on delete cascade,
   date date not null,
   completion_percent numeric(5, 2) not null default 0 check (completion_percent between 0 and 100),
@@ -246,9 +289,11 @@ comment on column public.daily_progress.recovery_mode is
 alter table public.daily_promises enable row level security;
 alter table public.daily_progress enable row level security;
 
+drop policy if exists "daily_promises_owner_all" on public.daily_promises;
 create policy "daily_promises_owner_all" on public.daily_promises
   for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
 
+drop policy if exists "daily_progress_owner_all" on public.daily_progress;
 create policy "daily_progress_owner_all" on public.daily_progress
   for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
 
@@ -259,9 +304,16 @@ create policy "daily_progress_owner_all" on public.daily_progress
 -- الفرق والتحديات ونبض الفريق
 -- ============================================================
 
-create type public.team_role as enum ('owner', 'member');
+do $$
+begin
+  if not exists (select 1 from pg_type t
+    join pg_namespace n on n.oid = t.typnamespace
+    where t.typname = 'team_role' and n.nspname = 'public') then
+    create type public.team_role as enum ('owner', 'member');
+  end if;
+end $$;
 
-create table public.teams (
+create table if not exists public.teams (
   id uuid primary key default gen_random_uuid(),
   name text not null,
   invite_code text not null unique default substr(replace(gen_random_uuid()::text, '-', ''), 1, 8),
@@ -269,7 +321,7 @@ create table public.teams (
   created_at timestamptz not null default now()
 );
 
-create table public.team_members (
+create table if not exists public.team_members (
   team_id uuid not null references public.teams (id) on delete cascade,
   user_id uuid not null references public.profiles (id) on delete cascade,
   role public.team_role not null default 'member',
@@ -277,7 +329,7 @@ create table public.team_members (
   primary key (team_id, user_id)
 );
 
-create table public.challenges (
+create table if not exists public.challenges (
   id uuid primary key default gen_random_uuid(),
   team_id uuid not null references public.teams (id) on delete cascade,
   title text not null,
@@ -290,7 +342,7 @@ create table public.challenges (
 
 -- نسبة التزام كل عضو بهدفه الشخصي داخل التحدي — وليس رقمًا مطلقًا
 -- (وزن/سعرات)، حتى يتنافس من يريد التنحيف مع من يريد التضخم بعدالة.
-create table public.challenge_progress (
+create table if not exists public.challenge_progress (
   challenge_id uuid not null references public.challenges (id) on delete cascade,
   user_id uuid not null references public.profiles (id) on delete cascade,
   progress_percent numeric(5, 2) not null default 0 check (progress_percent between 0 and 100),
@@ -298,14 +350,14 @@ create table public.challenge_progress (
   primary key (challenge_id, user_id)
 );
 
-create index team_members_user_idx on public.team_members (user_id);
-create index challenges_team_idx on public.challenges (team_id);
+create index if not exists team_members_user_idx on public.team_members (user_id);
+create index if not exists challenges_team_idx on public.challenges (team_id);
 
 -- ---------------------------------------------------------------
 -- دالة مساعدة: هل يشارك المستخدم الحالي نفس الفريق مع صف معيّن؟
 -- تُستخدم داخل سياسات RLS لعدة جداول لتفادي التكرار.
 -- ---------------------------------------------------------------
-create function public.shares_team_with(target_user uuid)
+create or replace function public.shares_team_with(target_user uuid)
 returns boolean
 language sql
 stable
@@ -323,7 +375,7 @@ $$;
 -- إنشاء الفريق يضيف صاحبه تلقائيًا كـ owner في team_members — بدلاً
 -- من انتظار إدراج ثانٍ من العميل قد يُنسى أو يفشل جزئيًا.
 -- ---------------------------------------------------------------
-create function public.handle_new_team()
+create or replace function public.handle_new_team()
 returns trigger
 language plpgsql
 security definer set search_path = public
@@ -335,6 +387,7 @@ begin
 end;
 $$;
 
+drop trigger if exists on_team_created on public.teams;
 create trigger on_team_created
   after insert on public.teams
   for each row execute function public.handle_new_team();
@@ -344,7 +397,7 @@ create trigger on_team_created
 -- بدل السماح بإدراج مباشر في team_members، لمنع أي مستخدم من ضمّ
 -- نفسه لفريق لا يملك كوده.
 -- ---------------------------------------------------------------
-create function public.join_team_by_code(p_invite_code text)
+create or replace function public.join_team_by_code(p_invite_code text)
 returns uuid
 language plpgsql
 security definer set search_path = public
@@ -376,7 +429,7 @@ $$;
 -- الوصول هنا مكتوب صراحة داخل شرط where (عبر auth.uid())، وليس
 -- معتمِدًا على RLS الجداول الأساسية إطلاقًا.
 -- ---------------------------------------------------------------
-create view public.team_roster
+create or replace view public.team_roster
 as
 select
   tm.team_id,
@@ -404,12 +457,15 @@ alter table public.team_members enable row level security;
 alter table public.challenges enable row level security;
 alter table public.challenge_progress enable row level security;
 
+drop policy if exists "teams_select_member" on public.teams;
 create policy "teams_select_member" on public.teams
   for select using (public.shares_team_with(created_by) or created_by = auth.uid());
 
+drop policy if exists "teams_insert_self" on public.teams;
 create policy "teams_insert_self" on public.teams
   for insert with check (created_by = auth.uid());
 
+drop policy if exists "teams_update_owner" on public.teams;
 create policy "teams_update_owner" on public.teams
   for update using (
     exists (
@@ -418,6 +474,7 @@ create policy "teams_update_owner" on public.teams
     )
   );
 
+drop policy if exists "team_members_select_same_team" on public.team_members;
 create policy "team_members_select_same_team" on public.team_members
   for select using (public.shares_team_with(user_id));
 
@@ -426,9 +483,11 @@ create policy "team_members_select_same_team" on public.team_members
 -- (handle_new_team عند إنشاء الفريق، join_team_by_code عند الانضمام)
 -- بدلاً من الاعتماد على إدراج مباشر من العميل.
 
+drop policy if exists "challenges_select_team_member" on public.challenges;
 create policy "challenges_select_team_member" on public.challenges
   for select using (public.shares_team_with(created_by) or created_by = auth.uid());
 
+drop policy if exists "challenges_insert_team_owner" on public.challenges;
 create policy "challenges_insert_team_owner" on public.challenges
   for insert with check (
     exists (
@@ -437,6 +496,7 @@ create policy "challenges_insert_team_owner" on public.challenges
     )
   );
 
+drop policy if exists "challenge_progress_select_team_member" on public.challenge_progress;
 create policy "challenge_progress_select_team_member" on public.challenge_progress
   for select using (
     exists (
@@ -446,9 +506,11 @@ create policy "challenge_progress_select_team_member" on public.challenge_progre
     or user_id = auth.uid()
   );
 
+drop policy if exists "challenge_progress_upsert_own" on public.challenge_progress;
 create policy "challenge_progress_upsert_own" on public.challenge_progress
   for insert with check (user_id = auth.uid());
 
+drop policy if exists "challenge_progress_update_own" on public.challenge_progress;
 create policy "challenge_progress_update_own" on public.challenge_progress
   for update using (user_id = auth.uid());
 
@@ -459,10 +521,24 @@ create policy "challenge_progress_update_own" on public.challenge_progress
 -- رفيق هِمّة — شريك التزام واحد اختياري + تفاعلات سريعة (بدون شات)
 -- ============================================================
 
-create type public.pair_status as enum ('pending', 'active', 'ended');
-create type public.ping_kind as enum ('lets_go', 'almost_there', 'well_done', 'with_you');
+do $$
+begin
+  if not exists (select 1 from pg_type t
+    join pg_namespace n on n.oid = t.typnamespace
+    where t.typname = 'pair_status' and n.nspname = 'public') then
+    create type public.pair_status as enum ('pending', 'active', 'ended');
+  end if;
+end $$;
+do $$
+begin
+  if not exists (select 1 from pg_type t
+    join pg_namespace n on n.oid = t.typnamespace
+    where t.typname = 'ping_kind' and n.nspname = 'public') then
+    create type public.ping_kind as enum ('lets_go', 'almost_there', 'well_done', 'with_you');
+  end if;
+end $$;
 
-create table public.accountability_pairs (
+create table if not exists public.accountability_pairs (
   id uuid primary key default gen_random_uuid(),
   requester_id uuid not null references public.profiles (id) on delete cascade,
   partner_id uuid not null references public.profiles (id) on delete cascade,
@@ -473,12 +549,12 @@ create table public.accountability_pairs (
 );
 
 -- شريك نشط واحد فقط لكل مستخدم في نفس الوقت.
-create unique index accountability_pairs_one_active_per_requester
+create unique index if not exists accountability_pairs_one_active_per_requester
   on public.accountability_pairs (requester_id) where status = 'active';
-create unique index accountability_pairs_one_active_per_partner
+create unique index if not exists accountability_pairs_one_active_per_partner
   on public.accountability_pairs (partner_id) where status = 'active';
 
-create table public.accountability_pings (
+create table if not exists public.accountability_pings (
   id uuid primary key default gen_random_uuid(),
   pair_id uuid not null references public.accountability_pairs (id) on delete cascade,
   sender_id uuid not null references public.profiles (id),
@@ -486,21 +562,25 @@ create table public.accountability_pings (
   created_at timestamptz not null default now()
 );
 
-create index accountability_pings_pair_idx on public.accountability_pings (pair_id, created_at desc);
+create index if not exists accountability_pings_pair_idx on public.accountability_pings (pair_id, created_at desc);
 
 alter table public.accountability_pairs enable row level security;
 alter table public.accountability_pings enable row level security;
 
+drop policy if exists "pairs_select_participant" on public.accountability_pairs;
 create policy "pairs_select_participant" on public.accountability_pairs
   for select using (auth.uid() in (requester_id, partner_id));
 
+drop policy if exists "pairs_insert_requester" on public.accountability_pairs;
 create policy "pairs_insert_requester" on public.accountability_pairs
   for insert with check (auth.uid() = requester_id);
 
 -- الطرف الآخر فقط يقبل/يرفض/ينهي الشراكة (لا يعدّل الطالب حالتها بنفسه).
+drop policy if exists "pairs_update_partner_responds" on public.accountability_pairs;
 create policy "pairs_update_partner_responds" on public.accountability_pairs
   for update using (auth.uid() = partner_id or auth.uid() = requester_id);
 
+drop policy if exists "pings_select_participant" on public.accountability_pings;
 create policy "pings_select_participant" on public.accountability_pings
   for select using (
     exists (
@@ -511,6 +591,7 @@ create policy "pings_select_participant" on public.accountability_pings
     )
   );
 
+drop policy if exists "pings_insert_participant" on public.accountability_pings;
 create policy "pings_insert_participant" on public.accountability_pings
   for insert with check (
     sender_id = auth.uid()
@@ -535,7 +616,7 @@ create policy "pings_insert_participant" on public.accountability_pings
 -- في 20260831000004_teams_and_challenges.sql).
 -- ============================================================
 
-create table public.points_ledger (
+create table if not exists public.points_ledger (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null references public.profiles (id) on delete cascade,
   delta integer not null,
@@ -543,10 +624,11 @@ create table public.points_ledger (
   created_at timestamptz not null default now()
 );
 
-create index points_ledger_user_idx on public.points_ledger (user_id, created_at desc);
+create index if not exists points_ledger_user_idx on public.points_ledger (user_id, created_at desc);
 
 alter table public.points_ledger enable row level security;
 
+drop policy if exists "points_ledger_select_own" on public.points_ledger;
 create policy "points_ledger_select_own" on public.points_ledger
   for select using (auth.uid() = user_id);
 
@@ -557,7 +639,7 @@ create policy "points_ledger_select_own" on public.points_ledger
 -- view داخلية فقط (تجميع عبر كل المستخدمين) — لا تُمنح صلاحية وصول
 -- مباشرة لها؛ تُستخدم حصرًا داخل team_leaderboard الذي يقيّد النتيجة
 -- بأعضاء نفس الفريق عبر team_roster.
-create view public.user_points_totals
+create or replace view public.user_points_totals
 as
 select user_id, coalesce(sum(delta), 0) as total_points
 from public.points_ledger
@@ -567,7 +649,7 @@ revoke all on public.user_points_totals from public, anon, authenticated;
 
 -- نبض الفريق: متوسط إنجاز اليوم لكل أعضاء الفريق في تاريخ معيّن،
 -- مقيّد بفرق المستخدم الحالي فقط.
-create view public.team_pulse_daily
+create or replace view public.team_pulse_daily
 as
 select
   tm.team_id,
@@ -588,7 +670,7 @@ comment on view public.team_pulse_daily is
 grant select on public.team_pulse_daily to authenticated;
 
 -- ترتيب الفريق: نقاط + اسم لكل عضو (يرث تقييد team_roster تلقائيًا).
-create view public.team_leaderboard
+create or replace view public.team_leaderboard
 as
 select
   r.team_id,
@@ -610,7 +692,7 @@ grant select on public.team_leaderboard to authenticated;
 -- الإدراج يتم فقط من الخادم (service role / Edge Functions / triggers)
 -- — لا يوجد insert policy لدور authenticated عمدًا.
 
-create table public.notifications (
+create table if not exists public.notifications (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null references public.profiles (id) on delete cascade,
   type text not null,
@@ -621,16 +703,18 @@ create table public.notifications (
   created_at timestamptz not null default now()
 );
 
-create index notifications_user_idx on public.notifications (user_id, created_at desc);
+create index if not exists notifications_user_idx on public.notifications (user_id, created_at desc);
 
 alter table public.notifications enable row level security;
 
+drop policy if exists "notifications_select_own" on public.notifications;
 create policy "notifications_select_own" on public.notifications
   for select using (auth.uid() = user_id);
 
 -- السماح فقط بتعليم الإشعار كمقروء (read_at) — أي تحديث آخر لا يزال
 -- مسموحًا تقنيًا هنا (RLS لا يقيّد أعمدة)، لكن العميل الرسمي لا يستخدم
 -- إلا هذا المسار؛ لا insert/delete من العميل نهائيًا.
+drop policy if exists "notifications_mark_read_own" on public.notifications;
 create policy "notifications_mark_read_own" on public.notifications
   for update using (auth.uid() = user_id) with check (auth.uid() = user_id);
 
@@ -645,9 +729,16 @@ create policy "notifications_mark_read_own" on public.notifications
 -- webhook وتستخدم service role key (يتجاوز RLS). لو سمحنا للعميل
 -- بتعديل هذا الجدول لأمكن لأي مستخدم منح نفسه Premium مجانًا.
 
-create type public.subscription_store as enum ('app_store', 'play_store');
+do $$
+begin
+  if not exists (select 1 from pg_type t
+    join pg_namespace n on n.oid = t.typnamespace
+    where t.typname = 'subscription_store' and n.nspname = 'public') then
+    create type public.subscription_store as enum ('app_store', 'play_store');
+  end if;
+end $$;
 
-create table public.subscriptions (
+create table if not exists public.subscriptions (
   user_id uuid primary key references public.profiles (id) on delete cascade,
   is_premium boolean not null default false,
   product_id text,
@@ -663,6 +754,7 @@ comment on table public.subscriptions is
 
 alter table public.subscriptions enable row level security;
 
+drop policy if exists "subscriptions_select_own" on public.subscriptions;
 create policy "subscriptions_select_own" on public.subscriptions
   for select using (auth.uid() = user_id);
 
@@ -693,11 +785,24 @@ $$;
 -- والإشعارات. RLS تبقى سارية على قنوات Realtime في Supabase تلقائيًا.
 -- ============================================================
 
-alter publication supabase_realtime add table public.daily_progress;
-alter publication supabase_realtime add table public.challenge_progress;
-alter publication supabase_realtime add table public.accountability_pings;
-alter publication supabase_realtime add table public.notifications;
-alter publication supabase_realtime add table public.team_members;
+-- إضافة جدول موجود مسبقًا إلى publication ترفع 42710 وتُسقط الملف
+-- كله. نفحص عضوية كل جدول أولًا (pg_publication_tables).
+do $$
+declare
+  tbl text;
+begin
+  foreach tbl in array array[
+    'daily_progress', 'challenge_progress', 'accountability_pings', 'notifications', 'team_members'
+  ]
+  loop
+    if not exists (
+      select 1 from pg_publication_tables
+      where pubname = 'supabase_realtime' and schemaname = 'public' and tablename = tbl
+    ) then
+      execute format('alter publication supabase_realtime add table public.%I;', tbl);
+    end if;
+  end loop;
+end $$;
 
 alter table public.daily_progress replica identity full;
 alter table public.challenge_progress replica identity full;
@@ -713,7 +818,7 @@ alter table public.notifications replica identity full;
 -- ============================================================
 
 alter table public.profiles
-  add column onboarding_completed_at timestamptz;
+  add column if not exists onboarding_completed_at timestamptz;
 
 -- ============================================================
 -- 20260904000001_grant_authenticated_privileges.sql
@@ -1040,7 +1145,13 @@ select
   count(*) filter (where p.created_at >= now() - interval '7 days')  as new_last_7_days,
   count(*) filter (where p.created_at >= now() - interval '30 days') as new_last_30_days
 from public.profiles p
-where public.is_admin();
+where public.is_admin()
+-- HAVING وليس WHERE وحده: استعلام تجميعي بلا GROUP BY يُرجع **صفًا
+-- واحدًا دائمًا** حتى لو صفّى WHERE كل الصفوف — فكان غير الأدمن يحصل
+-- على صف أصفار بدل لا شيء. لا تسريب بيانات (كلها أصفار)، لكن الشاشة
+-- كانت ستعرض "0 مستخدم" بدل حالة "غير مصرَّح". HAVING كاذبة تُرجع
+-- صفر صفوف فعلًا. اكتُشف باختبار فعلي على PostgreSQL 16، لا بالقراءة.
+having public.is_admin();
 
 comment on view public.admin_user_stats is 'أعداد مستخدمين مجمّعة للإدارة — بلا أي بيانات شخصية.';
 
@@ -1053,7 +1164,8 @@ select
   count(*) filter (where s.store = 'play_store')           as play_store,
   count(*) filter (where s.expires_at < now())             as expired
 from public.subscriptions s
-where public.is_admin();
+where public.is_admin()
+having public.is_admin();  -- راجع التعليق في admin_user_stats أعلاه
 
 comment on view public.admin_subscription_stats is 'حالة الاشتراكات مجمّعة — بلا ربط بأي مستخدم بعينه.';
 

@@ -4,14 +4,21 @@
 -- profiles تمتد من auth.users (Supabase Auth). صف واحد لكل مستخدم
 -- يُنشأ تلقائيًا عبر trigger عند التسجيل.
 
-create type public.goal_type as enum (
-  'lose_weight',
-  'gain_muscle',
-  'increase_activity',
-  'general_health'
-);
+do $$
+begin
+  if not exists (select 1 from pg_type t
+    join pg_namespace n on n.oid = t.typnamespace
+    where t.typname = 'goal_type' and n.nspname = 'public') then
+    create type public.goal_type as enum (
+      'lose_weight',
+      'gain_muscle',
+      'increase_activity',
+      'general_health'
+    );
+  end if;
+end $$;
 
-create table public.profiles (
+create table if not exists public.profiles (
   id uuid primary key references auth.users (id) on delete cascade,
   display_name text not null,
   avatar_url text,
@@ -24,7 +31,7 @@ comment on table public.profiles is 'ملف شخصي عام لكل مستخدم 
 
 -- أهداف قابلة للقياس يوميًا (تُستخدم لحساب "إنجاز اليوم" و% الالتزام
 -- بالفريق — راجع 20260831000006_points_and_leaderboard.sql).
-create table public.user_goals (
+create table if not exists public.user_goals (
   user_id uuid primary key references public.profiles (id) on delete cascade,
   target_water_ml integer not null default 2000,
   target_steps integer not null default 8000,
@@ -37,7 +44,7 @@ create table public.user_goals (
 comment on table public.user_goals is 'أهداف قابلة للقياس لكل مستخدم — أساس حساب نسبة الالتزام الشخصية.';
 
 -- إنشاء profile + user_goals تلقائيًا عند تسجيل مستخدم جديد.
-create function public.handle_new_user()
+create or replace function public.handle_new_user()
 returns trigger
 language plpgsql
 security definer set search_path = public
@@ -52,11 +59,12 @@ begin
 end;
 $$;
 
+drop trigger if exists on_auth_user_created on auth.users;
 create trigger on_auth_user_created
   after insert on auth.users
   for each row execute function public.handle_new_user();
 
-create function public.set_updated_at()
+create or replace function public.set_updated_at()
 returns trigger
 language plpgsql
 as $$
@@ -66,10 +74,12 @@ begin
 end;
 $$;
 
+drop trigger if exists set_profiles_updated_at on public.profiles;
 create trigger set_profiles_updated_at
   before update on public.profiles
   for each row execute function public.set_updated_at();
 
+drop trigger if exists set_user_goals_updated_at on public.user_goals;
 create trigger set_user_goals_updated_at
   before update on public.user_goals
   for each row execute function public.set_updated_at();
@@ -82,17 +92,22 @@ create trigger set_user_goals_updated_at
 alter table public.profiles enable row level security;
 alter table public.user_goals enable row level security;
 
+drop policy if exists "profiles_select_own" on public.profiles;
 create policy "profiles_select_own" on public.profiles
   for select using (auth.uid() = id);
 
+drop policy if exists "profiles_update_own" on public.profiles;
 create policy "profiles_update_own" on public.profiles
   for update using (auth.uid() = id);
 
+drop policy if exists "user_goals_select_own" on public.user_goals;
 create policy "user_goals_select_own" on public.user_goals
   for select using (auth.uid() = user_id);
 
+drop policy if exists "user_goals_upsert_own" on public.user_goals;
 create policy "user_goals_upsert_own" on public.user_goals
   for insert with check (auth.uid() = user_id);
 
+drop policy if exists "user_goals_update_own" on public.user_goals;
 create policy "user_goals_update_own" on public.user_goals
   for update using (auth.uid() = user_id);

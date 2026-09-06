@@ -8,7 +8,7 @@
 -- في 20260831000004_teams_and_challenges.sql).
 -- ============================================================
 
-create table public.points_ledger (
+create table if not exists public.points_ledger (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null references public.profiles (id) on delete cascade,
   delta integer not null,
@@ -16,10 +16,11 @@ create table public.points_ledger (
   created_at timestamptz not null default now()
 );
 
-create index points_ledger_user_idx on public.points_ledger (user_id, created_at desc);
+create index if not exists points_ledger_user_idx on public.points_ledger (user_id, created_at desc);
 
 alter table public.points_ledger enable row level security;
 
+drop policy if exists "points_ledger_select_own" on public.points_ledger;
 create policy "points_ledger_select_own" on public.points_ledger
   for select using (auth.uid() = user_id);
 
@@ -30,7 +31,7 @@ create policy "points_ledger_select_own" on public.points_ledger
 -- view داخلية فقط (تجميع عبر كل المستخدمين) — لا تُمنح صلاحية وصول
 -- مباشرة لها؛ تُستخدم حصرًا داخل team_leaderboard الذي يقيّد النتيجة
 -- بأعضاء نفس الفريق عبر team_roster.
-create view public.user_points_totals
+create or replace view public.user_points_totals
 as
 select user_id, coalesce(sum(delta), 0) as total_points
 from public.points_ledger
@@ -40,7 +41,7 @@ revoke all on public.user_points_totals from public, anon, authenticated;
 
 -- نبض الفريق: متوسط إنجاز اليوم لكل أعضاء الفريق في تاريخ معيّن،
 -- مقيّد بفرق المستخدم الحالي فقط.
-create view public.team_pulse_daily
+create or replace view public.team_pulse_daily
 as
 select
   tm.team_id,
@@ -61,7 +62,7 @@ comment on view public.team_pulse_daily is
 grant select on public.team_pulse_daily to authenticated;
 
 -- ترتيب الفريق: نقاط + اسم لكل عضو (يرث تقييد team_roster تلقائيًا).
-create view public.team_leaderboard
+create or replace view public.team_leaderboard
 as
 select
   r.team_id,

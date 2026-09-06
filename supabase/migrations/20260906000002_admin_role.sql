@@ -90,7 +90,13 @@ select
   count(*) filter (where p.created_at >= now() - interval '7 days')  as new_last_7_days,
   count(*) filter (where p.created_at >= now() - interval '30 days') as new_last_30_days
 from public.profiles p
-where public.is_admin();
+where public.is_admin()
+-- HAVING وليس WHERE وحده: استعلام تجميعي بلا GROUP BY يُرجع **صفًا
+-- واحدًا دائمًا** حتى لو صفّى WHERE كل الصفوف — فكان غير الأدمن يحصل
+-- على صف أصفار بدل لا شيء. لا تسريب بيانات (كلها أصفار)، لكن الشاشة
+-- كانت ستعرض "0 مستخدم" بدل حالة "غير مصرَّح". HAVING كاذبة تُرجع
+-- صفر صفوف فعلًا. اكتُشف باختبار فعلي على PostgreSQL 16، لا بالقراءة.
+having public.is_admin();
 
 comment on view public.admin_user_stats is 'أعداد مستخدمين مجمّعة للإدارة — بلا أي بيانات شخصية.';
 
@@ -103,7 +109,8 @@ select
   count(*) filter (where s.store = 'play_store')           as play_store,
   count(*) filter (where s.expires_at < now())             as expired
 from public.subscriptions s
-where public.is_admin();
+where public.is_admin()
+having public.is_admin();  -- راجع التعليق في admin_user_stats أعلاه
 
 comment on view public.admin_subscription_stats is 'حالة الاشتراكات مجمّعة — بلا ربط بأي مستخدم بعينه.';
 

@@ -2,9 +2,16 @@
 -- الفرق والتحديات ونبض الفريق
 -- ============================================================
 
-create type public.team_role as enum ('owner', 'member');
+do $$
+begin
+  if not exists (select 1 from pg_type t
+    join pg_namespace n on n.oid = t.typnamespace
+    where t.typname = 'team_role' and n.nspname = 'public') then
+    create type public.team_role as enum ('owner', 'member');
+  end if;
+end $$;
 
-create table public.teams (
+create table if not exists public.teams (
   id uuid primary key default gen_random_uuid(),
   name text not null,
   invite_code text not null unique default substr(replace(gen_random_uuid()::text, '-', ''), 1, 8),
@@ -12,7 +19,7 @@ create table public.teams (
   created_at timestamptz not null default now()
 );
 
-create table public.team_members (
+create table if not exists public.team_members (
   team_id uuid not null references public.teams (id) on delete cascade,
   user_id uuid not null references public.profiles (id) on delete cascade,
   role public.team_role not null default 'member',
@@ -20,7 +27,7 @@ create table public.team_members (
   primary key (team_id, user_id)
 );
 
-create table public.challenges (
+create table if not exists public.challenges (
   id uuid primary key default gen_random_uuid(),
   team_id uuid not null references public.teams (id) on delete cascade,
   title text not null,
@@ -33,7 +40,7 @@ create table public.challenges (
 
 -- نسبة التزام كل عضو بهدفه الشخصي داخل التحدي — وليس رقمًا مطلقًا
 -- (وزن/سعرات)، حتى يتنافس من يريد التنحيف مع من يريد التضخم بعدالة.
-create table public.challenge_progress (
+create table if not exists public.challenge_progress (
   challenge_id uuid not null references public.challenges (id) on delete cascade,
   user_id uuid not null references public.profiles (id) on delete cascade,
   progress_percent numeric(5, 2) not null default 0 check (progress_percent between 0 and 100),
@@ -41,14 +48,14 @@ create table public.challenge_progress (
   primary key (challenge_id, user_id)
 );
 
-create index team_members_user_idx on public.team_members (user_id);
-create index challenges_team_idx on public.challenges (team_id);
+create index if not exists team_members_user_idx on public.team_members (user_id);
+create index if not exists challenges_team_idx on public.challenges (team_id);
 
 -- ---------------------------------------------------------------
 -- دالة مساعدة: هل يشارك المستخدم الحالي نفس الفريق مع صف معيّن؟
 -- تُستخدم داخل سياسات RLS لعدة جداول لتفادي التكرار.
 -- ---------------------------------------------------------------
-create function public.shares_team_with(target_user uuid)
+create or replace function public.shares_team_with(target_user uuid)
 returns boolean
 language sql
 stable
@@ -66,7 +73,7 @@ $$;
 -- إنشاء الفريق يضيف صاحبه تلقائيًا كـ owner في team_members — بدلاً
 -- من انتظار إدراج ثانٍ من العميل قد يُنسى أو يفشل جزئيًا.
 -- ---------------------------------------------------------------
-create function public.handle_new_team()
+create or replace function public.handle_new_team()
 returns trigger
 language plpgsql
 security definer set search_path = public
@@ -78,6 +85,7 @@ begin
 end;
 $$;
 
+drop trigger if exists on_team_created on public.teams;
 create trigger on_team_created
   after insert on public.teams
   for each row execute function public.handle_new_team();
@@ -87,7 +95,7 @@ create trigger on_team_created
 -- بدل السماح بإدراج مباشر في team_members، لمنع أي مستخدم من ضمّ
 -- نفسه لفريق لا يملك كوده.
 -- ---------------------------------------------------------------
-create function public.join_team_by_code(p_invite_code text)
+create or replace function public.join_team_by_code(p_invite_code text)
 returns uuid
 language plpgsql
 security definer set search_path = public
@@ -119,7 +127,7 @@ $$;
 -- الوصول هنا مكتوب صراحة داخل شرط where (عبر auth.uid())، وليس
 -- معتمِدًا على RLS الجداول الأساسية إطلاقًا.
 -- ---------------------------------------------------------------
-create view public.team_roster
+create or replace view public.team_roster
 as
 select
   tm.team_id,
@@ -147,12 +155,15 @@ alter table public.team_members enable row level security;
 alter table public.challenges enable row level security;
 alter table public.challenge_progress enable row level security;
 
+drop policy if exists "teams_select_member" on public.teams;
 create policy "teams_select_member" on public.teams
   for select using (public.shares_team_with(created_by) or created_by = auth.uid());
 
+drop policy if exists "teams_insert_self" on public.teams;
 create policy "teams_insert_self" on public.teams
   for insert with check (created_by = auth.uid());
 
+drop policy if exists "teams_update_owner" on public.teams;
 create policy "teams_update_owner" on public.teams
   for update using (
     exists (
@@ -161,6 +172,7 @@ create policy "teams_update_owner" on public.teams
     )
   );
 
+drop policy if exists "team_members_select_same_team" on public.team_members;
 create policy "team_members_select_same_team" on public.team_members
   for select using (public.shares_team_with(user_id));
 
@@ -169,9 +181,11 @@ create policy "team_members_select_same_team" on public.team_members
 -- (handle_new_team عند إنشاء الفريق، join_team_by_code عند الانضمام)
 -- بدلاً من الاعتماد على إدراج مباشر من العميل.
 
+drop policy if exists "challenges_select_team_member" on public.challenges;
 create policy "challenges_select_team_member" on public.challenges
   for select using (public.shares_team_with(created_by) or created_by = auth.uid());
 
+drop policy if exists "challenges_insert_team_owner" on public.challenges;
 create policy "challenges_insert_team_owner" on public.challenges
   for insert with check (
     exists (
@@ -180,6 +194,7 @@ create policy "challenges_insert_team_owner" on public.challenges
     )
   );
 
+drop policy if exists "challenge_progress_select_team_member" on public.challenge_progress;
 create policy "challenge_progress_select_team_member" on public.challenge_progress
   for select using (
     exists (
@@ -189,8 +204,10 @@ create policy "challenge_progress_select_team_member" on public.challenge_progre
     or user_id = auth.uid()
   );
 
+drop policy if exists "challenge_progress_upsert_own" on public.challenge_progress;
 create policy "challenge_progress_upsert_own" on public.challenge_progress
   for insert with check (user_id = auth.uid());
 
+drop policy if exists "challenge_progress_update_own" on public.challenge_progress;
 create policy "challenge_progress_update_own" on public.challenge_progress
   for update using (user_id = auth.uid());

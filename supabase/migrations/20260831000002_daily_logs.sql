@@ -4,9 +4,16 @@
 -- كل جدول يحمل source ('manual' | 'healthkit') لأن المرحلة 10 ستضيف
 -- مزامنة HealthKit دون الحاجة لأي تغيير هيكلي هنا.
 
-create type public.log_source as enum ('manual', 'healthkit');
+do $$
+begin
+  if not exists (select 1 from pg_type t
+    join pg_namespace n on n.oid = t.typnamespace
+    where t.typname = 'log_source' and n.nspname = 'public') then
+    create type public.log_source as enum ('manual', 'healthkit');
+  end if;
+end $$;
 
-create table public.workouts (
+create table if not exists public.workouts (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null references public.profiles (id) on delete cascade,
   title text not null,
@@ -17,7 +24,7 @@ create table public.workouts (
   created_at timestamptz not null default now()
 );
 
-create table public.nutrition_logs (
+create table if not exists public.nutrition_logs (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null references public.profiles (id) on delete cascade,
   meal_type text not null check (meal_type in ('breakfast', 'lunch', 'dinner', 'snack')),
@@ -28,7 +35,7 @@ create table public.nutrition_logs (
   created_at timestamptz not null default now()
 );
 
-create table public.water_logs (
+create table if not exists public.water_logs (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null references public.profiles (id) on delete cascade,
   amount_ml integer not null check (amount_ml > 0),
@@ -37,7 +44,7 @@ create table public.water_logs (
 );
 
 -- الخطوات والنوم إجمالي يومي واحد (وليس أحداثًا متعددة) — upsert لكل يوم.
-create table public.steps_logs (
+create table if not exists public.steps_logs (
   user_id uuid not null references public.profiles (id) on delete cascade,
   date date not null,
   steps integer not null check (steps >= 0),
@@ -46,7 +53,7 @@ create table public.steps_logs (
   primary key (user_id, date)
 );
 
-create table public.sleep_logs (
+create table if not exists public.sleep_logs (
   user_id uuid not null references public.profiles (id) on delete cascade,
   date date not null,
   hours numeric(3, 1) not null check (hours >= 0 and hours <= 24),
@@ -55,7 +62,7 @@ create table public.sleep_logs (
   primary key (user_id, date)
 );
 
-create table public.weight_logs (
+create table if not exists public.weight_logs (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null references public.profiles (id) on delete cascade,
   weight_kg numeric(5, 1) not null check (weight_kg > 0),
@@ -64,10 +71,10 @@ create table public.weight_logs (
   created_at timestamptz not null default now()
 );
 
-create index workouts_user_performed_idx on public.workouts (user_id, performed_at desc);
-create index nutrition_logs_user_logged_idx on public.nutrition_logs (user_id, logged_at desc);
-create index water_logs_user_logged_idx on public.water_logs (user_id, logged_at desc);
-create index weight_logs_user_logged_idx on public.weight_logs (user_id, logged_at desc);
+create index if not exists workouts_user_performed_idx on public.workouts (user_id, performed_at desc);
+create index if not exists nutrition_logs_user_logged_idx on public.nutrition_logs (user_id, logged_at desc);
+create index if not exists water_logs_user_logged_idx on public.water_logs (user_id, logged_at desc);
+create index if not exists weight_logs_user_logged_idx on public.weight_logs (user_id, logged_at desc);
 
 -- ---------------------------------------------------------------
 -- RLS: كل سجلات هذه الشاشة خاصة تمامًا بصاحبها — بيانات صحية حسّاسة.
@@ -87,6 +94,9 @@ begin
     'workouts', 'nutrition_logs', 'water_logs', 'steps_logs', 'sleep_logs', 'weight_logs'
   ]
   loop
+    -- الحذف قبل الإنشاء: بدونه تفشل إعادة التشغيل بـ 42710 عند أول
+    -- جدول، فتتوقف بقية الترحيلات كلها قبل أن تصل إلى الناقص فعلًا.
+    execute format('drop policy if exists "%1$s_owner_all" on public.%1$s;', t);
     execute format(
       'create policy "%1$s_owner_all" on public.%1$s for all using (auth.uid() = user_id) with check (auth.uid() = user_id);',
       t
