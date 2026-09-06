@@ -35,7 +35,8 @@
     "kg": "kg",
     "meters": "m",
     "grams": "g",
-    "kcal": "kcal"
+    "kcal": "kcal",
+    "next": "Next"
   },
   "goals": {
     "title": "My goals",
@@ -105,7 +106,7 @@
     "welcome": "Welcome to Hemma 🌿",
     "intro": "Let's get to know you quickly before we start",
     "nameLabel": "What should we call you?",
-    "namePlaceholder": "Your name",
+    "namePlaceholder": "First name is enough",
     "goalLabel": "What's your main goal?",
     "nameRequired": "Enter your name first",
     "goalRequired": "Choose your main goal",
@@ -114,7 +115,57 @@
     "signOutConfirmTitle": "Sign out?",
     "signOutConfirmMessage": "We'll take you back to sign-in. Your data stays saved.",
     "signOutError": "Couldn't sign out",
-    "signedInAs": "Signed in as"
+    "signedInAs": "Signed in as",
+    "sectionYou": "About you",
+    "sectionBody": "Your body",
+    "sectionPlan": "Your plan",
+    "progressLabel": "Step {{current}} of {{total}}",
+    "finish": "Start my journey",
+    "ageDerived": "You're {{age}}",
+    "weightKg": "Weight (kg)",
+    "dailyCalories": "Your daily calories",
+    "planBasis": "Calculated from your resting metabolism ({{bmr}} kcal) multiplied by your activity level ({{tdee}} kcal), then adjusted for your goal.",
+    "planEditable": "You can change any of these any time from the goals screen.",
+    "step1": {
+      "title": "What should we call you?",
+      "subtitle": "Your name is used in the app and with your teammates only."
+    },
+    "step2": {
+      "title": "What's your main goal?",
+      "subtitle": "Your calories and macros are built around it."
+    },
+    "step3": {
+      "title": "Your biological sex",
+      "subtitle": "The resting metabolism equation differs by a fixed amount."
+    },
+    "step4": {
+      "title": "Your date of birth",
+      "subtitle": "Age is a core input to the metabolism equation — use year-month-day."
+    },
+    "step5": {
+      "title": "Your height and weight",
+      "subtitle": "The two numbers that turn a general estimate into yours."
+    },
+    "step6": {
+      "title": "How often do you train each week?",
+      "subtitle": "This sets your activity factor."
+    },
+    "step7": {
+      "title": "Here's your plan"
+    },
+    "goalHint": {
+      "lose_weight": "A moderate 500 kcal deficit — about half a kilo a week",
+      "gain_muscle": "A moderate 350 kcal surplus with higher protein",
+      "increase_activity": "Hold your weight while raising daily activity",
+      "general_health": "Hold your weight with balanced nutrition"
+    },
+    "activityHint": {
+      "sedentary": "I don't really train",
+      "light": "Once or twice a week",
+      "moderate": "Three to five times a week",
+      "active": "Six or more times a week",
+      "very_active": "Hard daily training or physical work"
+    }
   },
   "profileEdit": {
     "title": "Edit profile",
@@ -575,5 +626,18 @@
       "upstream_unavailable": "Couldn't reach the analysis service. Check your connection.",
       "unknown": "Couldn't analyse the photo"
     }
+  },
+  "goalType": {
+    "lose_weight": "Lose weight",
+    "gain_muscle": "Build muscle",
+    "increase_activity": "Move more",
+    "general_health": "General health"
+  },
+  "activityLevel": {
+    "sedentary": "Sedentary",
+    "light": "Light",
+    "moderate": "Regular",
+    "active": "Active",
+    "very_active": "Very active"
   }
 }

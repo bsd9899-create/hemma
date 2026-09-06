@@ -1,4 +1,5 @@
 import { execSync } from 'child_process';
+import { readFileSync } from 'fs';
 
 function grep(pattern: string, extra = ''): string {
   const cmd =
@@ -54,6 +55,30 @@ describe('جودة الكود — قواعد مستخلَصة من أعطال و
       'done';
     const missing = execSync(cmd, { cwd: process.cwd(), encoding: 'utf8', shell: '/bin/bash' }).trim();
     expect(missing).toBe('');
+  });
+
+  it('كل مفتاح ترجمة يُمرَّر كقيمة (labelKey/hintKey) موجود فعلًا', () => {
+    // فحص t('...') الحرفي لا يرى المفاتيح الممرَّرة كخصائص، فمرّ
+    // 'profileEdit.male' غير الموجود وكان سيُعرض للمستخدم كنصّ خام.
+    const cmd =
+      `grep -rhoE "(labelKey|hintKey|titleKey|subtitleKey|sectionKey|bodyKey): '[^']+'" app src ` +
+      `--include=*.ts --include=*.tsx | grep -oE "'[^']+'" | tr -d "'" | sort -u`;
+    const referenced = execSync(cmd, { cwd: process.cwd(), encoding: 'utf8', shell: '/bin/bash' })
+      .split('\n')
+      .map((l) => l.trim())
+      .filter(Boolean);
+
+    const ar = JSON.parse(readFileSync('src/lib/i18n/locales/ar.json', 'utf8'));
+    const has = (key: string): boolean => {
+      let node: unknown = ar;
+      for (const part of key.split('.')) {
+        if (typeof node !== 'object' || node === null || !(part in node)) return false;
+        node = (node as Record<string, unknown>)[part];
+      }
+      return true;
+    };
+
+    expect(referenced.filter((key) => !has(key))).toEqual([]);
   });
 
   it('لا سعر اشتراك مكتوب يدويًا — السعر من المتجر وحده', () => {

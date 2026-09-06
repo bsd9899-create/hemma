@@ -5,10 +5,13 @@ import { Card, Text, colors, rowDirection } from '@/src/design-system';
 import { spacing } from '@/src/design-system/spacing';
 
 export const GOAL_OPTIONS: { value: GoalType; labelKey: string; emoji: string }[] = [
-  { value: 'lose_weight', labelKey: 'goals.loseWeight', emoji: '🔥' },
-  { value: 'gain_muscle', labelKey: 'goals.gainMuscle', emoji: '💪' },
-  { value: 'increase_activity', labelKey: 'goals.increaseActivity', emoji: '🏃' },
-  { value: 'general_health', labelKey: 'goals.generalHealth', emoji: '🌿' },
+  // مفاتيح goalType.* هي المصدر الوحيد لأسماء الأهداف، وتشاركها شاشة
+  // التسجيل. المفاتيح السابقة (goals.loseWeight …) لم تكن موجودة في
+  // ملفات الترجمة إطلاقًا، فكان المستخدم يرى المفتاح الخام نصًّا.
+  { value: 'lose_weight', labelKey: 'goalType.lose_weight', emoji: '🔥' },
+  { value: 'gain_muscle', labelKey: 'goalType.gain_muscle', emoji: '💪' },
+  { value: 'increase_activity', labelKey: 'goalType.increase_activity', emoji: '🏃' },
+  { value: 'general_health', labelKey: 'goalType.general_health', emoji: '🌿' },
 ];
 
 type GoalPickerProps = {
