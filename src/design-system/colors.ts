@@ -1,65 +1,83 @@
 /**
- * ألوان هِمّة — مأخوذة من ملف الهوية الرسمي.
+ * ألوان هِمّة — مأخوذة من ملف الهوية الرسمي
+ * (assets/branding/brand-identity.png). هذا الملف هو المرجع الوحيد،
+ * وأي لون هنا يجب أن يعود إليه أو يكون مشتقًا منه بصبغة واحدة.
  *
- * الألوان الرسمية الثلاثة (لا تُعدَّل):
- *   Deep Teal  #0F3D3E  اللون الأساسي  → palette.teal700
- *   Warm Gold  #C8A15A  اللون المميِّز → palette.gold500
- *   Ivory      #F7F3EE  لون الخلفية    → palette.cream50
+ * الألوان الخمسة الرسمية (لا تُعدَّل):
+ *   #0F3D3E  أخضر أساسي   ثقة · صحة · توازن      → palette.green700
+ *   #2E7D64  أخضر ثانوي   نمو · حيوية            → palette.green500
+ *   #D9C3A6  بيج          دفء · توازن            → palette.beige400
+ *   #F7F3EE  أوف وايت     نظافة · بساطة          → palette.ivory50
+ *   #1A1A1A  نص أساسي     وضوح · احترافية        → palette.ink900
  *
- * بقية الدرجات مشتقة منها بنفس الصبغة (Hue) وبنفس فروق الإضاءة المستخدمة
- * سابقًا في السلّم، حتى تبقى التباينات والحالات (pressed/soft/…) كما هي.
- *
- * القاعدة: التيل الداكن هو اللون الأساسي (نص، أيقونات، عناصر تفاعلية)،
- * والذهبي Accent محدود الاستخدام (تمييز/إنجاز/CTA رئيسي فقط) تمامًا
- * كما يظهر في الشعار (الذهبي فقط في أيقونة الدمبل، وليس كخلفية كبيرة).
+ * قاعدة الاستخدام كما في الشعار نفسه: الأخضر الداكن هو اللون الأساسي
+ * (النص، الأيقونات، العناصر التفاعلية)، والبيج accent محدود الاستخدام
+ * (تمييز، إنجاز، CTA واحد) — تمامًا كما يظهر البيج في الدمبل وحده لا
+ * كخلفية كبيرة. الأخضر الثانوي للنمو والتقدّم (رسوم، حالات نجاح).
  */
 export const palette = {
-  teal900: '#0A292A',
-  teal700: '#0F3D3E',
-  teal600: '#154C4E',
-  teal500: '#246264',
-  teal100: '#DCE9E9',
+  // ── الأخضر الأساسي ودرجاته ──
+  green900: '#0A292A',
+  green700: '#0F3D3E',
+  green600: '#154C4E',
+  green100: '#DCE9E9',
 
-  gold500: '#C8A15A',
-  gold300: '#E4C997',
-  gold100: '#F4E8D2',
+  // ── الأخضر الثانوي ودرجاته ──
+  green500: '#2E7D64',
+  green300: '#6FA894',
+  green50: '#E8F1ED',
 
-  cream50: '#F7F3EE',
-  cream100: '#EFE7DE',
+  // ── البيج (accent) ودرجاته ──
+  beige400: '#D9C3A6',
+  beige200: '#EADCC8',
+  beige100: '#F3EADC',
+
+  // ── محايدات ──
+  ivory50: '#F7F3EE',
+  ivory100: '#EFE7DE',
   white: '#FFFFFF',
 
+  ink900: '#1A1A1A',
   neutral700: '#4A4E4B',
   neutral500: '#6B6F6D',
   neutral300: '#DAD2C4',
   neutral200: '#EDE5D8',
 
-  success: '#3F8F6B',
+  // ── حالات ──
+  // النجاح هو الأخضر الثانوي نفسه: "النمو والحيوية" في ملف الهوية هي
+  // بالضبط ما تعنيه حالة النجاح، ولون نجاح مستقل كان سيضيف أخضر ثالثًا
+  // بلا سبب.
+  success: '#2E7D64',
   warning: '#D98C3D',
   danger: '#C1503F',
 
   // خلفيات خفيفة لحالات الرسائل — نفس الصبغة بإضاءة عالية، حتى تبقى
   // الرسالة واضحة دون أن تصرخ في وجه المستخدم.
-  successSoft: '#E7F1EC',
+  successSoft: '#E8F1ED',
   warningSoft: '#FBEEDF',
   dangerSoft: '#F7E4E1',
 } as const;
 
 export const colors = {
-  background: palette.cream50,
+  background: palette.ivory50,
   surface: palette.white,
-  surfaceAlt: palette.cream100,
+  surfaceAlt: palette.ivory100,
 
-  primary: palette.teal700,
-  primaryPressed: palette.teal900,
-  onPrimary: palette.cream50,
+  primary: palette.green700,
+  primaryPressed: palette.green900,
+  onPrimary: palette.ivory50,
 
-  accent: palette.gold500,
-  accentSoft: palette.gold100,
-  onAccent: palette.teal900,
+  /** الأخضر الثانوي — للنمو والتقدّم (رسوم بيانية، مؤشرات تحسّن). */
+  secondary: palette.green500,
+  secondarySoft: palette.green50,
 
-  textPrimary: palette.teal900,
+  accent: palette.beige400,
+  accentSoft: palette.beige100,
+  onAccent: palette.ink900,
+
+  textPrimary: palette.ink900,
   textSecondary: palette.neutral500,
-  textOnDark: palette.cream50,
+  textOnDark: palette.ivory50,
 
   border: palette.neutral300,
   divider: palette.neutral200,

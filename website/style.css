@@ -2,14 +2,16 @@
    (src/design-system/colors.ts). لا تُعدَّل هنا وحدها: أي تغيير يجب أن
    يبقى مطابقًا لملف الهوية في المصدرين معًا. */
 :root {
-  --teal-900: #0A292A;
-  --teal-700: #0F3D3E;
-  --teal-500: #246264;
-  --teal-100: #DCE9E9;
-  --gold-500: #C8A15A;
-  --gold-100: #F4E8D2;
-  --cream-50: #F7F3EE;
-  --cream-100: #EFE7DE;
+  /* ألوان ملف الهوية الرسمي — assets/branding/brand-identity.png */
+  --green-900: #0A292A;
+  --green-700: #0F3D3E; /* أخضر أساسي */
+  --green-500: #2E7D64; /* أخضر ثانوي */
+  --green-100: #DCE9E9;
+  --beige-400: #D9C3A6; /* بيج */
+  --beige-100: #F3EADC;
+  --ivory-50: #F7F3EE; /* أوف وايت */
+  --ivory-100: #EFE7DE;
+  --ink-900: #1A1A1A; /* نص أساسي */
   --white: #FFFFFF;
   --neutral-500: #6B6F6D;
   --neutral-300: #DAD2C4;
@@ -23,8 +25,8 @@ html { -webkit-text-size-adjust: 100%; }
 
 body {
   margin: 0;
-  background: var(--cream-50);
-  color: var(--teal-900);
+  background: var(--ivory-50);
+  color: var(--ink-900);
   font-family: "Tajawal", "Segoe UI", system-ui, -apple-system, sans-serif;
   font-size: 1.0625rem;
   line-height: 1.85;
@@ -33,15 +35,15 @@ body {
 /* الاتجاه يأتي من dir="rtl" على <html>؛ لا نفرض اتجاهًا هنا حتى تعمل
    النسخة الإنجليزية بنفس الملف دون تعارض. */
 
-a { color: var(--teal-700); text-underline-offset: 0.25em; }
-a:hover { color: var(--teal-500); }
+a { color: var(--green-700); text-underline-offset: 0.25em; }
+a:hover { color: var(--green-500); }
 
 .wrap { max-width: var(--max-width); margin: 0 auto; padding: 0 1.25rem; }
 
 /* ---------- الترويسة ---------- */
 header.site {
-  background: var(--teal-700);
-  color: var(--cream-50);
+  background: var(--green-700);
+  color: var(--ivory-50);
   padding: 1rem 0;
 }
 header.site .wrap {
@@ -54,7 +56,7 @@ header.site .wrap {
 .brand { display: flex; align-items: center; gap: 0.625rem; font-weight: 800; font-size: 1.25rem; }
 .brand svg { width: 32px; height: 32px; flex: none; }
 header.site nav { display: flex; gap: 1.25rem; font-size: 0.9375rem; }
-header.site nav a { color: var(--cream-50); text-decoration: none; opacity: 0.85; }
+header.site nav a { color: var(--ivory-50); text-decoration: none; opacity: 0.85; }
 header.site nav a:hover, header.site nav a[aria-current="page"] { opacity: 1; text-decoration: underline; }
 
 /* ---------- الواجهة الرئيسية ---------- */
@@ -88,8 +90,8 @@ main.doc li { margin-bottom: 0.5rem; }
 
 .updated {
   display: inline-block;
-  background: var(--gold-100);
-  color: var(--teal-900);
+  background: var(--beige-100);
+  color: var(--ink-900);
   border-radius: 999px;
   padding: 0.25rem 0.875rem;
   font-size: 0.875rem;
@@ -97,8 +99,8 @@ main.doc li { margin-bottom: 0.5rem; }
 }
 
 .callout {
-  background: var(--teal-100);
-  border-inline-start: 4px solid var(--teal-700);
+  background: var(--green-100);
+  border-inline-start: 4px solid var(--green-700);
   border-radius: 8px;
   padding: 1rem 1.125rem;
   margin: 1.5rem 0;
@@ -110,7 +112,7 @@ table { width: 100%; border-collapse: collapse; margin: 1.25rem 0; font-size: 0.
    لا تمرير أفقي للصفحة كلها. */
 .table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
 th, td { border: 1px solid var(--neutral-300); padding: 0.625rem 0.75rem; text-align: start; vertical-align: top; }
-th { background: var(--cream-100); font-weight: 700; }
+th { background: var(--ivory-100); font-weight: 700; }
 
 /* ---------- التذييل ---------- */
 footer.site {
@@ -123,16 +125,16 @@ footer.site .wrap { display: flex; justify-content: space-between; gap: 1rem; fl
 footer.site nav { display: flex; gap: 1.125rem; flex-wrap: wrap; }
 
 @media (prefers-color-scheme: dark) {
-  body { background: var(--teal-900); color: var(--cream-50); }
+  body { background: var(--green-900); color: var(--ivory-50); }
   .feature, th { background: rgba(255, 255, 255, 0.04); }
   .feature { border-color: rgba(255, 255, 255, 0.14); }
   th, td { border-color: rgba(255, 255, 255, 0.14); }
   main.doc h2, footer.site { border-color: rgba(255, 255, 255, 0.14); }
-  a { color: var(--gold-500); }
-  a:hover { color: var(--gold-100); }
+  a { color: var(--beige-400); }
+  a:hover { color: var(--beige-100); }
   .hero p.lead, .feature p, footer.site { color: #B9C4C2; }
-  .callout { background: rgba(255, 255, 255, 0.05); border-inline-start-color: var(--gold-500); }
-  .updated { background: rgba(200, 161, 90, 0.18); color: var(--gold-100); }
+  .callout { background: rgba(255, 255, 255, 0.05); border-inline-start-color: var(--beige-400); }
+  .updated { background: rgba(200, 161, 90, 0.18); color: var(--beige-100); }
 }
 
 /* ---------- خطوات "كيف تعمل" ---------- */
@@ -153,8 +155,8 @@ footer.site nav { display: flex; gap: 1.125rem; flex-wrap: wrap; }
   top: 1.125rem;
   width: 1.75rem; height: 1.75rem;
   border-radius: 999px;
-  background: var(--teal-700);
-  color: var(--cream-50);
+  background: var(--green-700);
+  color: var(--ivory-50);
   display: grid; place-items: center;
   font-weight: 700; font-size: 0.9375rem;
 }
@@ -170,15 +172,15 @@ footer.site nav { display: flex; gap: 1.125rem; flex-wrap: wrap; }
   padding: 1.375rem;
   position: relative;
 }
-.plan.featured { border-color: var(--gold-500); border-width: 2px; }
+.plan.featured { border-color: var(--beige-400); border-width: 2px; }
 .plan .tag {
   position: absolute; top: -0.7rem; inset-inline-start: 1.25rem;
-  background: var(--gold-500); color: var(--teal-900);
+  background: var(--beige-400); color: var(--ink-900);
   border-radius: 999px; padding: 0.15rem 0.7rem;
   font-size: 0.8125rem; font-weight: 700;
 }
 .plan h3 { margin: 0 0 0.5rem; font-size: 1rem; }
-.plan .price { margin: 0; font-size: 1.75rem; font-weight: 800; color: var(--teal-700); }
+.plan .price { margin: 0; font-size: 1.75rem; font-weight: 800; color: var(--green-700); }
 .plan .price span { font-size: 0.9375rem; font-weight: 400; color: var(--neutral-500); }
 
 /* ---------- الأسئلة المتكررة ---------- */
@@ -195,8 +197,8 @@ details p { margin: 0.625rem 0 0; color: var(--neutral-500); font-size: 0.9375re
 @media (prefers-color-scheme: dark) {
   .steps li, .plan, details { background: rgba(255,255,255,0.04); border-color: rgba(255,255,255,0.14); }
   .steps span, .plan .price span, details p { color: #B9C4C2; }
-  .plan .price { color: var(--gold-500); }
-  .steps li::before { background: var(--gold-500); color: var(--teal-900); }
+  .plan .price { color: var(--beige-400); }
+  .steps li::before { background: var(--beige-400); color: var(--ink-900); }
 }
 
 .plan .price-note { margin: 0.25rem 0 0; font-size: 0.875rem; color: var(--neutral-500); }

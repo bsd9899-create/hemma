@@ -10,16 +10,31 @@ import { colors, palette } from '../colors';
  * سبب مفهوم. هذا الاختبار يمنع ذلك آليًا بدل الاعتماد على المراجعة.
  */
 describe('الهوية البصرية', () => {
-  it('الألوان الرسمية الثلاثة كما في ملف الهوية بالضبط', () => {
-    expect(palette.teal700).toBe('#0F3D3E');
-    expect(palette.gold500).toBe('#C8A15A');
-    expect(palette.cream50).toBe('#F7F3EE');
+  it('الألوان الخمسة الرسمية كما في ملف الهوية بالضبط', () => {
+    // assets/branding/brand-identity.png — أي اختلاف هنا يعني أن
+    // التطبيق خرج عن الهوية، لا أن الاختبار قديم.
+    expect(palette.green700).toBe('#0F3D3E'); // أخضر أساسي
+    expect(palette.green500).toBe('#2E7D64'); // أخضر ثانوي
+    expect(palette.beige400).toBe('#D9C3A6'); // بيج
+    expect(palette.ivory50).toBe('#F7F3EE'); // أوف وايت
+    expect(palette.ink900).toBe('#1A1A1A'); // نص أساسي
   });
 
-  it('اللون الأساسي هو التيل الداكن، والذهبي accent لا خلفية', () => {
-    expect(colors.primary).toBe(palette.teal700);
-    expect(colors.accent).toBe(palette.gold500);
-    expect(colors.background).toBe(palette.cream50);
+  it('الأدوار كما يحدّدها ملف الهوية', () => {
+    expect(colors.primary).toBe(palette.green700);
+    expect(colors.secondary).toBe(palette.green500);
+    expect(colors.accent).toBe(palette.beige400);
+    expect(colors.background).toBe(palette.ivory50);
+    expect(colors.textPrimary).toBe(palette.ink900);
+  });
+
+  it('لا أثر للوحة القديمة (الذهبي/التيل) في أي مكان', () => {
+    // الهوية السابقة استُبدلت بالكامل؛ بقاء اسم واحد منها يعني ملفًا
+    // لم يُرحَّل وسيظهر بلون خاطئ.
+    const values = Object.values(palette) as string[];
+    expect(values).not.toContain('#C8A15A'); // الذهبي القديم
+    expect(values).not.toContain('#E4C997');
+    expect(values).not.toContain('#F4E8D2');
   });
 
   it('لا لون مكتوب يدويًا في أي شاشة أو مكوّن', () => {

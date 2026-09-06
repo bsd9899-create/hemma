@@ -645,5 +645,21 @@
     "moderate": "Regular",
     "active": "Active",
     "very_active": "Very active"
+  },
+  "brand": {
+    "tagline": "A Healthier You, Every Day",
+    "signature": "Your Health Journey, With You",
+    "phrases": {
+      "healthFirst": "Your Health First",
+      "smallSteps": "Small Steps Make a Big Difference",
+      "smarterLifestyle": "A Smarter Lifestyle",
+      "todaysCommitment": "Today's Commitment, A Brighter Tomorrow"
+    },
+    "values": {
+      "commitment": "Commitment",
+      "simplicity": "Simplicity",
+      "wellness": "Wellness",
+      "realistic": "Realistic"
+    }
   }
 }

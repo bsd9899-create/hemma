@@ -188,9 +188,9 @@ export const HEMMA_LOGO_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="
 41 24 48 0 7 14 41 31 75 79 154 89 176 89 190 0 7 14 34 31 60 41 62 38 111
 -6 114 -16 2 -37 -1 -45 -6z"/>
   </g>
-  <!-- علامة الدمبل: مولَّدة بارامتريًا بنسب الشعار المرجعي، لون #C8A15A -->
+  <!-- علامة الدمبل: مولَّدة بارامتريًا بنسب الشعار المرجعي، لون #D9C3A6 -->
   <g transform="translate(367.20 1348.29)">
-    <rect x="0.00" y="119.07" width="18.91" height="82.37" rx="9.45" ry="9.45" fill="#C8A15A"/><rect x="44.87" y="58.97" width="63.78" height="202.56" rx="20.41" ry="20.41" fill="#C8A15A"/><rect x="216.98" y="141.34" width="871.63" height="37.82" rx="18.91" ry="18.91" fill="#C8A15A"/><rect x="134.61" y="0.00" width="82.37" height="320.51" rx="23.06" ry="23.06" fill="#C8A15A"/><rect x="1088.62" y="0.00" width="82.37" height="320.51" rx="23.06" ry="23.06" fill="#C8A15A"/><rect x="1196.95" y="58.97" width="63.78" height="202.56" rx="20.41" ry="20.41" fill="#C8A15A"/><rect x="1286.69" y="119.07" width="18.91" height="82.37" rx="9.45" ry="9.45" fill="#C8A15A"/>
+    <rect x="0.00" y="119.07" width="18.91" height="82.37" rx="9.45" ry="9.45" fill="#D9C3A6"/><rect x="44.87" y="58.97" width="63.78" height="202.56" rx="20.41" ry="20.41" fill="#D9C3A6"/><rect x="216.98" y="141.34" width="871.63" height="37.82" rx="18.91" ry="18.91" fill="#D9C3A6"/><rect x="134.61" y="0.00" width="82.37" height="320.51" rx="23.06" ry="23.06" fill="#D9C3A6"/><rect x="1088.62" y="0.00" width="82.37" height="320.51" rx="23.06" ry="23.06" fill="#D9C3A6"/><rect x="1196.95" y="58.97" width="63.78" height="202.56" rx="20.41" ry="20.41" fill="#D9C3A6"/><rect x="1286.69" y="119.07" width="18.91" height="82.37" rx="9.45" ry="9.45" fill="#D9C3A6"/>
   </g>
 </svg>`;
 

@@ -113,7 +113,7 @@ export default function TodayScreen() {
               progress={summary.completionPercent / 100}
               size={92}
               strokeWidth={9}
-              fillColor={summary.completionPercent >= 90 ? palette.gold500 : colors.primary}
+              fillColor={summary.completionPercent >= 90 ? palette.beige400 : colors.primary}
             >
               <Text variant="title" color={summary.completionPercent >= 90 ? 'accent' : 'primary'}>
                 {summary.completionPercent}%

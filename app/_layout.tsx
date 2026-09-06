@@ -10,6 +10,12 @@ import {
   Tajawal_700Bold,
   Tajawal_800ExtraBold,
 } from '@expo-google-fonts/tajawal';
+import {
+  Inter_400Regular,
+  Inter_500Medium,
+  Inter_700Bold,
+  Inter_800ExtraBold,
+} from '@expo-google-fonts/inter';
 import { colors } from '@/src/design-system';
 import { ErrorBoundary } from '@/src/lib/ErrorBoundary';
 import { bootstrapI18n } from '@/src/lib/i18n';
@@ -22,11 +28,17 @@ SplashScreen.preventAutoHideAsync().catch(() => {
 export default function RootLayout() {
   const [isRestarting, setIsRestarting] = useState(false);
   const [isI18nReady, setIsI18nReady] = useState(false);
+  // العائلتان تُحمَّلان معًا: تبديل اللغة يعيد تشغيل التطبيق، وتحميل
+  // عائلة واحدة فقط يترك اللغة الأخرى بلا خط في أول إقلاع بعد التبديل.
   const [fontsLoaded, fontsError] = useFonts({
     Tajawal_400Regular,
     Tajawal_500Medium,
     Tajawal_700Bold,
     Tajawal_800ExtraBold,
+    Inter_400Regular,
+    Inter_500Medium,
+    Inter_700Bold,
+    Inter_800ExtraBold,
   });
 
   useEffect(() => {

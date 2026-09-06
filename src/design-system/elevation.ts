@@ -15,7 +15,7 @@ export const elevation = {
   },
   /** بطاقات المحتوى العادية. */
   card: {
-    shadowColor: palette.teal900,
+    shadowColor: palette.green900,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.04,
     shadowRadius: 8,
@@ -23,7 +23,7 @@ export const elevation = {
   },
   /** عناصر بارزة: البطاقة الرئيسية، الأزرار العائمة. */
   raised: {
-    shadowColor: palette.teal900,
+    shadowColor: palette.green900,
     shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.08,
     shadowRadius: 16,
@@ -31,7 +31,7 @@ export const elevation = {
   },
   /** الأشرطة الثابتة (شريط التبويبات) — ظل لأعلى. */
   bar: {
-    shadowColor: palette.teal900,
+    shadowColor: palette.green900,
     shadowOffset: { width: 0, height: -2 },
     shadowOpacity: 0.05,
     shadowRadius: 12,

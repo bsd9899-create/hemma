@@ -11,9 +11,11 @@ import type { MacroKey } from '@/src/domain/nutrition';
  * الدهون بدرجة تيل أفتح لتبقى الثلاثة عائلة واحدة بصريًا.
  */
 const MACRO_COLORS: Record<MacroKey, string> = {
-  protein: palette.teal700,
-  carbs: palette.gold500,
-  fat: palette.teal500,
+  // ألوان الهوية الثلاثة: الأخضر الأساسي، الأخضر الثانوي، البيج —
+  // فيتمايز الماكروز بصريًا بلا إدخال أي لون خارج الملف.
+  protein: palette.green700,
+  carbs: palette.green500,
+  fat: palette.beige400,
 };
 
 type MacroRowProps = {

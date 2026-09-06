@@ -53,7 +53,7 @@ export default function NutritionScreen() {
   const isOverTarget = caloriesRemaining < 0;
   // الحلقة تُقصّ عند 100% بصريًا، بينما تبقى النسبة الخام في المنطق —
   // التجاوز يُبلَّغ عنه بالنص واللون بدل حلقة تلتفّ على نفسها.
-  const ringColor = isOverTarget ? colors.warning : calorieRatio >= 0.9 ? palette.gold500 : colors.primary;
+  const ringColor = isOverTarget ? colors.warning : calorieRatio >= 0.9 ? palette.beige400 : colors.primary;
 
   return (
     <Screen>

@@ -21,7 +21,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.divider,
     // ظل خفيف جدًا — إحساس "مرفوعة قليلاً" دافئ بدل البطاقات المسطّحة تمامًا.
-    shadowColor: palette.teal900,
+    shadowColor: palette.green900,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.04,
     shadowRadius: 8,

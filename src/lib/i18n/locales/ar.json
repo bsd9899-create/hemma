@@ -664,5 +664,21 @@
     "moderate": "رياضي منتظم",
     "active": "نشيط",
     "very_active": "رياضي محترف"
+  },
+  "brand": {
+    "tagline": "لصحة أفضل، كل يوم",
+    "signature": "صحتك.. رحلتك.. هِمّة معك.",
+    "phrases": {
+      "healthFirst": "صحتك أولاً",
+      "smallSteps": "خطوة اليوم تصنع فرقًا",
+      "smarterLifestyle": "نمط حياة أذكى",
+      "todaysCommitment": "التزام اليوم لغد أفضل"
+    },
+    "values": {
+      "commitment": "الالتزام",
+      "simplicity": "البساطة",
+      "wellness": "الصحة",
+      "realistic": "الواقعية"
+    }
   }
 }

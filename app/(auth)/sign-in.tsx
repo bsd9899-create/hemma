@@ -72,7 +72,7 @@ export default function SignInScreen() {
             {t('signIn.welcome')}
           </Text>
           <Text variant="body" color="textSecondary" style={{ textAlign: 'center' }}>
-            {t('signIn.subtitle')}
+            {t('brand.tagline')}
           </Text>
         </View>
 
