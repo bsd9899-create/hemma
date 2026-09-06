@@ -13,9 +13,9 @@ import type { MacroKey } from '@/src/domain/nutrition';
 const MACRO_COLORS: Record<MacroKey, string> = {
   // ألوان الهوية الثلاثة: الأخضر الأساسي، الأخضر الثانوي، البيج —
   // فيتمايز الماكروز بصريًا بلا إدخال أي لون خارج الملف.
-  protein: palette.green700,
-  carbs: palette.green500,
-  fat: palette.beige400,
+  protein: palette.green900,
+  carbs: palette.sage400,
+  fat: palette.green900,
 };
 
 type MacroRowProps = {

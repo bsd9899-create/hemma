@@ -416,7 +416,7 @@
     "subtitle": "Support your long-term commitment — more perks coming soon.",
     "notConfigured": "Subscriptions aren't enabled yet in this build — waiting on Hemma+ products from App Store Connect and RevenueCat.",
     "noPlans": "No plans available right now.",
-    "bestValue": "Best value",
+    "bestValue": "Best saving",
     "subscribe": "Subscribe",
     "purchasing": "Purchasing...",
     "restorePurchases": "Restore purchases",
@@ -647,19 +647,19 @@
     "very_active": "Very active"
   },
   "brand": {
-    "tagline": "A Healthier You, Every Day",
-    "signature": "Your Health Journey, With You",
+    "tagline": "More Than A Beginning",
+    "promise": "Smarter Health, A Better Life",
+    "signature": "Your Health Journey, With You.",
     "phrases": {
-      "healthFirst": "Your Health First",
-      "smallSteps": "Small Steps Make a Big Difference",
-      "smarterLifestyle": "A Smarter Lifestyle",
-      "todaysCommitment": "Today's Commitment, A Brighter Tomorrow"
+      "moreThanStart": "More Than A Beginning",
+      "smarterHealth": "Smarter Health, A Better Life",
+      "smallSteps": "Small Steps Make a Big Difference"
     },
     "values": {
-      "commitment": "Commitment",
-      "simplicity": "Simplicity",
+      "progress": "Progress",
       "wellness": "Wellness",
-      "realistic": "Realistic"
+      "simplicity": "Simplicity",
+      "commitment": "Commitment"
     }
   }
 }

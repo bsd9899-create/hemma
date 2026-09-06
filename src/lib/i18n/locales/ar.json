@@ -419,7 +419,7 @@
     "subtitle": "دعم الالتزام على المدى الطويل — مزايا إضافية قادمة تباعًا.",
     "notConfigured": "الاشتراكات غير مفعّلة بعد في هذه النسخة — بانتظار ربط منتجات هِمّة+ من App Store Connect وRevenueCat.",
     "noPlans": "لا توجد خطط متاحة حاليًا.",
-    "bestValue": "الأفضل قيمة",
+    "bestValue": "الأكثر توفيرًا",
     "subscribe": "اشترك",
     "purchasing": "جارِ الشراء...",
     "restorePurchases": "استعادة المشتريات",
@@ -666,19 +666,19 @@
     "very_active": "رياضي محترف"
   },
   "brand": {
-    "tagline": "لصحة أفضل، كل يوم",
-    "signature": "صحتك.. رحلتك.. هِمّة معك.",
+    "tagline": "أكثر من مجرد بداية",
+    "promise": "صحة أذكى لحياة أفضل",
+    "signature": "صحتك.. رحلتك.. همة معك.",
     "phrases": {
-      "healthFirst": "صحتك أولاً",
-      "smallSteps": "خطوة اليوم تصنع فرقًا",
-      "smarterLifestyle": "نمط حياة أذكى",
-      "todaysCommitment": "التزام اليوم لغد أفضل"
+      "moreThanStart": "أكثر من مجرد بداية",
+      "smarterHealth": "صحة أذكى لحياة أفضل",
+      "smallSteps": "خطوة كل يوم تصنع فرقًا"
     },
     "values": {
-      "commitment": "الالتزام",
-      "simplicity": "البساطة",
+      "progress": "التقدم",
       "wellness": "الصحة",
-      "realistic": "الواقعية"
+      "simplicity": "البساطة",
+      "commitment": "الالتزام"
     }
   }
 }

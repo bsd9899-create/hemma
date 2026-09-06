@@ -39,7 +39,7 @@ export function Skeleton({ width = '100%', height = 16, style }: SkeletonProps) 
 
 const styles = StyleSheet.create({
   base: {
-    backgroundColor: palette.neutral200,
+    backgroundColor: palette.sage100,
     borderRadius: radius.sm,
   },
 });

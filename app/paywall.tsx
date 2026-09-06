@@ -216,7 +216,7 @@ export default function PaywallScreen() {
               return (
                 <Card
                   key={pkg.identifier}
-                  style={featured ? { borderColor: palette.beige400, borderWidth: 2 } : undefined}
+                  style={featured ? { borderColor: palette.green900, borderWidth: 2 } : undefined}
                 >
                   {featured ? <Badge label={t('paywall.bestValue')} tone="accent" /> : null}
 
