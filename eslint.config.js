@@ -39,6 +39,15 @@ module.exports = defineConfig([
     },
   },
   {
+    // ملفات الاختبار: jest.mock يُرفَع فوق الاستيرادات، فالوصول إلى
+    // الوحدات داخل المصانع يجب أن يكون بـ require() لا import — وهذا
+    // شرط تقني من Jest لا خيار أسلوبي.
+    files: ['**/__tests__/**/*.{ts,tsx}', '**/*.test.{ts,tsx}', 'src/test-support/**/*.{ts,tsx}'],
+    rules: {
+      '@typescript-eslint/no-require-imports': 'off',
+    },
+  },
+  {
     // Supabase Edge Functions تعمل على Deno، لا على Metro/Node: مواصفة
     // `npm:@supabase/supabase-js@2` يحلّها Deno وقت النشر، ولا يستطيع
     // محلّل import الخاص بـ ESLint رؤيتها. تعطيل القاعدة هنا فقط.

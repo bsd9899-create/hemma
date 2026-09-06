@@ -116,8 +116,20 @@ export default function PaywallScreen() {
     }
   }
 
-  function openLink(url: string) {
-    Linking.openURL(url).catch(() => setError(t('profile.linkError')));
+  /**
+   * فتح رابط خارجي بأمان.
+   *
+   * `Linking.openURL(url).catch(...)` وحده غير كافٍ: الدالة قد ترمي
+   * **تزامنيًا** (رابط مشوَّه، أو منصة بلا معالج) فلا يُستدعى catch
+   * إطلاقًا وينهار التطبيق. await داخل try يمسك الحالتين معًا — وهو
+   * نفس النمط المستخدم في شاشة "حسابي".
+   */
+  async function openLink(url: string) {
+    try {
+      await Linking.openURL(url);
+    } catch {
+      setError(t('profile.linkError'));
+    }
   }
 
   if (isPremium) {
@@ -245,8 +257,8 @@ export default function PaywallScreen() {
         </Text>
 
         <View style={{ flexDirection: rowDirection, justifyContent: 'center', gap: spacing.md }}>
-          <Button label={t('paywall.termsOfUse')} variant="ghost" onPress={() => openLink(TERMS_URL)} />
-          <Button label={t('paywall.privacyPolicy')} variant="ghost" onPress={() => openLink(PRIVACY_URL)} />
+          <Button label={t('paywall.termsOfUse')} variant="ghost" onPress={() => void openLink(TERMS_URL)} />
+          <Button label={t('paywall.privacyPolicy')} variant="ghost" onPress={() => void openLink(PRIVACY_URL)} />
         </View>
       </ScrollView>
     </Screen>

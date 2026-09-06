@@ -47,8 +47,20 @@ export default function SignInScreen() {
     }
   }
 
-  function openLink(url: string) {
-    Linking.openURL(url).catch(() => setError(t('profile.linkError')));
+  /**
+   * فتح رابط خارجي بأمان.
+   *
+   * `Linking.openURL(url).catch(...)` وحده غير كافٍ: الدالة قد ترمي
+   * **تزامنيًا** (رابط مشوَّه، أو منصة بلا معالج) فلا يُستدعى catch
+   * إطلاقًا وينهار التطبيق. await داخل try يمسك الحالتين معًا — وهو
+   * نفس النمط المستخدم في شاشة "حسابي".
+   */
+  async function openLink(url: string) {
+    try {
+      await Linking.openURL(url);
+    } catch {
+      setError(t('profile.linkError'));
+    }
   }
 
   return (
@@ -100,7 +112,7 @@ export default function SignInScreen() {
             <Pressable
               accessibilityRole="link"
               hitSlop={8}
-              onPress={() => openLink(PRIVACY_URL)}
+              onPress={() => void openLink(PRIVACY_URL)}
             >
               <Text variant="captionStrong" color="primary">
                 {t('profile.privacyPolicy')}
@@ -109,7 +121,7 @@ export default function SignInScreen() {
             <Text variant="caption" color="textSecondary">
               ·
             </Text>
-            <Pressable accessibilityRole="link" hitSlop={8} onPress={() => openLink(TERMS_URL)}>
+            <Pressable accessibilityRole="link" hitSlop={8} onPress={() => void openLink(TERMS_URL)}>
               <Text variant="captionStrong" color="primary">
                 {t('profile.termsOfUse')}
               </Text>
