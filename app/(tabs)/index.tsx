@@ -110,14 +110,20 @@ export default function TodayScreen() {
             progress={summary.workoutMinutes / 30}
             href="/log/workout"
           />
+          {/* بلا هدف سعرات محفوظ نعرض المُستهلَك وحده بلا "من ٠" وبلا
+              حلقة تقدّم — نسبة إلى هدف غير موجود رقم بلا معنى. */}
           <MetricTile
             emoji="🍽️"
             label={t('today.calories')}
-            valueText={t('today.caloriesValue', {
-              value: formatNumber(summary.calories),
-              target: formatNumber(summary.caloriesTarget),
-            })}
-            progress={summary.caloriesTarget > 0 ? summary.calories / summary.caloriesTarget : 0}
+            valueText={
+              summary.caloriesTarget === null
+                ? t('today.caloriesValueNoTarget', { value: formatNumber(summary.calories) })
+                : t('today.caloriesValue', {
+                    value: formatNumber(summary.calories),
+                    target: formatNumber(summary.caloriesTarget),
+                  })
+            }
+            progress={summary.caloriesTarget ? summary.calories / summary.caloriesTarget : 0}
             href="/(tabs)/nutrition"
           />
           <MetricTile

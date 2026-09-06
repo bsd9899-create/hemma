@@ -27,7 +27,7 @@ export default function NutritionScreen() {
   const { t } = useTranslation();
   const router = useRouter();
   const userId = useAuthStore((s) => s.session?.user.id);
-  const { summary, isReferenceTargets, isLoading, error, refetch } = useNutritionData(userId);
+  const { summary, isReferenceTargets, hasTargets, isLoading, error, refetch } = useNutritionData(userId);
 
   if (!summary && isLoading) {
     return (
@@ -70,10 +70,19 @@ export default function NutritionScreen() {
             كم أكلت اليوم مقابل هدفي؟ */}
         <Card>
           <View style={{ flexDirection: rowDirection, alignItems: 'center', gap: spacing.lg }}>
-            <ProgressRing progress={Math.min(1, calorieRatio)} size={116} strokeWidth={11} fillColor={ringColor}>
+            {/* بلا هدف محفوظ: نعرض المُستهلَك وحده. حلقة بنسبة إلى صفر
+                ليست معلومة، وعرض "من ٠" أسوأ من عدم عرض شيء. */}
+            <ProgressRing
+              progress={hasTargets ? Math.min(1, calorieRatio) : 0}
+              size={116}
+              strokeWidth={11}
+              fillColor={ringColor}
+            >
               <Text variant="title">{formatNumber(totals.calories)}</Text>
               <Text variant="caption" color="textSecondary">
-                {t('nutrition.ofTarget', { target: formatNumber(targets.calories) })}
+                {hasTargets
+                  ? t('nutrition.ofTarget', { target: formatNumber(targets.calories) })
+                  : t('nutrition.noTargetYet')}
               </Text>
             </ProgressRing>
 
@@ -81,10 +90,12 @@ export default function NutritionScreen() {
               <Text variant="overline" color="textSecondary">
                 {t('nutrition.todayCalories')}
               </Text>
-              <Text variant="bodyStrong" color={isOverTarget ? 'warning' : 'textPrimary'}>
-                {isOverTarget
-                  ? t('nutrition.overBy', { value: formatNumber(Math.abs(caloriesRemaining)) })
-                  : t('nutrition.remaining', { value: formatNumber(caloriesRemaining) })}
+              <Text variant="bodyStrong" color={isOverTarget && hasTargets ? 'warning' : 'textPrimary'}>
+                {!hasTargets
+                  ? t('nutrition.noTargetYet')
+                  : isOverTarget
+                    ? t('nutrition.overBy', { value: formatNumber(Math.abs(caloriesRemaining)) })
+                    : t('nutrition.remaining', { value: formatNumber(caloriesRemaining) })}
               </Text>
               <Text variant="caption" color="textSecondary">
                 {t(getNutritionHintKey(summary))}

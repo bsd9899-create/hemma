@@ -20,6 +20,11 @@ export function useNutritionData(userId: string | undefined) {
    * سعرة وكأنها هدفه هو.
    */
   const [isReferenceTargets, setIsReferenceTargets] = useState(false);
+  /**
+   * false حين لا يوجد هدف سعرات محفوظ إطلاقًا (قاعدة بيانات متأخرة عن
+   * الكود). الشاشة تُخفي حلقة النسبة حينها بدل عرض نسبة إلى صفر.
+   */
+  const [hasTargets, setHasTargets] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -34,14 +39,19 @@ export function useNutritionData(userId: string | undefined) {
           goalsRepository.getCurrent(userId),
         ]);
 
-        setIsReferenceTargets(goals.targets_source === 'reference');
+        // نفس التطبيع المستخدم في شاشة اليوم: عمود ناقص (ترحيل لم
+        // يُطبَّق) يصل كـ undefined فيتحوّل كل حساب بعده إلى NaN —
+        // والحلقة تتلقى NaN فتتوقف عن الرسم بلا رسالة خطأ واحدة.
+        const targets = goalsRepository.toNutritionTargets(goals);
+        setHasTargets(targets.calories !== null);
+        setIsReferenceTargets(targets.source === 'reference' || targets.calories === null);
         setSummary(
           summarizeNutrition(meals, {
-            calories: goals.target_calories,
+            calories: targets.calories ?? 0,
             macros: {
-              protein: goals.target_protein_g,
-              carbs: goals.target_carbs_g,
-              fat: goals.target_fat_g,
+              protein: targets.proteinG ?? 0,
+              carbs: targets.carbsG ?? 0,
+              fat: targets.fatG ?? 0,
             },
           })
         );
@@ -62,5 +72,5 @@ export function useNutritionData(userId: string | undefined) {
     }, [load])
   );
 
-  return { summary, isReferenceTargets, isLoading, error, refetch: load };
+  return { summary, isReferenceTargets, hasTargets, isLoading, error, refetch: load };
 }

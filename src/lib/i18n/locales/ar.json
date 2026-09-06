@@ -154,7 +154,8 @@
     "recoveryMode": "وضع الإنقاذ 🌱",
     "decisionOfDay": "قرار اليوم",
     "calories": "السعرات",
-    "caloriesValue": "{{value}} / {{target}}"
+    "caloriesValue": "{{value}} / {{target}}",
+    "caloriesValueNoTarget": "{{value}} سعرة"
   },
   "progress": {
     "title": "تقدمي",
@@ -433,7 +434,8 @@
     },
     "referenceTargetsTitle": "هذه أرقام مرجعية عامة",
     "referenceTargetsBody": "الأرقام المعروضة هي القيم اليومية المرجعية التي تظهر على ملصقات الأغذية (FDA)، وليست محسوبة لك. أضف بيانات جسمك لنحسب هدفًا يخصّك أنت.",
-    "setMyTargets": "احسب هدفي"
+    "setMyTargets": "احسب هدفي",
+    "noTargetYet": "لم تحدّد هدفًا بعد"
   },
   "admin": {
     "title": "لوحة الإدارة",

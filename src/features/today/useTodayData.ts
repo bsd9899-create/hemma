@@ -17,7 +17,8 @@ export type TodaySummary = TodayDecision & {
   workoutMinutes: number;
   mealsLogged: number;
   calories: number;
-  caloriesTarget: number;
+  /** null حين لا يوجد هدف سعرات محفوظ — لا يُعرض كصفر. */
+  caloriesTarget: number | null;
   goals: UserGoals;
 };
 
@@ -61,7 +62,7 @@ export function useTodayData(userId: string | undefined) {
         workoutMinutes,
         mealsLogged: meals.length,
         calories: meals.reduce((total, meal) => total + (meal.calories ?? 0), 0),
-        caloriesTarget: goals.target_calories,
+        caloriesTarget: goalsRepository.toNutritionTargets(goals).calories,
         goals,
       });
     } catch (e) {
