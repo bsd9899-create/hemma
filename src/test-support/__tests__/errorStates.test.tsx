@@ -104,6 +104,29 @@ async function mount(load: () => { default: React.ComponentType }) {
   return view;
 }
 
+/**
+ * انقطاع الشبكة ليس خطأ خادم: رسالته يجب أن تقول للمستخدم إن الاتصال
+ * مقطوع، لا «حدث خطأ ما» التي تدفعه لإعادة المحاولة بلا فائدة.
+ */
+describe('انقطاع الشبكة', () => {
+  const offline = new TypeError('Network request failed');
+
+  it('يُترجَم إلى رسالة اتصال لا رسالة خطأ عامة', () => {
+    const { getFriendlyErrorMessage } = require('@/src/lib/errors');
+    const message = getFriendlyErrorMessage(offline);
+    const generic = require('@/src/lib/i18n').default.t('common.genericError');
+    expect(message).not.toBe(generic);
+    expect(message.length).toBeGreaterThan(0);
+  });
+
+  it('لا يخلط انقطاع الشبكة بخطأ صلاحيات', () => {
+    const { getFriendlyErrorMessage, isOfflineError } = require('@/src/lib/errors');
+    expect(isOfflineError(offline)).toBe(true);
+    expect(isOfflineError(mockPgError)).toBe(false);
+    expect(getFriendlyErrorMessage(offline)).not.toBe(getFriendlyErrorMessage(mockPgError));
+  });
+});
+
 describe.each(DATA_SCREENS)('فشل الجلب في شاشة $name', ({ load }) => {
   it('لا تنهار الشاشة', async () => {
     const view = await mount(load);
