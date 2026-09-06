@@ -71,3 +71,10 @@ Trigger إنشاء الملف الشخصي (`handle_new_user`) يعمل تلقا
 أصلية — **لن تعمل داخل Expo Go**، تمامًا كما هو الحال مع HealthKit
 والاشتراكات. اختبرها فقط عبر Development Build حقيقي على جهاز
 (راجع `docs/EAS_BUILD_GUIDE.md`).
+
+## شاشة موافقة Google تعرض نطاقًا غريبًا؟
+
+إن ظهر للمستخدم «للمتابعة إلى zvcynshexfffvxskqhet.supabase.co» فالسبب
+أن **App name** غير مضبوط في شاشة موافقة OAuth، فتعرض Google نطاق
+`redirect_uri` بدلًا منه. الإصلاح حقل واحد ولا يحتاج تعديل كود —
+التفاصيل والإثبات في `docs/GOOGLE_CONSENT_SCREEN.md`.
