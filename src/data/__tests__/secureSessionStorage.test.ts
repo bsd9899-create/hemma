@@ -30,6 +30,9 @@ jest.mock('@react-native-async-storage/async-storage', () => ({
   },
 }));
 
+// jest.mock يجب أن يسبق الاستيراد حتى يُرفَع قبل تحميل الوحدة، وإلا
+// استوردت الوحدة الحقيقية أولًا وفشل المحاكاة.
+// eslint-disable-next-line import/first
 import { secureSessionStorage } from '../secureSessionStorage';
 
 const KEY = 'sb-abcdefgh-auth-token';

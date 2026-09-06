@@ -333,7 +333,8 @@
     "carbsLabel": "Carbs (g)",
     "fatLabel": "Fat (g)",
     "macrosOptional": "Macros — optional",
-    "optional": "Optional"
+    "optional": "Optional",
+    "mealType": "Meal type"
   },
   "logWorkout": {
     "title": "🏋️ Workout",

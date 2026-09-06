@@ -134,3 +134,67 @@ footer.site nav { display: flex; gap: 1.125rem; flex-wrap: wrap; }
   .callout { background: rgba(255, 255, 255, 0.05); border-inline-start-color: var(--gold-500); }
   .updated { background: rgba(200, 161, 90, 0.18); color: var(--gold-100); }
 }
+
+/* ---------- خطوات "كيف تعمل" ---------- */
+.steps { counter-reset: step; list-style: none; padding: 0; margin: 0; display: grid; gap: 1rem; }
+.steps li {
+  counter-increment: step;
+  background: var(--white);
+  border: 1px solid var(--neutral-300);
+  border-radius: var(--radius);
+  padding: 1.125rem 1.25rem 1.125rem 1.25rem;
+  padding-inline-start: 3.5rem;
+  position: relative;
+}
+.steps li::before {
+  content: counter(step);
+  position: absolute;
+  inset-inline-start: 1.125rem;
+  top: 1.125rem;
+  width: 1.75rem; height: 1.75rem;
+  border-radius: 999px;
+  background: var(--teal-700);
+  color: var(--cream-50);
+  display: grid; place-items: center;
+  font-weight: 700; font-size: 0.9375rem;
+}
+.steps strong { display: block; margin-bottom: 0.25rem; }
+.steps span { color: var(--neutral-500); font-size: 0.9375rem; }
+
+/* ---------- الأسعار ---------- */
+.pricing { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr)); margin-bottom: 1rem; }
+.plan {
+  background: var(--white);
+  border: 1px solid var(--neutral-300);
+  border-radius: var(--radius);
+  padding: 1.375rem;
+  position: relative;
+}
+.plan.featured { border-color: var(--gold-500); border-width: 2px; }
+.plan .tag {
+  position: absolute; top: -0.7rem; inset-inline-start: 1.25rem;
+  background: var(--gold-500); color: var(--teal-900);
+  border-radius: 999px; padding: 0.15rem 0.7rem;
+  font-size: 0.8125rem; font-weight: 700;
+}
+.plan h3 { margin: 0 0 0.5rem; font-size: 1rem; }
+.plan .price { margin: 0; font-size: 1.75rem; font-weight: 800; color: var(--teal-700); }
+.plan .price span { font-size: 0.9375rem; font-weight: 400; color: var(--neutral-500); }
+
+/* ---------- الأسئلة المتكررة ---------- */
+details {
+  background: var(--white);
+  border: 1px solid var(--neutral-300);
+  border-radius: var(--radius);
+  padding: 0.875rem 1.125rem;
+  margin-bottom: 0.625rem;
+}
+details summary { cursor: pointer; font-weight: 700; }
+details p { margin: 0.625rem 0 0; color: var(--neutral-500); font-size: 0.9375rem; }
+
+@media (prefers-color-scheme: dark) {
+  .steps li, .plan, details { background: rgba(255,255,255,0.04); border-color: rgba(255,255,255,0.14); }
+  .steps span, .plan .price span, details p { color: #B9C4C2; }
+  .plan .price { color: var(--gold-500); }
+  .steps li::before { background: var(--gold-500); color: var(--teal-900); }
+}

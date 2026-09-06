@@ -333,7 +333,8 @@
     "carbsLabel": "كربوهيدرات (جم)",
     "fatLabel": "دهون (جم)",
     "macrosOptional": "الماكروز — اختيارية",
-    "optional": "اختياري"
+    "optional": "اختياري",
+    "mealType": "نوع الوجبة"
   },
   "logWorkout": {
     "title": "🏋️ التمرين",
