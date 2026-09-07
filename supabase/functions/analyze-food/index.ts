@@ -13,23 +13,19 @@
 //   صورة (base64) → هذه الدالة → النموذج → تقدير → تأكيد المستخدم → سجل
 
 import { createClient } from 'npm:@supabase/supabase-js@2';
+// التحقق والتطهير في _shared لأنهما يُختبران هناك فعليًا (jest)؛ هذا
+// الملف يبقى للتوصيل: مصادقة، حدّ يومي، نداء النموذج، ردّ HTTP.
+import {
+  buildUserText,
+  DAILY_LIMIT,
+  rejectImage,
+  sanitizeResult,
+  stripCodeFence,
+} from '../_shared/foodAnalysis.ts';
 
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!;
 const ANON_KEY = Deno.env.get('SUPABASE_ANON_KEY')!;
 const ANTHROPIC_API_KEY = Deno.env.get('ANTHROPIC_API_KEY');
-
-/** أكبر صورة مقبولة. الأكبر يُرفض بدل أن يُستهلك رصيد بلا فائدة. */
-const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
-
-const ALLOWED_MEDIA_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp']);
-
-/**
- * حد الاستخدام لكل مستخدم يوميًا.
- *
- * ليس تقييدًا للمستخدم بل حماية للتكلفة: بلا حدّ، حساب واحد مخترق أو
- * حلقة خاطئة في العميل تستنزف الرصيد كاملًا خلال ساعات.
- */
-const DAILY_LIMIT = 25;
 
 type AnalyzeRequest = {
   imageBase64: string;
@@ -78,13 +74,9 @@ Deno.serve(async (req) => {
     return json({ error: 'malformed_json' }, 400);
   }
 
-  if (!body.imageBase64 || !ALLOWED_MEDIA_TYPES.has(body.mediaType)) {
-    return json({ error: 'invalid_image' }, 400);
-  }
-
-  // طول base64 ≈ 4/3 من حجم البايتات — نفحص قبل أي عمل مكلف.
-  if ((body.imageBase64.length * 3) / 4 > MAX_IMAGE_BYTES) {
-    return json({ error: 'image_too_large' }, 413);
+  const rejection = rejectImage(body.imageBase64, body.mediaType);
+  if (rejection) {
+    return json({ error: rejection }, rejection === 'image_too_large' ? 413 : 400);
   }
 
   // حدّ يومي: يُحسب من سجل الاستخدام لا من الذاكرة (الدوال بلا حالة).
@@ -104,9 +96,7 @@ Deno.serve(async (req) => {
     return json({ error: 'daily_limit_reached', limit: DAILY_LIMIT }, 429);
   }
 
-  const userText = body.hint?.trim()
-    ? `حلّل هذه الوجبة. ملاحظة من المستخدم: ${body.hint.trim().slice(0, 200)}`
-    : 'حلّل هذه الوجبة.';
+  const userText = buildUserText(body.hint);
 
   let modelResponse: Response;
   try {
@@ -148,8 +138,7 @@ Deno.serve(async (req) => {
 
   let parsed: unknown;
   try {
-    // النموذج قد يلفّ JSON بأسوار markdown رغم التعليمات.
-    parsed = JSON.parse(text.replace(/^```(?:json)?\s*|\s*```$/g, '').trim());
+    parsed = JSON.parse(stripCodeFence(text));
   } catch {
     console.error('analyze-food: model returned non-JSON');
     return json({ error: 'unparseable_result' }, 502);
@@ -163,49 +152,6 @@ Deno.serve(async (req) => {
 
   return json(result, 200);
 });
-
-/**
- * تطهير مخرجات النموذج قبل تصديقها.
- *
- * مخرجات النموذج **مدخلات غير موثوقة** حتى لو كان النموذج ملكنا: أي
- * رقم سالب أو ضخم أو نص مكان رقم سيتسرّب إلى قاعدة البيانات ثم إلى
- * حسابات المستخدم. نقصّ هنا لا لاحقًا.
- */
-function sanitizeResult(raw: unknown): {
-  items: {
-    name_ar: string; name_en: string; grams: number;
-    calories: number; protein_g: number; carbs_g: number; fat_g: number;
-  }[];
-  confidence: 'high' | 'medium' | 'low';
-  note_ar: string;
-} | null {
-  if (typeof raw !== 'object' || raw === null) return null;
-  const obj = raw as Record<string, unknown>;
-  if (!Array.isArray(obj.items)) return null;
-
-  const num = (v: unknown, max: number): number => {
-    const n = typeof v === 'number' ? v : Number(v);
-    if (!Number.isFinite(n) || n < 0) return 0;
-    return Math.min(Math.round(n * 10) / 10, max);
-  };
-  const str = (v: unknown): string => (typeof v === 'string' ? v.slice(0, 120) : '');
-
-  const items = obj.items.slice(0, 12).map((it) => {
-    const i = (it ?? {}) as Record<string, unknown>;
-    return {
-      name_ar: str(i.name_ar),
-      name_en: str(i.name_en),
-      grams: num(i.grams, 5000),
-      calories: num(i.calories, 5000),
-      protein_g: num(i.protein_g, 500),
-      carbs_g: num(i.carbs_g, 1000),
-      fat_g: num(i.fat_g, 500),
-    };
-  });
-
-  const confidence = obj.confidence === 'high' || obj.confidence === 'medium' ? obj.confidence : 'low';
-  return { items, confidence, note_ar: str(obj.note_ar) };
-}
 
 function json(body: unknown, status: number): Response {
   return new Response(JSON.stringify(body), {

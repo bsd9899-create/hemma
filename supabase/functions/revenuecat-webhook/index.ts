@@ -13,47 +13,19 @@
 // Supabase ولا يملك JWT؛ المصادقة هنا بالسر المشترك أدناه وحده.
 
 import { createClient } from 'npm:@supabase/supabase-js@2';
+// المنطق الذي يقرّر من يصبح مشتركًا يعيش في _shared لأنه يُختبر هناك
+// فعليًا (jest)؛ هذا الملف يبقى للتوصيل: مصادقة، استعلام، ردّ HTTP.
+import {
+  buildSubscriptionPatch,
+  isKnownUserId,
+  safeEqual,
+  staleGuardTimestamp,
+  type RevenueCatEvent,
+} from '../_shared/subscription.ts';
 
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!;
 const SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 const WEBHOOK_AUTH_HEADER = Deno.env.get('REVENUECAT_WEBHOOK_AUTH_HEADER');
-
-type RevenueCatEvent = {
-  type: string;
-  app_user_id: string;
-  product_id?: string;
-  store?: 'APP_STORE' | 'PLAY_STORE' | string;
-  expiration_at_ms?: number | null;
-  event_timestamp_ms?: number | null;
-};
-
-/** أحداث RevenueCat التي تعني "أصبح/بقي مشتركًا فعليًا". */
-const PREMIUM_ACTIVE_EVENTS = new Set(['INITIAL_PURCHASE', 'RENEWAL', 'PRODUCT_CHANGE', 'UNCANCELLATION']);
-/** CANCELLATION فقط تعني إيقاف التجديد التلقائي وليس انتهاء الاشتراك فورًا. */
-const PREMIUM_INACTIVE_EVENTS = new Set(['EXPIRATION', 'BILLING_ISSUE']);
-
-/** app_user_id لدينا هو auth.users.id دائمًا — أي UUID. */
-const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-
-/**
- * مقارنة ثابتة الزمن للسر المشترك.
- *
- * المقارنة بـ !== تتوقف عند أول حرف مختلف، فيتسرّب طول البادئة الصحيحة
- * عبر زمن الاستجابة. الفارق ضئيل عبر الشبكة لكن تصحيحه سطران، وهذه
- * الدالة تحرس الجدول الوحيد الذي يمنح Premium مجانًا لو اختُرق.
- */
-function safeEqual(a: string, b: string): boolean {
-  const encoder = new TextEncoder();
-  const bufA = encoder.encode(a);
-  const bufB = encoder.encode(b);
-  // الطول نفسه ليس سرًا، لكن المقارنة يجب أن تمرّ على كل البايتات.
-  let mismatch = bufA.length ^ bufB.length;
-  const max = Math.max(bufA.length, bufB.length);
-  for (let i = 0; i < max; i++) {
-    mismatch |= (bufA[i] ?? 0) ^ (bufB[i] ?? 0);
-  }
-  return mismatch === 0;
-}
 
 Deno.serve(async (req) => {
   // فشل مغلق (fail closed) عمدًا: لو REVENUECAT_WEBHOOK_AUTH_HEADER غير
@@ -81,30 +53,14 @@ Deno.serve(async (req) => {
   // لم يُعرَّفوا بعد، وهي ليست UUID. تمريرها إلى عمود uuid يرفع خطأ
   // 22P02 فنُرجع 500، فيعيد RevenueCat المحاولة إلى الأبد على حدث لن
   // ينجح أبدًا. 200 هنا تعني "استُلم وتقرر تجاهله"، وهو الصحيح.
-  if (!UUID_RE.test(event.app_user_id)) {
+  if (!isKnownUserId(event.app_user_id)) {
     console.log('revenuecat-webhook: ignoring non-UUID app_user_id', event.type);
     return new Response('Ignored: anonymous app_user_id', { status: 200 });
   }
 
   const supabase = createClient(SUPABASE_URL, SERVICE_ROLE_KEY);
 
-  const patch: Record<string, unknown> = {
-    revenuecat_app_user_id: event.app_user_id,
-    product_id: event.product_id ?? null,
-    store: event.store === 'PLAY_STORE' ? 'play_store' : 'app_store',
-    expires_at: event.expiration_at_ms ? new Date(event.expiration_at_ms).toISOString() : null,
-    will_renew: event.type === 'RENEWAL' || event.type === 'INITIAL_PURCHASE',
-    last_synced_at: new Date().toISOString(),
-  };
-
-  if (PREMIUM_ACTIVE_EVENTS.has(event.type)) {
-    patch.is_premium = true;
-  } else if (PREMIUM_INACTIVE_EVENTS.has(event.type)) {
-    patch.is_premium = false;
-    patch.will_renew = false;
-  }
-  // أنواع أخرى (مثل CANCELLATION وTRANSFER) تُحدَّث بالحقول أعلاه فقط
-  // بدون تغيير is_premium — الإلغاء لا يعني انتهاء الاشتراك فورًا.
+  const patch = buildSubscriptionPatch(event);
 
   // app_user_id في RevenueCat = auth.users.id (نمرّره كـ appUserID عند
   // initPurchases في src/subscriptions/revenuecat.ts) — لذلك user_id
@@ -115,8 +71,9 @@ Deno.serve(async (req) => {
   // جُدِّد للتو، أو إعادة إرسال INITIAL_PURCHASE أن تُحيي اشتراكًا
   // منتهيًا. نرفض أي حدث أقدم من آخر مزامنة مسجّلة.
   let query = supabase.from('subscriptions').update(patch).eq('user_id', event.app_user_id);
-  if (event.event_timestamp_ms) {
-    query = query.lt('last_synced_at', new Date(event.event_timestamp_ms).toISOString());
+  const notOlderThan = staleGuardTimestamp(event);
+  if (notOlderThan) {
+    query = query.lt('last_synced_at', notOlderThan);
   }
 
   const { data, error } = await query.select('user_id');
