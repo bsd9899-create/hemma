@@ -51,7 +51,34 @@ export const mockScreenData = {
   revenueCatConfigured: false,
   revenueCatPackages: [] as unknown[],
   isPremium: false,
+  /**
+   * حين يُضبط، يرمي **كل** استدعاء مستودع هذا الخطأ.
+   *
+   * كان لاختبار حالات الفشل نسخته الخاصة من طبقة التمويه بأربعة عشر
+   * jest.mock — أي نسختان تنحرفان، وقد انحرفت الأولى فعلًا إلى أسماء
+   * دوال مخترعة. وضع الفشل هنا يجعل النسخة واحدة.
+   */
+  failWith: null as Error | null,
+  /** تمرين بديل لاختبار حالات الوسائط. */
+  exerciseOverride: null as unknown,
 };
+
+/**
+ * يلفّ مموّه مستودع بحيث يحترم وضع الفشل: يرمي حين يكون مضبوطًا،
+ * ويعمل عاديًا حين لا يكون.
+ */
+function mockFailable<T extends Record<string, (...args: never[]) => unknown>>(repository: T): T {
+  return new Proxy(repository, {
+    get(target, key) {
+      const original = Reflect.get(target, key);
+      if (typeof original !== 'function') return original;
+      return (...args: never[]) => {
+        if (mockScreenData.failWith) return Promise.reject(mockScreenData.failWith);
+        return (original as (...a: never[]) => unknown)(...args);
+      };
+    },
+  });
+}
 
 const mockRouter = {
   push: jest.fn(), replace: jest.fn(), back: jest.fn(),
@@ -104,7 +131,7 @@ jest.mock('@/src/data/repositories/goalsRepository', () => {
 const mockGoalsRef = { current: null as unknown };
 
 jest.mock('@/src/data/repositories/dailyLogsRepository', () => ({
-  dailyLogsRepository: {
+  dailyLogsRepository: mockFailable({
     getTodaySteps: jest.fn(async () => mockScreenData.todaySteps),
     getTodayWorkoutMinutes: jest.fn(async () => mockScreenData.todayWorkoutMinutes),
     getTodayMeals: jest.fn(async () => mockScreenData.todayMeals),
@@ -115,15 +142,15 @@ jest.mock('@/src/data/repositories/dailyLogsRepository', () => ({
     setStepsToday: jest.fn(async () => undefined),
     setSleepToday: jest.fn(async () => undefined),
     addWeight: jest.fn(async () => undefined),
-  },
+  }),
 }));
 
 jest.mock('@/src/data/repositories/dailyProgressRepository', () => ({
-  dailyProgressRepository: { upsertToday: jest.fn(async () => undefined) },
+  dailyProgressRepository: mockFailable({ upsertToday: jest.fn(async () => undefined) }),
 }));
 
 jest.mock('@/src/data/repositories/progressRepository', () => ({
-  progressRepository: {
+  progressRepository: mockFailable({
     getCompletionHistory: jest.fn(async () => mockScreenData.history),
     getWeightTrend: jest.fn(async () => mockScreenData.weightTrend),
     getWorkoutCount: jest.fn(async () => mockScreenData.workoutCount),
@@ -131,11 +158,11 @@ jest.mock('@/src/data/repositories/progressRepository', () => ({
     getAverageSteps: jest.fn(async () => mockScreenData.averageSteps),
     getWeeklyRawAverages: jest.fn(async () => mockScreenData.weeklyRaw),
     getLatestWeightKg: jest.fn(async () => mockScreenData.latestWeightKg),
-  },
+  }),
 }));
 
 jest.mock('@/src/data/repositories/teamsRepository', () => ({
-  teamsRepository: {
+  teamsRepository: mockFailable({
     getMyTeam: jest.fn(async () => mockScreenData.team),
     createTeam: jest.fn(async () => ({ id: 't1', name: 'فريق', invite_code: 'ABC123' })),
     joinByCode: jest.fn(async () => 't1'),
@@ -146,42 +173,42 @@ jest.mock('@/src/data/repositories/teamsRepository', () => ({
     createChallenge: jest.fn(async () => undefined),
     getMyChallengeProgress: jest.fn(async () => mockScreenData.challengeProgress),
     upsertMyChallengeProgress: jest.fn(async () => undefined),
-  },
+  }),
 }));
 
 jest.mock('@/src/data/repositories/accountabilityRepository', () => ({
-  accountabilityRepository: {
+  accountabilityRepository: mockFailable({
     getMyPair: jest.fn(async () => mockScreenData.pair),
     sendRequest: jest.fn(async () => undefined),
     respond: jest.fn(async () => undefined),
     endPair: jest.fn(async () => undefined),
     getPings: jest.fn(async () => mockScreenData.pings),
     sendPing: jest.fn(async () => undefined),
-  },
+  }),
 }));
 
 jest.mock('@/src/data/repositories/profileRepository', () => ({
-  profileRepository: {
+  profileRepository: mockFailable({
     getCurrent: jest.fn(async () => mockProfileRef.current),
     updateCurrent: jest.fn(async () => mockProfileRef.current),
-  },
+  }),
 }));
 
 jest.mock('@/src/data/repositories/exerciseRepository', () => ({
-  exerciseRepository: {
+  exerciseRepository: mockFailable({
     list: jest.fn(async () => [mockTestExercise]),
-    getById: jest.fn(async () => mockTestExercise),
+    getById: jest.fn(async () => mockScreenData.exerciseOverride ?? mockTestExercise),
     getPersonalRecord: jest.fn(async () => mockScreenData.personalRecord),
     getLastSession: jest.fn(async () => mockScreenData.recentSets),
     getHistory: jest.fn(async () => mockScreenData.recentSets),
     logSets: jest.fn(async () => undefined),
     listFavourites: jest.fn(async () => mockScreenData.favorites),
     toggleFavourite: jest.fn(async () => undefined),
-  },
+  }),
 }));
 
 jest.mock('@/src/data/repositories/adminRepository', () => ({
-  adminRepository: { getOverview: jest.fn(async () => mockScreenData.adminOverview) },
+  adminRepository: mockFailable({ getOverview: jest.fn(async () => mockScreenData.adminOverview) }),
 }));
 
 jest.mock('@/src/subscriptions/usePremiumStatus', () => ({
@@ -219,6 +246,17 @@ jest.mock('@/src/features/auth/oauth', () => ({
 jest.mock('@/src/features/auth/api', () => ({
   signOut: jest.fn(async () => undefined),
   deleteAccount: jest.fn(async () => undefined),
+}));
+
+jest.mock('expo-image', () => ({ Image: 'Image' }));
+
+jest.mock('expo-video', () => ({
+  VideoView: 'VideoView',
+  useVideoPlayer: (_source: unknown, setup?: (p: unknown) => void) => {
+    const player = { loop: false, muted: false, play: jest.fn(), pause: jest.fn() };
+    setup?.(player);
+    return player;
+  },
 }));
 
 jest.mock('expo-image-picker', () => ({
@@ -276,6 +314,7 @@ export async function mount(load: () => { default: React.ComponentType }) {
 const EMPTY_SCREEN_DATA = JSON.parse(JSON.stringify(mockScreenData));
 
 export function resetScreenMocks() {
+  mockScreenData.failWith = null;
   Object.assign(mockScreenData, JSON.parse(JSON.stringify(EMPTY_SCREEN_DATA)));
   mockGoalsRef.current = mockCompleteGoals;
   mockProfileRef.current = mockTestProfile;

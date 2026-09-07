@@ -28,6 +28,7 @@ import { muscleLabelKey } from '@/src/features/exercises/labels';
 import { totalVolumeKg, workingSetCount } from '@/src/domain/workoutSets';
 import { formatNumber } from '@/src/lib/i18n/format';
 import { getFriendlyErrorMessage } from '@/src/lib/errors';
+import { ExerciseMedia } from '@/src/features/exercises/ExerciseMedia';
 
 export default function ExerciseDetailScreen() {
   const { t, i18n } = useTranslation();
@@ -127,15 +128,57 @@ export default function ExerciseDetailScreen() {
           </View>
         </Card>
 
-        {/* الوسائط: تُعرض فقط بترخيص معروف. لا وسيط خير من وسيط
-            لا نملك حقوقه — راجع docs/EXERCISE_MEDIA.md. */}
-        {exercise.media_url && exercise.media_license ? null : (
-          <Card variant="soft">
-            <Text variant="caption" color="textSecondary">
-              {t('exercises.noMediaYet')}
-            </Text>
+
+        {/* الوسيط المرخَّص، حين يوجد. الشرط مزدوج عمدًا: رابط بلا
+            ترخيص مسجَّل لا يُعرض — راجع docs/EXERCISE_MEDIA.md. */}
+        {exercise.media_url && exercise.media_license ? (
+          <ExerciseMedia
+            url={exercise.media_url}
+            attribution={exercise.media_attribution}
+            label={isArabic ? exercise.name_ar : exercise.name_en}
+          />
+        ) : null}
+
+        {/* ─────────────────────────────────────────────────────────
+            مكان الحركة.
+
+            ما دامت الوسائط غير مرخّصة، هذا الموضع ليس فراغًا يُعتذر عنه:
+            من يفتح صفحة تمرين يريد أن يعرف كيف يؤدّيه، لا أن يقرأ عن
+            تراخيصنا. فالخطوات ونقاط الانتباه — وهي ما يقوم مقام الفيديو
+            فعلًا — تصعد إلى هنا، فوق الأرقام القياسية.
+
+            وحين يُضاف وسيط مرخَّص يظهر في هذا الموضع نفسه وتبقى الخطوات
+            تحته: الترتيب لا يتغيّر، يُضاف إليه فقط.
+            ───────────────────────────────────────────────────────── */}
+        {/* طريقة الأداء */}
+        {instructions.length > 0 ? (
+          <>
+            <SectionHeader title={t('exercises.howTo')} />
+            <Card style={{ gap: spacing.sm }}>
+              {instructions.map((step, i) => (
+                <View key={step} style={{ flexDirection: rowDirection, gap: spacing.sm }}>
+                  <Text variant="bodyStrong" color="primary">
+                    {formatNumber(i + 1)}
+                  </Text>
+                  <Text variant="body" style={{ flex: 1 }}>
+                    {step}
+                  </Text>
+                </View>
+              ))}
+            </Card>
+          </>
+        ) : null}
+
+        {isArabic && exercise.cues_ar.length > 0 ? (
+          <Card variant="soft" style={{ gap: spacing.xs }}>
+            <Text variant="captionStrong">{t('exercises.cues')}</Text>
+            {exercise.cues_ar.map((cue) => (
+              <Text key={cue} variant="caption" color="textSecondary">
+                • {cue}
+              </Text>
+            ))}
           </Card>
-        )}
+        ) : null}
 
         {/* الأرقام القياسية */}
         <SectionHeader title={t('exercises.records')} />
@@ -212,35 +255,6 @@ export default function ExerciseDetailScreen() {
           )}
         </Card>
 
-        {/* طريقة الأداء */}
-        {instructions.length > 0 ? (
-          <>
-            <SectionHeader title={t('exercises.howTo')} />
-            <Card style={{ gap: spacing.sm }}>
-              {instructions.map((step, i) => (
-                <View key={step} style={{ flexDirection: rowDirection, gap: spacing.sm }}>
-                  <Text variant="bodyStrong" color="primary">
-                    {formatNumber(i + 1)}
-                  </Text>
-                  <Text variant="body" style={{ flex: 1 }}>
-                    {step}
-                  </Text>
-                </View>
-              ))}
-            </Card>
-          </>
-        ) : null}
-
-        {isArabic && exercise.cues_ar.length > 0 ? (
-          <Card variant="soft" style={{ gap: spacing.xs }}>
-            <Text variant="captionStrong">{t('exercises.cues')}</Text>
-            {exercise.cues_ar.map((cue) => (
-              <Text key={cue} variant="caption" color="textSecondary">
-                • {cue}
-              </Text>
-            ))}
-          </Card>
-        ) : null}
 
         <InlineMessage tone="info" message={t('exercises.safetyNote')} />
 

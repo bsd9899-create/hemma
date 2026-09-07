@@ -562,7 +562,6 @@
     "volume": "Training volume",
     "volumeNote": "Weight × reps across {{sets}} working sets (warm-ups excluded).",
     "safetyNote": "If you are new or returning from injury, start light and own the movement before adding load.",
-    "noMediaYet": "No video for this exercise yet — we only show media we have a licence for.",
     "logSets": "Log sets",
     "setNumber": "Set {{number}}",
     "warmupSet": "Warm-up {{number}}",
@@ -604,7 +603,8 @@
       "kettlebell": "Kettlebell",
       "band": "Band",
       "other": "Other"
-    }
+    },
+    "mediaLabel": "{{name}} demonstration"
   },
   "foodPhoto": {
     "title": "Analyse a meal photo",
