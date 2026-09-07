@@ -12,7 +12,11 @@
 --    مخطط auth.
 --
 -- إن أردت الترحيلات الناقصة فقط، استخدم supabase/apply_pending.sql.
+--
+-- الملف كله داخل معاملة واحدة: إن فشلت أي جملة لأي سبب، تُلغى كل
+-- التغييرات ولا تبقى القاعدة نصف مبنيّة.
 
+begin;
 -- ============================================================
 -- 20260831000001_profiles_and_goals.sql
 -- ============================================================
@@ -1549,3 +1553,4 @@ create policy "food_analysis_usage_select_own" on public.food_analysis_usage
 
 grant select on public.food_analysis_usage to authenticated;
 
+commit;
