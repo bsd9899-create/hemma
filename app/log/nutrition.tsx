@@ -8,6 +8,9 @@ import { radius, spacing } from '@/src/design-system/spacing';
 import { useAuthStore } from '@/src/features/auth/store';
 import { getFriendlyErrorMessage } from '@/src/lib/errors';
 
+/** أصغر هدف لمس مقبول — إرشادات آبل وGoogle. */
+const TOUCH_TARGET = 44;
+
 const MEAL_TYPES: { value: 'breakfast' | 'lunch' | 'dinner' | 'snack'; labelKey: string }[] = [
   { value: 'breakfast', labelKey: 'logNutrition.breakfast' },
   { value: 'lunch', labelKey: 'logNutrition.lunch' },
@@ -88,7 +91,8 @@ export default function LogNutritionScreen() {
                 onPress={() => setMealType(meal.value)}
                 style={({ pressed }) => [
                   {
-                    minHeight: 40,
+                    // 44 هو أصغر هدف لمس في إرشادات آبل وGoogle معًا.
+                    minHeight: TOUCH_TARGET,
                     justifyContent: 'center',
                     paddingVertical: spacing.xs,
                     paddingHorizontal: spacing.md,

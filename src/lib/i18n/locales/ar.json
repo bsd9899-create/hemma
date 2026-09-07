@@ -38,7 +38,8 @@
     "kcal": "سعرة",
     "next": "التالي",
     "edit": "تعديل",
-    "percent": "{{value}}٪"
+    "percent": "{{value}}٪",
+    "listSeparator": "، "
   },
   "goals": {
     "title": "أهدافي",

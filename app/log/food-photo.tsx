@@ -110,7 +110,7 @@ export default function FoodPhotoScreen() {
       const description = analysis.items
         .map((i) => (isArabic ? i.name_ar : i.name_en))
         .filter(Boolean)
-        .join('، ');
+        .join(t('common.listSeparator'));
 
       await dailyLogsRepository.addNutritionLog(userId, {
         mealType,

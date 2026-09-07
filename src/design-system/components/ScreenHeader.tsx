@@ -4,6 +4,7 @@ import { colors } from '../colors';
 import { isRTL, rowDirection } from '../direction';
 import { radius, spacing } from '../spacing';
 import { Text } from './Text';
+import { useTranslation } from 'react-i18next';
 
 type ScreenHeaderProps = {
   title: string;
@@ -25,6 +26,7 @@ type ScreenHeaderProps = {
  * أو تنساه تمامًا فيعلق المستخدم بلا مخرج ظاهر.
  */
 export function ScreenHeader({ title, subtitle, action = 'none', onAction, trailing }: ScreenHeaderProps) {
+  const { t } = useTranslation();
   const router = useRouter();
   const hasAction = action !== 'none';
 
@@ -42,7 +44,7 @@ export function ScreenHeader({ title, subtitle, action = 'none', onAction, trail
         {hasAction ? (
           <Pressable
             accessibilityRole="button"
-            accessibilityLabel={action === 'close' ? 'إغلاق' : 'رجوع'}
+            accessibilityLabel={t(action === 'close' ? 'common.close' : 'common.back')}
             onPress={handleAction}
             hitSlop={spacing.sm}
             style={({ pressed }) => [styles.actionButton, pressed && styles.actionPressed]}

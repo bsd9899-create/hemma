@@ -38,7 +38,8 @@
     "kcal": "kcal",
     "next": "Next",
     "edit": "Edit",
-    "percent": "{{value}}%"
+    "percent": "{{value}}%",
+    "listSeparator": ", "
   },
   "goals": {
     "title": "My goals",
