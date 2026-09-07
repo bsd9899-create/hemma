@@ -37,7 +37,8 @@
     "grams": "g",
     "kcal": "kcal",
     "next": "Next",
-    "edit": "Edit"
+    "edit": "Edit",
+    "percent": "{{value}}%"
   },
   "goals": {
     "title": "My goals",
@@ -232,7 +233,7 @@
     "workoutsThisWeek": "Workouts this week",
     "weeklyReviewTitle": "Hemma's weekly review",
     "weeklyReviewEmpty": "Log a workout, your steps, or your sleep and your weekly review appears here.",
-    "scoreOutOf10": "{{score}} / 10",
+    "scoreOutOf10": "{{score}} / {{max}}",
     "strongestPoint": "Strongest area:",
     "weakestPoint": "Needs attention:",
     "focusNextWeek": "Your focus for next week: {{label}}",
@@ -260,7 +261,8 @@
     "newChallenge": "New challenge",
     "noChallenges": "No challenges yet.",
     "dateRange": "{{start}} → {{end}}",
-    "myCommitment": "Your commitment: {{percent}}%"
+    "myCommitment": "Your commitment: {{percent}}%",
+    "rank": "#{{rank}}"
   },
   "teamCreate": {
     "title": "Create your team 🤝",

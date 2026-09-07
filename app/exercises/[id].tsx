@@ -191,8 +191,8 @@ export default function ExerciseDetailScreen() {
                 >
                   <Text variant="caption" color="textSecondary">
                     {s.is_warmup
-                      ? t('exercises.warmupSet', { number: s.set_number })
-                      : t('exercises.setNumber', { number: s.set_number })}
+                      ? t('exercises.warmupSet', { number: formatNumber(s.set_number) })
+                      : t('exercises.setNumber', { number: formatNumber(s.set_number) })}
                   </Text>
                   <Text variant="bodyStrong">{describeSet(s, t)}</Text>
                 </View>
@@ -204,7 +204,7 @@ export default function ExerciseDetailScreen() {
                     value={`${formatNumber(Math.round(lastVolume))} ${t('common.kg')}`}
                   />
                   <Text variant="caption" color="textSecondary">
-                    {t('exercises.volumeNote', { sets: workingSetCount(lastSession) })}
+                    {t('exercises.volumeNote', { sets: formatNumber(workingSetCount(lastSession)) })}
                   </Text>
                 </View>
               ) : null}

@@ -117,7 +117,7 @@ export default function TodayScreen() {
               fillColor={summary.completionPercent >= 90 ? colors.success : colors.primary}
             >
               <Text variant="title" color={summary.completionPercent >= 90 ? 'accent' : 'primary'}>
-                {summary.completionPercent}%
+                {t('common.percent', { value: formatNumber(summary.completionPercent) })}
               </Text>
             </ProgressRing>
           </View>
@@ -134,7 +134,7 @@ export default function TodayScreen() {
           <MetricTile
             emoji="🏋️"
             label={t('today.workout')}
-            valueText={t('today.workoutValue', { minutes: summary.workoutMinutes })}
+            valueText={t('today.workoutValue', { minutes: formatNumber(summary.workoutMinutes) })}
             progress={summary.workoutMinutes / 30}
             href="/log/workout"
           />
@@ -194,11 +194,11 @@ export default function TodayScreen() {
           {hasTeam && team ? (
             <>
               <Text variant="bodyStrong" style={{ marginTop: spacing.xs }}>
-                {t('today.teamPulse', { percent: team.pulsePercent ?? 0 })}
+                {t('today.teamPulse', { percent: formatNumber(team.pulsePercent ?? 0) })}
               </Text>
               {team.myRank ? (
                 <Text variant="caption" color="textSecondary" style={{ marginTop: spacing.xxs }}>
-                  {t('today.myRank', { rank: team.myRank })}
+                  {t('today.myRank', { rank: formatNumber(team.myRank) })}
                 </Text>
               ) : null}
             </>

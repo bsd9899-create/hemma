@@ -12,7 +12,7 @@
  * الحالة الممتلئة تُغطّى في populatedScreens.test.tsx.
  */
 import { act } from '@testing-library/react-native';
-import { SCREENS, mount, mockProfileRef, mockRouter, resetScreenMocks } from '../screenMocks';
+import { SCREENS, mount, resetScreenMocks } from '../screenMocks';
 import { findPressables, renderedText, INTERACTIVE_ROLES } from '../renderScreen';
 
 beforeEach(resetScreenMocks);

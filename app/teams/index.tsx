@@ -79,7 +79,7 @@ export default function TeamsScreen() {
         <Card variant="soft">
           <SectionHeader title={t('teams.pulseToday')} />
           <Text variant="displayLg" color="primary" style={{ marginTop: spacing.xxs }}>
-            {data.pulsePercent ?? 0}%
+            {t('common.percent', { value: formatNumber(data.pulsePercent ?? 0) })}
           </Text>
           <View style={{ marginTop: spacing.sm }}>
             <ProgressBar progress={(data.pulsePercent ?? 0) / 100} />
@@ -98,7 +98,7 @@ export default function TeamsScreen() {
               >
                 <View style={{ flexDirection: rowDirection, alignItems: 'center', gap: spacing.sm }}>
                   <Text variant="bodyStrong" color={index === 0 ? 'accent' : 'textSecondary'}>
-                    {index === 0 ? '🥇' : `#${index + 1}`}
+                    {index === 0 ? '🥇' : t('teams.rank', { rank: formatNumber(index + 1) })}
                   </Text>
                   <Text variant="body">
                     {row.display_name}
@@ -106,7 +106,7 @@ export default function TeamsScreen() {
                   </Text>
                 </View>
                 <Text variant="bodyStrong" color={index === 0 ? 'accent' : 'textPrimary'}>
-                  {row.total_points}
+                  {formatNumber(row.total_points)}
                 </Text>
               </View>
             ))}
@@ -157,7 +157,7 @@ export default function TeamsScreen() {
                     <ProgressBar progress={challenge.myProgressPercent / 100} />
                   </View>
                   <Text variant="caption" color="textSecondary" style={{ marginTop: spacing.xxs }}>
-                    {t('teams.myCommitment', { percent: challenge.myProgressPercent })}
+                    {t('teams.myCommitment', { percent: formatNumber(challenge.myProgressPercent) })}
                   </Text>
                 </View>
               ))}

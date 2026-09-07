@@ -7,6 +7,8 @@
  * وهما بالضبط الشاشة التي تجلب المال والشاشة التي تعرض أرقام المشروع.
  */
 import { renderedText } from '../renderScreen';
+import { mockProfileRef, mockScreenData, mount, resetScreenMocks } from '../screenMocks';
+import { populatedAdminOverview, testProfile } from '../mocks';
 
 const mockPackages = [
   {
@@ -31,8 +33,6 @@ const mockPackages = [
   },
 ];
 
-import { mockProfileRef, mockScreenData, mount, resetScreenMocks } from '../screenMocks';
-import { populatedAdminOverview, testProfile } from '../mocks';
 
 beforeEach(resetScreenMocks);
 

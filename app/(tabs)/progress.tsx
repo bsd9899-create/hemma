@@ -8,6 +8,9 @@ import { useProgressData } from '@/src/features/progress/useProgressData';
 import { WeeklyBarChart } from '@/src/features/progress/components/WeeklyBarChart';
 import { formatNumber } from '@/src/lib/i18n/format';
 
+/** سقف تقييم الأسبوع — يُمرَّر منسّقًا حتى لا يبقى ١٠ لاتينيًا وسط أرقام عربية. */
+const WEEKLY_SCORE_MAX = 10;
+
 export default function ProgressScreen() {
   const { t } = useTranslation();
   const router = useRouter();
@@ -69,7 +72,7 @@ export default function ProgressScreen() {
               {t('progress.currentWeight')}
             </Text>
             <Text variant="title" style={{ marginTop: spacing.xxs }}>
-              {summary.weightNowKg !== null ? t('progress.weightUnit', { value: summary.weightNowKg }) : '—'}
+              {summary.weightNowKg !== null ? t('progress.weightUnit', { value: formatNumber(summary.weightNowKg) }) : '—'}
             </Text>
             {summary.weightDeltaKg !== null ? (
               <Text
@@ -78,7 +81,7 @@ export default function ProgressScreen() {
                 style={{ marginTop: spacing.xxs }}
               >
                 {t(summary.weightDeltaKg > 0 ? 'progress.weightDeltaPositive' : 'progress.weightDeltaNonPositive', {
-                  value: summary.weightDeltaKg,
+                  value: formatNumber(summary.weightDeltaKg),
                 })}
               </Text>
             ) : null}
@@ -102,7 +105,7 @@ export default function ProgressScreen() {
             {t('progress.workoutsThisWeek')}
           </Text>
           <Text variant="title" style={{ marginTop: spacing.xxs }}>
-            {summary.workoutsThisWeek}
+            {formatNumber(summary.workoutsThisWeek)}
           </Text>
         </Card>
 
@@ -111,7 +114,10 @@ export default function ProgressScreen() {
             {t('progress.weeklyReviewTitle')}
           </Text>
           <Text variant="displayLg" color="primary" style={{ marginTop: spacing.xxs }}>
-            {t('progress.scoreOutOf10', { score: summary.weeklyReview.score })}
+            {t('progress.scoreOutOf10', {
+              score: formatNumber(summary.weeklyReview.score),
+              max: formatNumber(WEEKLY_SCORE_MAX),
+            })}
           </Text>
           {summary.weeklyReview.hasData ? (
             <>

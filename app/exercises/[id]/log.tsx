@@ -234,8 +234,8 @@ export default function LogSetsScreen() {
                 <View style={{ flexDirection: rowDirection, alignItems: 'center', justifyContent: 'space-between' }}>
                   <Text variant="captionStrong">
                     {draft.isWarmup
-                      ? t('exercises.warmupSet', { number: index + 1 })
-                      : t('exercises.setNumber', { number: index + 1 })}
+                      ? t('exercises.warmupSet', { number: formatNumber(index + 1) })
+                      : t('exercises.setNumber', { number: formatNumber(index + 1) })}
                   </Text>
                   <View style={{ flexDirection: rowDirection, alignItems: 'center', gap: spacing.sm }}>
                     {/* تأكيد فوري أن هذه المجموعة رقم قياسي — أقوى دافع

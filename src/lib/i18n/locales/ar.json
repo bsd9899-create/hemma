@@ -37,7 +37,8 @@
     "grams": "جم",
     "kcal": "سعرة",
     "next": "التالي",
-    "edit": "تعديل"
+    "edit": "تعديل",
+    "percent": "{{value}}٪"
   },
   "goals": {
     "title": "أهدافي",
@@ -235,7 +236,7 @@
     "workoutsThisWeek": "التمارين هذا الأسبوع",
     "weeklyReviewTitle": "تقييم هِمّة الأسبوعي",
     "weeklyReviewEmpty": "سجّل تمرينًا أو خطواتك أو نومك، ويجيك تقييم أسبوعك هنا.",
-    "scoreOutOf10": "{{score}} / 10",
+    "scoreOutOf10": "{{score}} / {{max}}",
     "strongestPoint": "أقوى نقطة:",
     "weakestPoint": "تحتاج اهتمامًا:",
     "focusNextWeek": "تركيزك للأسبوع القادم: {{label}}",
@@ -263,7 +264,8 @@
     "newChallenge": "تحدٍ جديد",
     "noChallenges": "لا توجد تحديات بعد.",
     "dateRange": "{{start}} — {{end}}",
-    "myCommitment": "التزامك: {{percent}}%"
+    "myCommitment": "التزامك: {{percent}}%",
+    "rank": "#{{rank}}"
   },
   "teamCreate": {
     "title": "أنشئ فريقك 🤝",

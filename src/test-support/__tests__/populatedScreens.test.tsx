@@ -77,6 +77,20 @@ describe.each(SCREENS)('شاشة $name — ببيانات مستخدم فعلي'
     expect(text).not.toMatch(/\d+e[+-]\d+/i);
   });
 
+  /**
+   * في الواجهة العربية كل رقم مرّ على formatNumber يخرج بأرقام عربية
+   * هندية. أي رقم لاتيني متبقٍّ يعني قيمة عُرضت خامًا — وهكذا ظهرت نقاط
+   * لوحة الصدارة "1240" بلا فاصل آلاف بجانب "٩٬٣٥٠" منسّقة.
+   */
+  it('لا يعرض رقمًا لاتينيًا خامًا في واجهة عربية', async () => {
+    const raw = renderedText(await mount(load));
+    const text = IDENTIFIERS.reduce((acc, pattern) => acc.replace(pattern, ''), raw);
+    const latinRuns = (text.match(/\d+/g) ?? []).filter(
+      (run) => !ALLOWED_LATIN_NUMBERS.some((pattern) => pattern.test(run)),
+    );
+    expect(latinRuns).toEqual([]);
+  });
+
   it('كل زر يُضغَط بلا استثناء غير مُمسَك', async () => {
     const view = await mount(load);
     const seen = new Set<unknown>();
@@ -101,3 +115,23 @@ describe.each(SCREENS)('شاشة $name — ببيانات مستخدم فعلي'
  * بطاقة الوزن يفتح تسجيله) — مُدرَجة هنا بوعي لا بصمت.
  */
 const READ_ONLY_SCREENS = new Set(['progress']);
+
+/**
+ * أرقام لاتينية مشروعة في واجهة عربية: ما يأتي من بيانات المستخدم أو من
+ * المتجر (السعر بصيغته التي يرسلها App Store)، وسنة مرجع علمي.
+ */
+/**
+ * معرّفات تُقرأ حرفيًا ولا تُترجم أرقامها: معرّف الحساب (يُنسخ ويُرسل
+ * للدعم) وكود دعوة الفريق. تُحذف من النص قبل البحث عن الأرقام بدل
+ * السماح بها كأرقام — السماح بنمط عام يُفرغ الاختبار من معناه.
+ */
+const IDENTIFIERS = [
+  /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/gi, // UUID
+  /\b[A-Z]{2,}[0-9]+\b/g, // كود دعوة مثل FAJR24
+  /\b\d+\.\d+\.\d+\b/g, // رقم الإصدار — يُطابَق مع المتجر حرفيًا
+];
+
+/** أرقام لاتينية مشروعة رغم أنها ليست معرّفًا. */
+const ALLOWED_LATIN_NUMBERS = [
+  /^1985$/, // سنة معادلة Epley — مرجع علمي لا رقم واجهة
+];
