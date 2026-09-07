@@ -80,7 +80,7 @@ export default function TodayScreen() {
           {summary.streak > 0 ? (
             <View
               accessibilityRole="text"
-              accessibilityLabel={t('today.streakLabel', { count: summary.streak })}
+              accessibilityLabel={t('today.streakLabel', { count: summary.streak, days: formatNumber(summary.streak) })}
               style={{
                 flexDirection: rowDirection,
                 alignItems: 'center',

@@ -203,7 +203,7 @@ export default function PaywallScreen() {
                 التسلسل واحد مهما اختار المستخدم، وتكراره ضجيج. */}
             {trialDays !== null ? (
               <Card variant="soft" style={{ gap: spacing.sm }}>
-                <Text variant="bodyStrong">{t('paywall.timeline.heading', { count: trialDays })}</Text>
+                <Text variant="bodyStrong">{t('paywall.timeline.heading', { count: trialDays, days: formatNumber(trialDays) })}</Text>
                 <TrialTimeline trialDays={trialDays} />
               </Card>
             ) : null}
@@ -250,6 +250,7 @@ export default function PaywallScreen() {
                     <Text variant="caption" color="textSecondary" style={{ marginTop: spacing.xxs }}>
                       {t('paywall.trialLine', {
                         count: trial.count,
+                        days: formatNumber(trial.count),
                         unit: t(trialUnitKey(trial), { count: trial.count }),
                         price: pkg.product.priceString,
                         period: periodKey ? t(periodKey) : '',

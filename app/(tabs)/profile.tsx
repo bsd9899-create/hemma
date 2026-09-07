@@ -14,7 +14,7 @@ import { changeLanguage, type AppLanguage } from '@/src/lib/i18n';
 import { GOAL_OPTIONS } from '@/src/features/profile/GoalPicker';
 import { SummaryCard } from '@/src/features/profile/SummaryCard';
 import { goalsRepository } from '@/src/data/repositories/goalsRepository';
-import { formatNumber } from '@/src/lib/i18n/format';
+import { formatBirthDate, formatNumber } from '@/src/lib/i18n/format';
 
 /**
  * الموقع الرسمي — لا رابط GitHub. رابط blob على GitHub كان سيفشل مراجعة
@@ -163,7 +163,7 @@ export default function ProfileScreen() {
           title={t('profile.bodyCard')}
           onEdit={() => router.push('/profile-edit')}
           rows={[
-            { label: t('profileEdit.birthDateLabel'), value: profile?.birth_date ?? '—' },
+            { label: t('profileEdit.birthDateLabel'), value: formatBirthDate(profile?.birth_date) },
             { label: t('profileEdit.heightLabel'), value: profile?.height_cm ? `${formatNumber(profile.height_cm)}` : '—' },
             {
               label: t('profileEdit.activityLabel'),

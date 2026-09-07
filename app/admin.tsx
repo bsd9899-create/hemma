@@ -16,7 +16,7 @@ import {
 import { spacing } from '@/src/design-system/spacing';
 import { adminRepository, type AdminOverview } from '@/src/data/repositories/adminRepository';
 import { useProfileStore } from '@/src/features/auth/profileStore';
-import { formatNumber } from '@/src/lib/i18n/format';
+import { formatNumber, formatShortDate } from '@/src/lib/i18n/format';
 import { getFriendlyErrorMessage } from '@/src/lib/errors';
 
 /**
@@ -106,7 +106,7 @@ export default function AdminScreen() {
                 overview.activity.map((day) => (
                   <StatRow
                     key={day.date}
-                    label={day.date}
+                    label={formatShortDate(day.date)}
                     value={day.active_users}
                     suffix={t('admin.avgCompletion', {
                       value: formatNumber(day.avg_completion_percent ?? 0),

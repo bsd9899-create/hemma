@@ -191,7 +191,7 @@
       "very_active": "نشيط جدًا"
     },
     "invalidBirthDate": "أدخل التاريخ بصيغة 1996-05-20",
-    "invalidHeight": "أدخل طولًا بين 90 و250 سم"
+    "invalidHeight": "أدخل طولًا بين ٩٠ و٢٥٠ سم"
   },
   "today": {
     "sectionTitle": "أساسيات اليوم",
@@ -218,20 +218,20 @@
     "stepsDone": "خلصت ✅",
     "streakLabel_one": "سلسلة يوم واحد",
     "streakLabel_two": "سلسلة يومين",
-    "streakLabel_few": "سلسلة {{count}} أيام",
-    "streakLabel_many": "سلسلة {{count}} يومًا",
-    "streakLabel_other": "سلسلة {{count}} يوم"
+    "streakLabel_few": "سلسلة {{days}} أيام",
+    "streakLabel_many": "سلسلة {{days}} يومًا",
+    "streakLabel_other": "سلسلة {{days}} يوم"
   },
   "progress": {
     "title": "تقدمي",
     "noActivity": "ما سجّلت شيئًا بعد هالأسبوع — أول إدخال (ماء، خطوات، تمرين...) بيبدأ يبني تقدمك هنا.",
-    "last7Days": "آخر 7 أيام",
+    "last7Days": "آخر ٧ أيام",
     "currentWeight": "الوزن الحالي",
     "weightUnit": "{{value}} كجم",
-    "weightDeltaPositive": "+{{value}} كجم آخر 30 يوم",
-    "weightDeltaNonPositive": "{{value}} كجم آخر 30 يوم",
+    "weightDeltaPositive": "+{{value}} كجم آخر ٣٠ يومًا",
+    "weightDeltaNonPositive": "{{value}} كجم آخر ٣٠ يومًا",
     "averageSteps": "متوسط الخطوات",
-    "last7DaysShort": "آخر 7 أيام",
+    "last7DaysShort": "آخر ٧ أيام",
     "workoutsThisWeek": "التمارين هذا الأسبوع",
     "weeklyReviewTitle": "تقييم هِمّة الأسبوعي",
     "weeklyReviewEmpty": "سجّل تمرينًا أو خطواتك أو نومك، ويجيك تقييم أسبوعك هنا.",
@@ -258,11 +258,11 @@
     "pulseToday": "نبض الفريق اليوم",
     "leaderboard": "الترتيب",
     "youSuffix": " (أنت)",
-    "members": "الأعضاء ({{count}})",
+    "members": "الأعضاء ({{total}})",
     "challenges": "التحديات",
     "newChallenge": "تحدٍ جديد",
     "noChallenges": "لا توجد تحديات بعد.",
-    "dateRange": "{{start}} → {{end}}",
+    "dateRange": "{{start}} — {{end}}",
     "myCommitment": "التزامك: {{percent}}%"
   },
   "teamCreate": {
@@ -430,7 +430,7 @@
     "restoreError": "تعذّر استعادة المشتريات",
     "perMonth": "/ شهريًا",
     "startTrial": "ابدأ التجربة المجانية",
-    "trialLine": "مجانًا {{count}} {{unit}}، ثم {{price}} {{period}} تلقائيًا. يمكنك الإلغاء في أي وقت.",
+    "trialLine": "مجانًا {{days}} {{unit}}، ثم {{price}} {{period}} تلقائيًا. يمكنك الإلغاء في أي وقت.",
     "trialUnit": {
       "day_zero": "يوم",
       "day_one": "يوم",
@@ -454,7 +454,7 @@
       "year_many": "سنة",
       "year_other": "سنة"
     },
-    "renewalTerms": "يتجدد الاشتراك تلقائيًا ما لم تُلغِ التجديد قبل نهاية الفترة الحالية بـ 24 ساعة على الأقل. الإلغاء وإدارة الاشتراك من إعدادات جهازك ← الاشتراكات.",
+    "renewalTerms": "يتجدد الاشتراك تلقائيًا ما لم تُلغِ التجديد قبل نهاية الفترة الحالية بـ ٢٤ ساعة على الأقل. الإلغاء وإدارة الاشتراك من إعدادات جهازك ← الاشتراكات.",
     "termsOfUse": "شروط الاستخدام",
     "privacyPolicy": "سياسة الخصوصية",
     "nothingToRestore": "لم نجد أي مشتريات سابقة على حساب Apple هذا. تأكد أنك مسجّل بنفس الحساب الذي اشتريت به.",
@@ -462,11 +462,11 @@
     "perMonthEquivalent": "يعادل {{value}} ريال شهريًا",
     "noChargeToday": "ما راح يُخصم منك شيء اليوم",
     "timeline": {
-      "heading_one": "كيف تمشي التجربة المجانية ({{count}} يوم)",
+      "heading_one": "كيف تمشي التجربة المجانية ({{days}} يوم)",
       "heading_two": "كيف تمشي التجربة المجانية (يومان)",
-      "heading_few": "كيف تمشي التجربة المجانية ({{count}} أيام)",
-      "heading_many": "كيف تمشي التجربة المجانية ({{count}} يومًا)",
-      "heading_other": "كيف تمشي التجربة المجانية ({{count}} يوم)",
+      "heading_few": "كيف تمشي التجربة المجانية ({{days}} أيام)",
+      "heading_many": "كيف تمشي التجربة المجانية ({{days}} يومًا)",
+      "heading_other": "كيف تمشي التجربة المجانية ({{days}} يوم)",
       "todayTitle": "اليوم",
       "todayBody": "تفتح كل مزايا هِمّة+ فورًا — بلا أي خصم.",
       "reminderTitle": "التذكير",
@@ -532,13 +532,13 @@
     "usersTitle": "المستخدمون",
     "totalUsers": "الإجمالي",
     "onboarded": "أكملوا التسجيل",
-    "new7": "جدد خلال 7 أيام",
-    "new30": "جدد خلال 30 يومًا",
+    "new7": "جدد خلال ٧ أيام",
+    "new30": "جدد خلال ٣٠ يومًا",
     "subscriptionsTitle": "الاشتراكات",
     "activePremium": "مشتركون فعليًا",
     "renewing": "سيتجددون",
     "expired": "منتهية",
-    "activityTitle": "النشاط اليومي (30 يومًا)",
+    "activityTitle": "النشاط اليومي (٣٠ يومًا)",
     "noActivity": "لا يوجد نشاط مسجّل بعد.",
     "avgCompletion": "متوسط الإنجاز {{value}}%",
     "entry": "لوحة الإدارة"

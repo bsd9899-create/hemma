@@ -12,7 +12,7 @@ import { join } from 'path';
  * أيضًا — لأنها ستكون `undefined` عند أول استدعاء.
  */
 
-const HARNESS = join(__dirname, 'allScreens.test.tsx');
+const HARNESS = join(__dirname, '../screenMocks.tsx');
 const REPOSITORIES = join(__dirname, '../../data/repositories');
 
 const harness = readFileSync(HARNESS, 'utf8');

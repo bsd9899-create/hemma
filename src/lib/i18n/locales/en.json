@@ -216,8 +216,8 @@
     "caloriesOver": "{{value}} over",
     "stepsRemaining": "{{value}} left",
     "stepsDone": "Done ✅",
-    "streakLabel_one": "{{count}}-day streak",
-    "streakLabel_other": "{{count}}-day streak"
+    "streakLabel_one": "{{days}}-day streak",
+    "streakLabel_other": "{{days}}-day streak"
   },
   "progress": {
     "title": "My progress",
@@ -255,7 +255,7 @@
     "pulseToday": "Team pulse today",
     "leaderboard": "Leaderboard",
     "youSuffix": " (you)",
-    "members": "Members ({{count}})",
+    "members": "Members ({{total}})",
     "challenges": "Challenges",
     "newChallenge": "New challenge",
     "noChallenges": "No challenges yet.",
@@ -427,7 +427,7 @@
     "restoreError": "Couldn't restore purchases",
     "perMonth": "/ month",
     "startTrial": "Start free trial",
-    "trialLine": "Free for {{count}} {{unit}}, then {{price}} {{period}} automatically. Cancel anytime.",
+    "trialLine": "Free for {{days}} {{unit}}, then {{price}} {{period}} automatically. Cancel anytime.",
     "trialUnit": {
       "day_one": "day",
       "day_other": "days",
@@ -446,8 +446,8 @@
     "perMonthEquivalent": "Works out to {{value}} SAR a month",
     "noChargeToday": "You won't be charged today",
     "timeline": {
-      "heading_one": "How the {{count}}-day free trial works",
-      "heading_other": "How the {{count}}-day free trial works",
+      "heading_one": "How the {{days}}-day free trial works",
+      "heading_other": "How the {{days}}-day free trial works",
       "todayTitle": "Today",
       "todayBody": "Every HEMMA+ feature unlocks straight away — no charge.",
       "reminderTitle": "Reminder",

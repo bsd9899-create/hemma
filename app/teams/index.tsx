@@ -18,6 +18,7 @@ import {
 import { spacing } from '@/src/design-system/spacing';
 import { useAuthStore } from '@/src/features/auth/store';
 import { useTeamData } from '@/src/features/teams/useTeamData';
+import { formatNumber, formatShortDate } from '@/src/lib/i18n/format';
 
 export default function TeamsScreen() {
   const { t } = useTranslation();
@@ -114,7 +115,7 @@ export default function TeamsScreen() {
 
         <Card variant="soft">
           <Text variant="overline" color="textSecondary">
-            {t('teams.members', { count: data.roster.length })}
+            {t('teams.members', { count: data.roster.length, total: formatNumber(data.roster.length) })}
           </Text>
           <View style={{ marginTop: spacing.sm, gap: spacing.xs }}>
             {data.roster.map((member) => (
@@ -147,7 +148,10 @@ export default function TeamsScreen() {
                 <View key={challenge.id}>
                   <Text variant="bodyStrong">{challenge.title}</Text>
                   <Text variant="caption" color="textSecondary">
-                    {t('teams.dateRange', { start: challenge.start_date, end: challenge.end_date })}
+                    {t('teams.dateRange', {
+                      start: formatShortDate(challenge.start_date),
+                      end: formatShortDate(challenge.end_date),
+                    })}
                   </Text>
                   <View style={{ marginTop: spacing.xs }}>
                     <ProgressBar progress={challenge.myProgressPercent / 100} />

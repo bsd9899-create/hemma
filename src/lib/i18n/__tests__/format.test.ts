@@ -1,38 +1,93 @@
-import { formatNumber } from '../format';
+import i18n from '../index';
+import { formatBirthDate, formatLongDate, formatNumber, formatShortDate, formatTime, formattingLocale } from '../format';
 
 /**
- * اختبار انحدار لانهيار حقيقي في شاشة اليوم:
- * "TypeError: Cannot read property 'toLocaleString' of undefined".
+ * شكل الأرقام في التطبيق قرار، لا نتيجة لما تحمله المنصّة من بيانات ICU.
  *
- * السبب الجذري كان ترحيلًا لم يُطبَّق (user_goals بلا target_calories)،
- * فوصلت undefined إلى formatNumber رغم أن النوع يقول number — الأنواع
- * لا تُفرض على بيانات الشبكة. أُصلح الجذر في الترحيلات، وهذه الاختبارات
- * تضمن ألا يعود العرض نفسه سببًا لانهيار الشاشة مهما وصلته.
+ * ‏'ar' وحدها تُشتقّ منها أنظمة أرقام مختلفة باختلاف الجهاز — رأينا
+ * ١٢٬٤٨٠ و12,480 من نفس السطر — فتظهر أرقام لاتينية وسط نصوص عربية
+ * أرقامها هندية بلا سبب ظاهر. هذه الاختبارات تثبّت القرار.
  */
-describe('formatNumber — لا ينهار على البيانات الناقصة', () => {
-  it('لا يرمي على undefined (الانهيار الأصلي)', () => {
-    expect(() => formatNumber(undefined)).not.toThrow();
-    expect(formatNumber(undefined)).toBe('—');
+describe('نظام الأرقام محسوم لا متروك للجهاز', () => {
+  afterEach(() => {
+    i18n.changeLanguage('ar');
   });
 
-  it('لا يرمي على null', () => {
-    expect(formatNumber(null)).toBe('—');
+  it('العربية تستعمل الأرقام العربية الهندية صراحةً', () => {
+    expect(formattingLocale()).toBe('ar-u-nu-arab');
   });
 
-  it('يعرض شرطة لا صفرًا للقيمة المفقودة', () => {
-    // الصفر رقم يعني "لا شيء"؛ الغياب يعني "لا نعرف". عرض 0 مكان
-    // قيمة مفقودة اختراع بيانات.
-    expect(formatNumber(undefined)).not.toBe('0');
-    expect(formatNumber(undefined)).not.toBe('٠');
+  it('لا يعتمد التنسيق على النظام الافتراضي للجهاز', () => {
+    // لو كان الاعتماد على 'ar' المجرّدة، لاختلفت النتيجة بين بيئة وأخرى.
+    expect(formatNumber(12480)).toMatch(/^[٠-٩٬،.,\s]+$/);
+    expect(formatNumber(12480)).toMatch(/[٠-٩]/);
   });
 
-  it('يتعامل مع NaN وInfinity كقيم مفقودة', () => {
-    expect(formatNumber(NaN)).toBe('—');
-    expect(formatNumber(Infinity)).toBe('—');
+  it('الإنجليزية تستعمل الأرقام اللاتينية', async () => {
+    await i18n.changeLanguage('en');
+    expect(formattingLocale()).toBe('en');
+    expect(formatNumber(12480)).toBe('12,480');
   });
 
-  it('ما زال يُنسّق الأرقام الحقيقية، والصفر رقم حقيقي', () => {
+  it('يفصل الآلاف في اللغتين', async () => {
+    expect(formatNumber(12480)).not.toBe('١٢٤٨٠');
+    await i18n.changeLanguage('en');
+    expect(formatNumber(12480)).toBe('12,480');
+  });
+});
+
+describe('الغياب يظهر كغياب لا كصفر', () => {
+  it.each([
+    ['null', null],
+    ['undefined', undefined],
+    ['NaN', NaN],
+    ['Infinity', Infinity],
+  ])('%s يصبح شرطة', (_name, value) => {
+    expect(formatNumber(value as number)).toBe('—');
+  });
+
+  it('الصفر رقم حقيقي ويُعرض', () => {
     expect(formatNumber(0)).not.toBe('—');
-    expect(formatNumber(1500)).toMatch(/1|١/);
+  });
+});
+
+describe('التواريخ تُعرض مقروءة لا خامًا', () => {
+  it('التاريخ القصير لا يعيد صيغة ISO', () => {
+    const shown = formatShortDate('2026-09-07');
+    expect(shown).not.toBe('2026-09-07');
+    expect(shown).toMatch(/[؀-ۿ]/);
+  });
+
+  it('تاريخ الميلاد يُعرض بالشهر مكتوبًا', () => {
+    expect(formatBirthDate('1996-01-15')).toMatch(/[؀-ۿ]/);
+    expect(formatBirthDate('1996-01-15')).not.toContain('1996-01-15');
+  });
+
+  it('تاريخ الميلاد الغائب شرطة لا فراغ', () => {
+    expect(formatBirthDate(null)).toBe('—');
+    expect(formatBirthDate(undefined)).toBe('—');
+  });
+
+  /**
+   * تاريخ غير صالح يُعاد كما هو بدل أن يختفي: اختفاء الحقل يخفي المشكلة،
+   * وعرض النص الأصلي يجعلها مرئية دون انهيار.
+   */
+  it('التاريخ غير الصالح يُعاد كما هو لا يختفي', () => {
+    expect(formatShortDate('ليس تاريخًا')).toBe('ليس تاريخًا');
+    expect(formatBirthDate('غير صالح')).toBe('غير صالح');
+  });
+
+  it('التاريخ الطويل لا ينهار على قيمة غير صالحة', () => {
+    expect(formatLongDate(new Date('غير صالح'))).toBe('');
+  });
+
+  it('الوقت لا ينهار على نص غير صالح', () => {
+    expect(formatTime('ليس وقتًا')).toBe('');
+  });
+
+  it('تاريخ قصير لا يزحف يومًا بسبب المنطقة الزمنية', () => {
+    // "2026-09-07" بلا وقت يُفسَّر UTC فيصبح ٦ سبتمبر غرب غرينتش.
+    // نضيف T00:00:00 عمدًا ليُفسَّر بالتوقيت المحلي.
+    expect(formatShortDate('2026-09-07')).toContain('٧');
   });
 });
