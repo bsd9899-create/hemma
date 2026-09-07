@@ -3,6 +3,7 @@ import { RefreshControl, ScrollView, View } from 'react-native';
 import { useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import {
+  Appear,
   Badge,
   Button,
   Card,
@@ -103,167 +104,169 @@ export default function ExerciseDetailScreen() {
   return (
     <Screen>
       <ScreenHeader title={name} action="back" />
-      <ScrollView
-        contentContainerStyle={{ gap: spacing.md, paddingBottom: spacing.xxxl }}
-        showsVerticalScrollIndicator={false}
-        refreshControl={
-          // الأرقام القياسية وآخر أداء يتغيّران بعد تسجيل مجموعات من
-          // شاشة أخرى — بلا سحب للتحديث يبقى الرقم قديمًا بلا سبب ظاهر.
-          <RefreshControl refreshing={isLoading} onRefresh={() => void load()} tintColor={colors.primary} />
-        }
-      >
-        {/* العضلات المستهدفة */}
-        <Card style={{ gap: spacing.sm }}>
-          <Text variant="overline" color="textSecondary">
-            {t('exercises.targetMuscles')}
-          </Text>
-          <View style={{ flexDirection: rowDirection, gap: spacing.xs, flexWrap: 'wrap' }}>
-            <Badge label={t(muscleLabelKey(exercise.primary_muscle))} tone="accent" />
-            {exercise.secondary_muscles.map((m) => (
-              <Badge key={m} label={t(muscleLabelKey(m))} tone="neutral" />
-            ))}
-          </View>
-          <View style={{ flexDirection: rowDirection, gap: spacing.xs, flexWrap: 'wrap' }}>
-            <Badge label={t(`exercises.equipment.${exercise.equipment}`)} tone="neutral" />
-          </View>
-        </Card>
+      <Appear style={{ flex: 1 }}>
+        <ScrollView
+          contentContainerStyle={{ gap: spacing.md, paddingBottom: spacing.xxxl }}
+          showsVerticalScrollIndicator={false}
+          refreshControl={
+            // الأرقام القياسية وآخر أداء يتغيّران بعد تسجيل مجموعات من
+            // شاشة أخرى — بلا سحب للتحديث يبقى الرقم قديمًا بلا سبب ظاهر.
+            <RefreshControl refreshing={isLoading} onRefresh={() => void load()} tintColor={colors.primary} />
+          }
+        >
+          {/* العضلات المستهدفة */}
+          <Card style={{ gap: spacing.sm }}>
+            <Text variant="overline" color="textSecondary">
+              {t('exercises.targetMuscles')}
+            </Text>
+            <View style={{ flexDirection: rowDirection, gap: spacing.xs, flexWrap: 'wrap' }}>
+              <Badge label={t(muscleLabelKey(exercise.primary_muscle))} tone="accent" />
+              {exercise.secondary_muscles.map((m) => (
+                <Badge key={m} label={t(muscleLabelKey(m))} tone="neutral" />
+              ))}
+            </View>
+            <View style={{ flexDirection: rowDirection, gap: spacing.xs, flexWrap: 'wrap' }}>
+              <Badge label={t(`exercises.equipment.${exercise.equipment}`)} tone="neutral" />
+            </View>
+          </Card>
 
 
-        {/* الوسيط المرخَّص، حين يوجد. الشرط مزدوج عمدًا: رابط بلا
-            ترخيص مسجَّل لا يُعرض — راجع docs/EXERCISE_MEDIA.md. */}
-        {exercise.media_url && exercise.media_license ? (
-          <ExerciseMedia
-            url={exercise.media_url}
-            attribution={exercise.media_attribution}
-            label={isArabic ? exercise.name_ar : exercise.name_en}
-          />
-        ) : null}
+          {/* الوسيط المرخَّص، حين يوجد. الشرط مزدوج عمدًا: رابط بلا
+              ترخيص مسجَّل لا يُعرض — راجع docs/EXERCISE_MEDIA.md. */}
+          {exercise.media_url && exercise.media_license ? (
+            <ExerciseMedia
+              url={exercise.media_url}
+              attribution={exercise.media_attribution}
+              label={isArabic ? exercise.name_ar : exercise.name_en}
+            />
+          ) : null}
 
-        {/* ─────────────────────────────────────────────────────────
-            مكان الحركة.
+          {/* ─────────────────────────────────────────────────────────
+              مكان الحركة.
 
-            ما دامت الوسائط غير مرخّصة، هذا الموضع ليس فراغًا يُعتذر عنه:
-            من يفتح صفحة تمرين يريد أن يعرف كيف يؤدّيه، لا أن يقرأ عن
-            تراخيصنا. فالخطوات ونقاط الانتباه — وهي ما يقوم مقام الفيديو
-            فعلًا — تصعد إلى هنا، فوق الأرقام القياسية.
+              ما دامت الوسائط غير مرخّصة، هذا الموضع ليس فراغًا يُعتذر عنه:
+              من يفتح صفحة تمرين يريد أن يعرف كيف يؤدّيه، لا أن يقرأ عن
+              تراخيصنا. فالخطوات ونقاط الانتباه — وهي ما يقوم مقام الفيديو
+              فعلًا — تصعد إلى هنا، فوق الأرقام القياسية.
 
-            وحين يُضاف وسيط مرخَّص يظهر في هذا الموضع نفسه وتبقى الخطوات
-            تحته: الترتيب لا يتغيّر، يُضاف إليه فقط.
-            ───────────────────────────────────────────────────────── */}
-        {/* طريقة الأداء */}
-        {instructions.length > 0 ? (
-          <>
-            <SectionHeader title={t('exercises.howTo')} />
-            <Card style={{ gap: spacing.sm }}>
-              {instructions.map((step, i) => (
-                <View key={step} style={{ flexDirection: rowDirection, gap: spacing.sm }}>
-                  <Text variant="bodyStrong" color="primary">
-                    {formatNumber(i + 1)}
-                  </Text>
-                  <Text variant="body" style={{ flex: 1 }}>
-                    {step}
-                  </Text>
-                </View>
+              وحين يُضاف وسيط مرخَّص يظهر في هذا الموضع نفسه وتبقى الخطوات
+              تحته: الترتيب لا يتغيّر، يُضاف إليه فقط.
+              ───────────────────────────────────────────────────────── */}
+          {/* طريقة الأداء */}
+          {instructions.length > 0 ? (
+            <>
+              <SectionHeader title={t('exercises.howTo')} />
+              <Card style={{ gap: spacing.sm }}>
+                {instructions.map((step, i) => (
+                  <View key={step} style={{ flexDirection: rowDirection, gap: spacing.sm }}>
+                    <Text variant="bodyStrong" color="primary">
+                      {formatNumber(i + 1)}
+                    </Text>
+                    <Text variant="body" style={{ flex: 1 }}>
+                      {step}
+                    </Text>
+                  </View>
+                ))}
+              </Card>
+            </>
+          ) : null}
+
+          {isArabic && exercise.cues_ar.length > 0 ? (
+            <Card variant="soft" style={{ gap: spacing.xs }}>
+              <Text variant="captionStrong">{t('exercises.cues')}</Text>
+              {exercise.cues_ar.map((cue) => (
+                <Text key={cue} variant="caption" color="textSecondary">
+                  • {cue}
+                </Text>
               ))}
             </Card>
-          </>
-        ) : null}
+          ) : null}
 
-        {isArabic && exercise.cues_ar.length > 0 ? (
-          <Card variant="soft" style={{ gap: spacing.xs }}>
-            <Text variant="captionStrong">{t('exercises.cues')}</Text>
-            {exercise.cues_ar.map((cue) => (
-              <Text key={cue} variant="caption" color="textSecondary">
-                • {cue}
+          {/* الأرقام القياسية */}
+          <SectionHeader title={t('exercises.records')} />
+          <Card style={{ gap: spacing.sm }}>
+            {record === null || record.total_sets === 0 ? (
+              <Text variant="caption" color="textSecondary">
+                {t('exercises.noRecordsYet')}
               </Text>
-            ))}
+            ) : (
+              <>
+                {record.max_weight_kg !== null ? (
+                  <RecordRow label={t('exercises.maxWeight')} value={`${formatNumber(record.max_weight_kg)} ${t('common.kg')}`} />
+                ) : null}
+                {record.max_reps !== null ? (
+                  <RecordRow label={t('exercises.maxReps')} value={formatNumber(record.max_reps)} />
+                ) : null}
+                {record.max_duration_seconds !== null ? (
+                  <RecordRow
+                    label={t('exercises.maxDuration')}
+                    value={t('exercises.seconds', { value: formatNumber(record.max_duration_seconds) })}
+                  />
+                ) : null}
+                {record.estimated_1rm_kg !== null ? (
+                  <>
+                    <RecordRow
+                      label={t('exercises.estimated1rm')}
+                      value={`${formatNumber(record.estimated_1rm_kg)} ${t('common.kg')}`}
+                    />
+                    {/* تقدير لا قياس — قولها بدل تركها تُقرأ كرقم مؤكد. */}
+                    <Text variant="caption" color="textSecondary">
+                      {t('exercises.estimated1rmNote')}
+                    </Text>
+                  </>
+                ) : null}
+                <RecordRow label={t('exercises.totalSets')} value={formatNumber(record.total_sets)} />
+              </>
+            )}
           </Card>
-        ) : null}
 
-        {/* الأرقام القياسية */}
-        <SectionHeader title={t('exercises.records')} />
-        <Card style={{ gap: spacing.sm }}>
-          {record === null || record.total_sets === 0 ? (
-            <Text variant="caption" color="textSecondary">
-              {t('exercises.noRecordsYet')}
-            </Text>
-          ) : (
-            <>
-              {record.max_weight_kg !== null ? (
-                <RecordRow label={t('exercises.maxWeight')} value={`${formatNumber(record.max_weight_kg)} ${t('common.kg')}`} />
-              ) : null}
-              {record.max_reps !== null ? (
-                <RecordRow label={t('exercises.maxReps')} value={formatNumber(record.max_reps)} />
-              ) : null}
-              {record.max_duration_seconds !== null ? (
-                <RecordRow
-                  label={t('exercises.maxDuration')}
-                  value={t('exercises.seconds', { value: formatNumber(record.max_duration_seconds) })}
-                />
-              ) : null}
-              {record.estimated_1rm_kg !== null ? (
-                <>
-                  <RecordRow
-                    label={t('exercises.estimated1rm')}
-                    value={`${formatNumber(record.estimated_1rm_kg)} ${t('common.kg')}`}
-                  />
-                  {/* تقدير لا قياس — قولها بدل تركها تُقرأ كرقم مؤكد. */}
-                  <Text variant="caption" color="textSecondary">
-                    {t('exercises.estimated1rmNote')}
-                  </Text>
-                </>
-              ) : null}
-              <RecordRow label={t('exercises.totalSets')} value={formatNumber(record.total_sets)} />
-            </>
-          )}
-        </Card>
-
-        {/* آخر أداء — أهم رقم قبل التسجيل */}
-        <SectionHeader title={t('exercises.lastSession')} />
-        <Card style={{ gap: spacing.sm }}>
-          {lastSession.length === 0 ? (
-            <Text variant="caption" color="textSecondary">
-              {t('exercises.noHistoryYet')}
-            </Text>
-          ) : (
-            <>
-              {lastSession.map((s) => (
-                <View
-                  key={s.id}
-                  style={{ flexDirection: rowDirection, justifyContent: 'space-between', alignItems: 'center' }}
-                >
-                  <Text variant="caption" color="textSecondary">
-                    {s.is_warmup
-                      ? t('exercises.warmupSet', { number: formatNumber(s.set_number) })
-                      : t('exercises.setNumber', { number: formatNumber(s.set_number) })}
-                  </Text>
-                  <Text variant="bodyStrong">{describeSet(s, t)}</Text>
-                </View>
-              ))}
-              {lastVolume > 0 ? (
-                <View style={{ borderTopWidth: 1, borderTopColor: colors.divider, paddingTop: spacing.sm }}>
-                  <RecordRow
-                    label={t('exercises.volume')}
-                    value={`${formatNumber(Math.round(lastVolume))} ${t('common.kg')}`}
-                  />
-                  <Text variant="caption" color="textSecondary">
-                    {t('exercises.volumeNote', { sets: formatNumber(workingSetCount(lastSession)) })}
-                  </Text>
-                </View>
-              ) : null}
-            </>
-          )}
-        </Card>
+          {/* آخر أداء — أهم رقم قبل التسجيل */}
+          <SectionHeader title={t('exercises.lastSession')} />
+          <Card style={{ gap: spacing.sm }}>
+            {lastSession.length === 0 ? (
+              <Text variant="caption" color="textSecondary">
+                {t('exercises.noHistoryYet')}
+              </Text>
+            ) : (
+              <>
+                {lastSession.map((s) => (
+                  <View
+                    key={s.id}
+                    style={{ flexDirection: rowDirection, justifyContent: 'space-between', alignItems: 'center' }}
+                  >
+                    <Text variant="caption" color="textSecondary">
+                      {s.is_warmup
+                        ? t('exercises.warmupSet', { number: formatNumber(s.set_number) })
+                        : t('exercises.setNumber', { number: formatNumber(s.set_number) })}
+                    </Text>
+                    <Text variant="bodyStrong">{describeSet(s, t)}</Text>
+                  </View>
+                ))}
+                {lastVolume > 0 ? (
+                  <View style={{ borderTopWidth: 1, borderTopColor: colors.divider, paddingTop: spacing.sm }}>
+                    <RecordRow
+                      label={t('exercises.volume')}
+                      value={`${formatNumber(Math.round(lastVolume))} ${t('common.kg')}`}
+                    />
+                    <Text variant="caption" color="textSecondary">
+                      {t('exercises.volumeNote', { sets: formatNumber(workingSetCount(lastSession)) })}
+                    </Text>
+                  </View>
+                ) : null}
+              </>
+            )}
+          </Card>
 
 
-        <InlineMessage tone="info" message={t('exercises.safetyNote')} />
+          <InlineMessage tone="info" message={t('exercises.safetyNote')} />
 
-        <Button
-          label={t('exercises.logSets')}
-          size="lg"
-          onPress={() => router.push(`/exercises/${exercise.id}/log`)}
-        />
-      </ScrollView>
+          <Button
+            label={t('exercises.logSets')}
+            size="lg"
+            onPress={() => router.push(`/exercises/${exercise.id}/log`)}
+          />
+        </ScrollView>
+      </Appear>
     </Screen>
   );
 }

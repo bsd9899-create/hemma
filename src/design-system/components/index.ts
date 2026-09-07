@@ -11,3 +11,4 @@ export { TextField } from './TextField';
 export { ProgressRing } from './ProgressRing';
 export { EmptyState, ErrorState, InlineMessage } from './States';
 export { Skeleton, TodaySkeleton, ProgressSkeleton, TeamsSkeleton, AccountabilitySkeleton } from './Skeleton';
+export { Appear } from './Appear';

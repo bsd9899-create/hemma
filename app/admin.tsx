@@ -3,6 +3,7 @@ import { RefreshControl, ScrollView, View } from 'react-native';
 import { useFocusEffect } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import {
+  Appear,
   Card,
   ErrorState,
   Screen,
@@ -65,59 +66,61 @@ export default function AdminScreen() {
   return (
     <Screen>
       <ScreenHeader title={t('admin.title')} action="back" />
-      <ScrollView
-        contentContainerStyle={{ gap: spacing.md, paddingBottom: spacing.xxxl }}
-        showsVerticalScrollIndicator={false}
-        refreshControl={<RefreshControl refreshing={isLoading} onRefresh={load} tintColor={colors.primary} />}
-      >
-        {error ? <ErrorState message={error} onRetry={() => void load()} retryLabel={t('common.retry')} /> : null}
+      <Appear style={{ flex: 1 }}>
+        <ScrollView
+          contentContainerStyle={{ gap: spacing.md, paddingBottom: spacing.xxxl }}
+          showsVerticalScrollIndicator={false}
+          refreshControl={<RefreshControl refreshing={isLoading} onRefresh={load} tintColor={colors.primary} />}
+        >
+          {error ? <ErrorState message={error} onRetry={() => void load()} retryLabel={t('common.retry')} /> : null}
 
-        {!overview && isLoading ? (
-          <View style={{ gap: spacing.sm }}>
-            <Skeleton height={120} />
-            <Skeleton height={120} />
-          </View>
-        ) : null}
+          {!overview && isLoading ? (
+            <View style={{ gap: spacing.sm }}>
+              <Skeleton height={120} />
+              <Skeleton height={120} />
+            </View>
+          ) : null}
 
-        {overview ? (
-          <>
-            <SectionHeader title={t('admin.usersTitle')} />
-            <Card style={{ gap: spacing.sm }}>
-              <StatRow label={t('admin.totalUsers')} value={overview.users?.total_users} />
-              <StatRow label={t('admin.onboarded')} value={overview.users?.onboarded_users} />
-              <StatRow label={t('admin.new7')} value={overview.users?.new_last_7_days} />
-              <StatRow label={t('admin.new30')} value={overview.users?.new_last_30_days} />
-            </Card>
+          {overview ? (
+            <>
+              <SectionHeader title={t('admin.usersTitle')} />
+              <Card style={{ gap: spacing.sm }}>
+                <StatRow label={t('admin.totalUsers')} value={overview.users?.total_users} />
+                <StatRow label={t('admin.onboarded')} value={overview.users?.onboarded_users} />
+                <StatRow label={t('admin.new7')} value={overview.users?.new_last_7_days} />
+                <StatRow label={t('admin.new30')} value={overview.users?.new_last_30_days} />
+              </Card>
 
-            <SectionHeader title={t('admin.subscriptionsTitle')} />
-            <Card style={{ gap: spacing.sm }}>
-              <StatRow label={t('admin.activePremium')} value={overview.subscriptions?.active_premium} />
-              <StatRow label={t('admin.renewing')} value={overview.subscriptions?.renewing} />
-              <StatRow label={t('admin.expired')} value={overview.subscriptions?.expired} />
-            </Card>
+              <SectionHeader title={t('admin.subscriptionsTitle')} />
+              <Card style={{ gap: spacing.sm }}>
+                <StatRow label={t('admin.activePremium')} value={overview.subscriptions?.active_premium} />
+                <StatRow label={t('admin.renewing')} value={overview.subscriptions?.renewing} />
+                <StatRow label={t('admin.expired')} value={overview.subscriptions?.expired} />
+              </Card>
 
-            <SectionHeader title={t('admin.activityTitle')} />
-            <Card style={{ gap: spacing.sm }}>
-              {overview.activity.length === 0 ? (
-                <Text variant="caption" color="textSecondary">
-                  {t('admin.noActivity')}
-                </Text>
-              ) : (
-                overview.activity.map((day) => (
-                  <StatRow
-                    key={day.date}
-                    label={formatShortDate(day.date)}
-                    value={day.active_users}
-                    suffix={t('admin.avgCompletion', {
-                      value: formatNumber(day.avg_completion_percent ?? 0),
-                    })}
-                  />
-                ))
-              )}
-            </Card>
-          </>
-        ) : null}
-      </ScrollView>
+              <SectionHeader title={t('admin.activityTitle')} />
+              <Card style={{ gap: spacing.sm }}>
+                {overview.activity.length === 0 ? (
+                  <Text variant="caption" color="textSecondary">
+                    {t('admin.noActivity')}
+                  </Text>
+                ) : (
+                  overview.activity.map((day) => (
+                    <StatRow
+                      key={day.date}
+                      label={formatShortDate(day.date)}
+                      value={day.active_users}
+                      suffix={t('admin.avgCompletion', {
+                        value: formatNumber(day.avg_completion_percent ?? 0),
+                      })}
+                    />
+                  ))
+                )}
+              </Card>
+            </>
+          ) : null}
+        </ScrollView>
+      </Appear>
     </Screen>
   );
 }

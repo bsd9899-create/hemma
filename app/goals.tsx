@@ -3,6 +3,7 @@ import { KeyboardAvoidingView, Platform, ScrollView, View } from 'react-native';
 import { useFocusEffect } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import {
+  Appear,
   Button,
   Card,
   ErrorState,
@@ -227,81 +228,83 @@ export default function GoalsScreen() {
   return (
     <Screen>
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
+        <Appear style={{ flex: 1 }}>
         <ScrollView
-          contentContainerStyle={{ gap: spacing.lg, paddingBottom: spacing.xxxl }}
-          keyboardShouldPersistTaps="handled"
-          keyboardDismissMode="on-drag"
-          showsVerticalScrollIndicator={false}
-        >
-          <ScreenHeader title={t('goals.title')} subtitle={t('goals.subtitle')} action="back" />
+            contentContainerStyle={{ gap: spacing.lg, paddingBottom: spacing.xxxl }}
+            keyboardShouldPersistTaps="handled"
+            keyboardDismissMode="on-drag"
+            showsVerticalScrollIndicator={false}
+          >
+            <ScreenHeader title={t('goals.title')} subtitle={t('goals.subtitle')} action="back" />
 
-          <Card style={{ gap: spacing.md }}>
-            <SectionHeader title={t('goals.activitySection')} />
-            <View style={{ flexDirection: rowDirection, gap: spacing.sm }}>
-              {numberField('target_steps', t('goals.steps'))}
-              {numberField('target_sleep_hours', t('goals.sleepHours'), true)}
-            </View>
-            {numberField('target_workouts_per_week', t('goals.workoutsPerWeek'))}
-          </Card>
-
-          {suggested ? (
-            <Card variant="soft" style={{ gap: spacing.sm }}>
-              <SectionHeader title={t('goals.suggestedTitle')} />
-              <Text variant="body">
-                {t('goals.suggestedBody', {
-                  calories: formatNumber(suggested.calories),
-                  protein: formatNumber(suggested.proteinG),
-                  carbs: formatNumber(suggested.carbsG),
-                  fat: formatNumber(suggested.fatG),
-                })}
-              </Text>
-              <Text variant="caption" color="textSecondary">
-                {t('goals.suggestedBasis', {
-                  bmr: formatNumber(suggested.bmr),
-                  tdee: formatNumber(suggested.tdee),
-                })}
-              </Text>
-              {suggested.deficitLimitedBySafetyFloor ? (
-                <InlineMessage tone="success" message={t('goals.suggestedFloor')} />
-              ) : null}
-              <Button label={t('goals.suggestedApply')} variant="secondary" onPress={applySuggested} />
+            <Card style={{ gap: spacing.md }}>
+              <SectionHeader title={t('goals.activitySection')} />
+              <View style={{ flexDirection: rowDirection, gap: spacing.sm }}>
+                {numberField('target_steps', t('goals.steps'))}
+                {numberField('target_sleep_hours', t('goals.sleepHours'), true)}
+              </View>
+              {numberField('target_workouts_per_week', t('goals.workoutsPerWeek'))}
             </Card>
-          ) : (
-            <Card variant="soft">
-              <Text variant="caption" color="textSecondary">
-                {t('goals.suggestedMissing')}
-              </Text>
+
+            {suggested ? (
+              <Card variant="soft" style={{ gap: spacing.sm }}>
+                <SectionHeader title={t('goals.suggestedTitle')} />
+                <Text variant="body">
+                  {t('goals.suggestedBody', {
+                    calories: formatNumber(suggested.calories),
+                    protein: formatNumber(suggested.proteinG),
+                    carbs: formatNumber(suggested.carbsG),
+                    fat: formatNumber(suggested.fatG),
+                  })}
+                </Text>
+                <Text variant="caption" color="textSecondary">
+                  {t('goals.suggestedBasis', {
+                    bmr: formatNumber(suggested.bmr),
+                    tdee: formatNumber(suggested.tdee),
+                  })}
+                </Text>
+                {suggested.deficitLimitedBySafetyFloor ? (
+                  <InlineMessage tone="success" message={t('goals.suggestedFloor')} />
+                ) : null}
+                <Button label={t('goals.suggestedApply')} variant="secondary" onPress={applySuggested} />
+              </Card>
+            ) : (
+              <Card variant="soft">
+                <Text variant="caption" color="textSecondary">
+                  {t('goals.suggestedMissing')}
+                </Text>
+              </Card>
+            )}
+
+            <Card style={{ gap: spacing.md }}>
+              <SectionHeader title={t('goals.nutritionSection')} />
+              {numberField('target_calories', t('goals.calories'))}
+              <View style={{ flexDirection: rowDirection, gap: spacing.sm }}>
+                {numberField('target_protein_g', t('goals.protein'))}
+                {numberField('target_carbs_g', t('goals.carbs'))}
+                {numberField('target_fat_g', t('goals.fat'))}
+              </View>
             </Card>
-          )}
 
-          <Card style={{ gap: spacing.md }}>
-            <SectionHeader title={t('goals.nutritionSection')} />
-            {numberField('target_calories', t('goals.calories'))}
-            <View style={{ flexDirection: rowDirection, gap: spacing.sm }}>
-              {numberField('target_protein_g', t('goals.protein'))}
-              {numberField('target_carbs_g', t('goals.carbs'))}
-              {numberField('target_fat_g', t('goals.fat'))}
-            </View>
-          </Card>
+            <Card style={{ gap: spacing.md }}>
+              <SectionHeader title={t('goals.bodySection')} />
+              <TextField
+                label={t('goals.targetWeight')}
+                placeholder={t('goals.targetWeightOptional')}
+                value={fields.target_weight_kg}
+                onChangeText={(next) => setField('target_weight_kg', next)}
+                keyboardType="decimal-pad"
+                editable={!isSaving}
+                returnKeyType="done"
+              />
+            </Card>
 
-          <Card style={{ gap: spacing.md }}>
-            <SectionHeader title={t('goals.bodySection')} />
-            <TextField
-              label={t('goals.targetWeight')}
-              placeholder={t('goals.targetWeightOptional')}
-              value={fields.target_weight_kg}
-              onChangeText={(next) => setField('target_weight_kg', next)}
-              keyboardType="decimal-pad"
-              editable={!isSaving}
-              returnKeyType="done"
-            />
-          </Card>
+            {saveError ? <InlineMessage tone="danger" message={saveError} /> : null}
+            {savedAt ? <InlineMessage tone="success" message={t('goals.saved')} /> : null}
 
-          {saveError ? <InlineMessage tone="danger" message={saveError} /> : null}
-          {savedAt ? <InlineMessage tone="success" message={t('goals.saved')} /> : null}
-
-          <Button label={t('common.save')} size="lg" loading={isSaving} onPress={handleSave} />
-        </ScrollView>
+            <Button label={t('common.save')} size="lg" loading={isSaving} onPress={handleSave} />
+          </ScrollView>
+      </Appear>
       </KeyboardAvoidingView>
     </Screen>
   );

@@ -4,6 +4,7 @@ import { useRouter } from 'expo-router';
 import * as ImagePicker from 'expo-image-picker';
 import { useTranslation } from 'react-i18next';
 import {
+  Appear,
   Badge,
   Button,
   Card,
@@ -134,171 +135,173 @@ export default function FoodPhotoScreen() {
   return (
     <Screen>
       <ScreenHeader title={t('foodPhoto.title')} action="close" />
-      <ScrollView
-        contentContainerStyle={{ gap: spacing.md, paddingBottom: spacing.xxxl }}
-        keyboardShouldPersistTaps="handled"
-        showsVerticalScrollIndicator={false}
-      >
-        {imageUri ? (
-          <Image
-            source={{ uri: imageUri }}
-            style={{ width: '100%', height: 220, borderRadius: radius.lg }}
-            resizeMode="cover"
-            accessibilityLabel={t('foodPhoto.photoAlt')}
-          />
-        ) : (
-          <Card variant="soft" style={{ gap: spacing.sm }}>
-            <Text variant="bodyStrong">{t('foodPhoto.howItWorksTitle')}</Text>
-            <Text variant="caption" color="textSecondary">
-              {t('foodPhoto.howItWorksBody')}
-            </Text>
-          </Card>
-        )}
-
-        <View style={{ flexDirection: rowDirection, gap: spacing.sm }}>
-          <View style={{ flex: 1 }}>
-            <Button label={t('foodPhoto.takePhoto')} onPress={() => void pick('camera')} disabled={isAnalyzing} />
-          </View>
-          <View style={{ flex: 1 }}>
-            <Button
-              label={t('foodPhoto.choosePhoto')}
-              variant="secondary"
-              onPress={() => void pick('library')}
-              disabled={isAnalyzing}
+      <Appear style={{ flex: 1 }}>
+        <ScrollView
+          contentContainerStyle={{ gap: spacing.md, paddingBottom: spacing.xxxl }}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+        >
+          {imageUri ? (
+            <Image
+              source={{ uri: imageUri }}
+              style={{ width: '100%', height: 220, borderRadius: radius.lg }}
+              resizeMode="cover"
+              accessibilityLabel={t('foodPhoto.photoAlt')}
             />
-          </View>
-        </View>
-
-        {/* نوع الوجبة يُختار قبل الحفظ: بلا ذلك تُحفظ كل صورة كـ"غداء"
-            افتراضيًا، فيُفسد التصنيف شاشة التغذية بصمت. */}
-        <View style={{ gap: spacing.xs }}>
-          <Text variant="captionStrong" color="textSecondary">
-            {t('logNutrition.mealType')}
-          </Text>
-          <View style={{ flexDirection: rowDirection, gap: spacing.xs, flexWrap: 'wrap' }}>
-            {MEAL_TYPES.map((type) => {
-              const selected = mealType === type;
-              return (
-                <Pressable
-                  key={type}
-                  accessibilityRole="radio"
-                  accessibilityState={{ selected, checked: selected }}
-                  accessibilityLabel={t(`logNutrition.${type}`)}
-                  onPress={() => setMealType(type)}
-                  style={({ pressed }) => [
-                    {
-                      paddingHorizontal: spacing.md,
-                      paddingVertical: spacing.xs,
-                      borderRadius: radius.pill,
-                      backgroundColor: selected ? colors.primary : colors.surfaceAlt,
-                    },
-                    pressed && { opacity: 0.8 },
-                  ]}
-                >
-                  <Text variant="captionStrong" color={selected ? 'onPrimary' : 'textSecondary'}>
-                    {t(`logNutrition.${type}`)}
-                  </Text>
-                </Pressable>
-              );
-            })}
-          </View>
-        </View>
-
-        <TextField
-          label={t('foodPhoto.hintLabel')}
-          value={hint}
-          onChangeText={setHint}
-          placeholder={t('foodPhoto.hintPlaceholder')}
-        />
-
-        {isAnalyzing ? (
-          <View style={{ gap: spacing.sm }}>
-            <Skeleton height={24} />
-            <Skeleton height={90} />
-          </View>
-        ) : null}
-
-        {error ? <InlineMessage tone="danger" message={error} /> : null}
-
-        {analysis && !isAnalyzing ? (
-          <>
-            {/* الثقة تُعرض دائمًا: تقدير منخفض الثقة معروض كرقم واثق
-                هو أسوأ ما يمكن أن تفعله ميزة كهذه. */}
-            <View style={{ flexDirection: rowDirection, alignItems: 'center', gap: spacing.sm }}>
-              <Badge
-                label={t(`foodPhoto.confidence.${analysis.confidence}`)}
-                tone={analysis.confidence === 'high' ? 'accent' : 'neutral'}
-              />
-              <Text variant="caption" color="textSecondary" style={{ flex: 1 }}>
-                {t('foodPhoto.estimateDisclaimer')}
-              </Text>
-            </View>
-
-            {analysis.items.length === 0 ? (
-              <Card variant="soft">
-                <Text variant="body" color="textSecondary">
-                  {t('foodPhoto.nothingDetected')}
-                </Text>
-              </Card>
-            ) : (
-              <Card style={{ gap: spacing.sm }}>
-                {analysis.items.map((item, i) => (
-                  <View
-                    key={`${item.name_en}-${i}`}
-                    style={{ flexDirection: rowDirection, justifyContent: 'space-between', gap: spacing.sm }}
-                  >
-                    <Text variant="body" style={{ flex: 1 }}>
-                      {isArabic ? item.name_ar : item.name_en}
-                      {item.grams > 0 ? (
-                        <Text variant="caption" color="textSecondary">
-                          {'  '}
-                          {formatNumber(item.grams)} {t('common.grams')}
-                        </Text>
-                      ) : null}
-                    </Text>
-                    <Text variant="bodyStrong">
-                      {formatNumber(Math.round(item.calories))} {t('common.kcal')}
-                    </Text>
-                  </View>
-                ))}
-
-                {totals ? (
-                  <View style={{ borderTopWidth: 1, borderTopColor: colors.divider, paddingTop: spacing.sm, gap: spacing.xxs }}>
-                    <Text variant="bodyStrong">
-                      {t('foodPhoto.total')}: {formatNumber(Math.round(totals.calories))} {t('common.kcal')}
-                    </Text>
-                    <Text variant="caption" color="textSecondary">
-                      {t('foodPhoto.macros', {
-                        protein: formatNumber(Math.round(totals.protein_g)),
-                        carbs: formatNumber(Math.round(totals.carbs_g)),
-                        fat: formatNumber(Math.round(totals.fat_g)),
-                      })}
-                    </Text>
-                  </View>
-                ) : null}
-              </Card>
-            )}
-
-            {analysis.note_ar ? (
+          ) : (
+            <Card variant="soft" style={{ gap: spacing.sm }}>
+              <Text variant="bodyStrong">{t('foodPhoto.howItWorksTitle')}</Text>
               <Text variant="caption" color="textSecondary">
-                {analysis.note_ar}
+                {t('foodPhoto.howItWorksBody')}
               </Text>
-            ) : null}
+            </Card>
+          )}
 
-            {/* لا حفظ تلقائي: التقدير يُعرض ليؤكّده المستخدم أو يعدّله
-                من شاشة التغذية. حفظ رقم مقدَّر بلا موافقته يملأ سجلّه
-                بأرقام لم يقرّها. */}
-            {analysis.items.length > 0 ? (
+          <View style={{ flexDirection: rowDirection, gap: spacing.sm }}>
+            <View style={{ flex: 1 }}>
+              <Button label={t('foodPhoto.takePhoto')} onPress={() => void pick('camera')} disabled={isAnalyzing} />
+            </View>
+            <View style={{ flex: 1 }}>
               <Button
-                label={t('foodPhoto.confirmAndSave')}
-                size="lg"
-                loading={isSaving}
-                onPress={handleSave}
+                label={t('foodPhoto.choosePhoto')}
+                variant="secondary"
+                onPress={() => void pick('library')}
+                disabled={isAnalyzing}
               />
-            ) : null}
-          </>
-        ) : null}
-      </ScrollView>
+            </View>
+          </View>
+
+          {/* نوع الوجبة يُختار قبل الحفظ: بلا ذلك تُحفظ كل صورة كـ"غداء"
+              افتراضيًا، فيُفسد التصنيف شاشة التغذية بصمت. */}
+          <View style={{ gap: spacing.xs }}>
+            <Text variant="captionStrong" color="textSecondary">
+              {t('logNutrition.mealType')}
+            </Text>
+            <View style={{ flexDirection: rowDirection, gap: spacing.xs, flexWrap: 'wrap' }}>
+              {MEAL_TYPES.map((type) => {
+                const selected = mealType === type;
+                return (
+                  <Pressable
+                    key={type}
+                    accessibilityRole="radio"
+                    accessibilityState={{ selected, checked: selected }}
+                    accessibilityLabel={t(`logNutrition.${type}`)}
+                    onPress={() => setMealType(type)}
+                    style={({ pressed }) => [
+                      {
+                        paddingHorizontal: spacing.md,
+                        paddingVertical: spacing.xs,
+                        borderRadius: radius.pill,
+                        backgroundColor: selected ? colors.primary : colors.surfaceAlt,
+                      },
+                      pressed && { opacity: 0.8 },
+                    ]}
+                  >
+                    <Text variant="captionStrong" color={selected ? 'onPrimary' : 'textSecondary'}>
+                      {t(`logNutrition.${type}`)}
+                    </Text>
+                  </Pressable>
+                );
+              })}
+            </View>
+          </View>
+
+          <TextField
+            label={t('foodPhoto.hintLabel')}
+            value={hint}
+            onChangeText={setHint}
+            placeholder={t('foodPhoto.hintPlaceholder')}
+          />
+
+          {isAnalyzing ? (
+            <View style={{ gap: spacing.sm }}>
+              <Skeleton height={24} />
+              <Skeleton height={90} />
+            </View>
+          ) : null}
+
+          {error ? <InlineMessage tone="danger" message={error} /> : null}
+
+          {analysis && !isAnalyzing ? (
+            <>
+              {/* الثقة تُعرض دائمًا: تقدير منخفض الثقة معروض كرقم واثق
+                  هو أسوأ ما يمكن أن تفعله ميزة كهذه. */}
+              <View style={{ flexDirection: rowDirection, alignItems: 'center', gap: spacing.sm }}>
+                <Badge
+                  label={t(`foodPhoto.confidence.${analysis.confidence}`)}
+                  tone={analysis.confidence === 'high' ? 'accent' : 'neutral'}
+                />
+                <Text variant="caption" color="textSecondary" style={{ flex: 1 }}>
+                  {t('foodPhoto.estimateDisclaimer')}
+                </Text>
+              </View>
+
+              {analysis.items.length === 0 ? (
+                <Card variant="soft">
+                  <Text variant="body" color="textSecondary">
+                    {t('foodPhoto.nothingDetected')}
+                  </Text>
+                </Card>
+              ) : (
+                <Card style={{ gap: spacing.sm }}>
+                  {analysis.items.map((item, i) => (
+                    <View
+                      key={`${item.name_en}-${i}`}
+                      style={{ flexDirection: rowDirection, justifyContent: 'space-between', gap: spacing.sm }}
+                    >
+                      <Text variant="body" style={{ flex: 1 }}>
+                        {isArabic ? item.name_ar : item.name_en}
+                        {item.grams > 0 ? (
+                          <Text variant="caption" color="textSecondary">
+                            {'  '}
+                            {formatNumber(item.grams)} {t('common.grams')}
+                          </Text>
+                        ) : null}
+                      </Text>
+                      <Text variant="bodyStrong">
+                        {formatNumber(Math.round(item.calories))} {t('common.kcal')}
+                      </Text>
+                    </View>
+                  ))}
+
+                  {totals ? (
+                    <View style={{ borderTopWidth: 1, borderTopColor: colors.divider, paddingTop: spacing.sm, gap: spacing.xxs }}>
+                      <Text variant="bodyStrong">
+                        {t('foodPhoto.total')}: {formatNumber(Math.round(totals.calories))} {t('common.kcal')}
+                      </Text>
+                      <Text variant="caption" color="textSecondary">
+                        {t('foodPhoto.macros', {
+                          protein: formatNumber(Math.round(totals.protein_g)),
+                          carbs: formatNumber(Math.round(totals.carbs_g)),
+                          fat: formatNumber(Math.round(totals.fat_g)),
+                        })}
+                      </Text>
+                    </View>
+                  ) : null}
+                </Card>
+              )}
+
+              {analysis.note_ar ? (
+                <Text variant="caption" color="textSecondary">
+                  {analysis.note_ar}
+                </Text>
+              ) : null}
+
+              {/* لا حفظ تلقائي: التقدير يُعرض ليؤكّده المستخدم أو يعدّله
+                  من شاشة التغذية. حفظ رقم مقدَّر بلا موافقته يملأ سجلّه
+                  بأرقام لم يقرّها. */}
+              {analysis.items.length > 0 ? (
+                <Button
+                  label={t('foodPhoto.confirmAndSave')}
+                  size="lg"
+                  loading={isSaving}
+                  onPress={handleSave}
+                />
+              ) : null}
+            </>
+          ) : null}
+        </ScrollView>
+      </Appear>
     </Screen>
   );
 }

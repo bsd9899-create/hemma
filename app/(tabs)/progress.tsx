@@ -1,7 +1,17 @@
 import { RefreshControl, ScrollView, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
-import { Card, EmptyState, ErrorState, ProgressSkeleton, Screen, Text, colors, rowDirection } from '@/src/design-system';
+import {
+  Appear,
+  Card,
+  EmptyState,
+  ErrorState,
+  ProgressSkeleton,
+  Screen,
+  Text,
+  colors,
+  rowDirection,
+} from '@/src/design-system';
 import { spacing } from '@/src/design-system/spacing';
 import { useAuthStore } from '@/src/features/auth/store';
 import { useProgressData } from '@/src/features/progress/useProgressData';
@@ -38,110 +48,112 @@ export default function ProgressScreen() {
 
   return (
     <Screen>
-      <ScrollView
-        contentContainerStyle={{ gap: spacing.md, paddingBottom: spacing.xxxl }}
-        showsVerticalScrollIndicator={false}
-        refreshControl={<RefreshControl refreshing={isLoading} onRefresh={refetch} tintColor={colors.primary} />}
-      >
-        <Text variant="displayMd" style={{ marginTop: spacing.md }}>
-          {t('progress.title')}
-        </Text>
-
-        {!hasAnyActivity ? (
-          <EmptyState
-            emoji="📈"
-            title={t('progress.noActivityTitle')}
-            description={t('progress.noActivity')}
-            actionLabel={t('progress.noActivityCta')}
-            onAction={() => router.push('/quick-add')}
-          />
-        ) : null}
-
-        <Card>
-          <Text variant="overline" color="textSecondary">
-            {t('progress.last7Days')}
+      <Appear style={{ flex: 1 }}>
+        <ScrollView
+          contentContainerStyle={{ gap: spacing.md, paddingBottom: spacing.xxxl }}
+          showsVerticalScrollIndicator={false}
+          refreshControl={<RefreshControl refreshing={isLoading} onRefresh={refetch} tintColor={colors.primary} />}
+        >
+          <Text variant="displayMd" style={{ marginTop: spacing.md }}>
+            {t('progress.title')}
           </Text>
-          <View style={{ marginTop: spacing.md }}>
-            <WeeklyBarChart history={summary.history} days={7} />
+
+          {!hasAnyActivity ? (
+            <EmptyState
+              emoji="📈"
+              title={t('progress.noActivityTitle')}
+              description={t('progress.noActivity')}
+              actionLabel={t('progress.noActivityCta')}
+              onAction={() => router.push('/quick-add')}
+            />
+          ) : null}
+
+          <Card>
+            <Text variant="overline" color="textSecondary">
+              {t('progress.last7Days')}
+            </Text>
+            <View style={{ marginTop: spacing.md }}>
+              <WeeklyBarChart history={summary.history} days={7} />
+            </View>
+          </Card>
+
+          <View style={{ flexDirection: rowDirection, gap: spacing.sm }}>
+            <Card variant="soft" style={{ flex: 1 }}>
+              <Text variant="caption" color="textSecondary">
+                {t('progress.currentWeight')}
+              </Text>
+              <Text variant="title" style={{ marginTop: spacing.xxs }}>
+                {summary.weightNowKg !== null ? t('progress.weightUnit', { value: formatNumber(summary.weightNowKg) }) : '—'}
+              </Text>
+              {summary.weightDeltaKg !== null ? (
+                <Text
+                  variant="caption"
+                  color={summary.weightDeltaKg <= 0 ? 'success' : 'textSecondary'}
+                  style={{ marginTop: spacing.xxs }}
+                >
+                  {t(summary.weightDeltaKg > 0 ? 'progress.weightDeltaPositive' : 'progress.weightDeltaNonPositive', {
+                    value: formatNumber(summary.weightDeltaKg),
+                  })}
+                </Text>
+              ) : null}
+            </Card>
+
+            <Card variant="soft" style={{ flex: 1 }}>
+              <Text variant="caption" color="textSecondary">
+                {t('progress.averageSteps')}
+              </Text>
+              <Text variant="title" style={{ marginTop: spacing.xxs }}>
+                {formatNumber(summary.averageSteps)}
+              </Text>
+              <Text variant="caption" color="textSecondary" style={{ marginTop: spacing.xxs }}>
+                {t('progress.last7DaysShort')}
+              </Text>
+            </Card>
           </View>
-        </Card>
 
-        <View style={{ flexDirection: rowDirection, gap: spacing.sm }}>
-          <Card variant="soft" style={{ flex: 1 }}>
+          <Card variant="soft">
             <Text variant="caption" color="textSecondary">
-              {t('progress.currentWeight')}
+              {t('progress.workoutsThisWeek')}
             </Text>
             <Text variant="title" style={{ marginTop: spacing.xxs }}>
-              {summary.weightNowKg !== null ? t('progress.weightUnit', { value: formatNumber(summary.weightNowKg) }) : '—'}
-            </Text>
-            {summary.weightDeltaKg !== null ? (
-              <Text
-                variant="caption"
-                color={summary.weightDeltaKg <= 0 ? 'success' : 'textSecondary'}
-                style={{ marginTop: spacing.xxs }}
-              >
-                {t(summary.weightDeltaKg > 0 ? 'progress.weightDeltaPositive' : 'progress.weightDeltaNonPositive', {
-                  value: formatNumber(summary.weightDeltaKg),
-                })}
-              </Text>
-            ) : null}
-          </Card>
-
-          <Card variant="soft" style={{ flex: 1 }}>
-            <Text variant="caption" color="textSecondary">
-              {t('progress.averageSteps')}
-            </Text>
-            <Text variant="title" style={{ marginTop: spacing.xxs }}>
-              {formatNumber(summary.averageSteps)}
-            </Text>
-            <Text variant="caption" color="textSecondary" style={{ marginTop: spacing.xxs }}>
-              {t('progress.last7DaysShort')}
+              {formatNumber(summary.workoutsThisWeek)}
             </Text>
           </Card>
-        </View>
 
-        <Card variant="soft">
-          <Text variant="caption" color="textSecondary">
-            {t('progress.workoutsThisWeek')}
-          </Text>
-          <Text variant="title" style={{ marginTop: spacing.xxs }}>
-            {formatNumber(summary.workoutsThisWeek)}
-          </Text>
-        </Card>
-
-        <Card>
-          <Text variant="overline" color="textSecondary">
-            {t('progress.weeklyReviewTitle')}
-          </Text>
-          <Text variant="displayLg" color="primary" style={{ marginTop: spacing.xxs }}>
-            {t('progress.scoreOutOf10', {
-              score: formatNumber(summary.weeklyReview.score),
-              max: formatNumber(WEEKLY_SCORE_MAX),
-            })}
-          </Text>
-          {summary.weeklyReview.hasData ? (
-            <>
-              <View style={{ marginTop: spacing.sm, gap: spacing.xxs }}>
-                <Text variant="body">
-                  {t('progress.strongestPoint')}{' '}
-                  <Text variant="bodyStrong">{t(`weeklyMetrics.${summary.weeklyReview.strongestKey}`)}</Text>
-                </Text>
-                <Text variant="body">
-                  {t('progress.weakestPoint')}{' '}
-                  <Text variant="bodyStrong">{t(`weeklyMetrics.${summary.weeklyReview.weakestKey}`)}</Text>
-                </Text>
-              </View>
-              <Text variant="caption" color="textSecondary" style={{ marginTop: spacing.sm }}>
-                {t('progress.focusNextWeek', { label: t(`weeklyMetrics.${summary.weeklyReview.focusNextWeekKey}`) })}
-              </Text>
-            </>
-          ) : (
-            <Text variant="body" color="textSecondary" style={{ marginTop: spacing.sm }}>
-              {t('progress.weeklyReviewEmpty')}
+          <Card>
+            <Text variant="overline" color="textSecondary">
+              {t('progress.weeklyReviewTitle')}
             </Text>
-          )}
-        </Card>
-      </ScrollView>
+            <Text variant="displayLg" color="primary" style={{ marginTop: spacing.xxs }}>
+              {t('progress.scoreOutOf10', {
+                score: formatNumber(summary.weeklyReview.score),
+                max: formatNumber(WEEKLY_SCORE_MAX),
+              })}
+            </Text>
+            {summary.weeklyReview.hasData ? (
+              <>
+                <View style={{ marginTop: spacing.sm, gap: spacing.xxs }}>
+                  <Text variant="body">
+                    {t('progress.strongestPoint')}{' '}
+                    <Text variant="bodyStrong">{t(`weeklyMetrics.${summary.weeklyReview.strongestKey}`)}</Text>
+                  </Text>
+                  <Text variant="body">
+                    {t('progress.weakestPoint')}{' '}
+                    <Text variant="bodyStrong">{t(`weeklyMetrics.${summary.weeklyReview.weakestKey}`)}</Text>
+                  </Text>
+                </View>
+                <Text variant="caption" color="textSecondary" style={{ marginTop: spacing.sm }}>
+                  {t('progress.focusNextWeek', { label: t(`weeklyMetrics.${summary.weeklyReview.focusNextWeekKey}`) })}
+                </Text>
+              </>
+            ) : (
+              <Text variant="body" color="textSecondary" style={{ marginTop: spacing.sm }}>
+                {t('progress.weeklyReviewEmpty')}
+              </Text>
+            )}
+          </Card>
+        </ScrollView>
+      </Appear>
     </Screen>
   );
 }

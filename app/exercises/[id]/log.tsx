@@ -3,6 +3,7 @@ import { KeyboardAvoidingView, Platform, Pressable, ScrollView, View } from 'rea
 import { useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import {
+  Appear,
   Badge,
   Button,
   Card,
@@ -188,142 +189,144 @@ export default function LogSetsScreen() {
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         keyboardVerticalOffset={80}
       >
+        <Appear style={{ flex: 1 }}>
         <ScrollView
-          contentContainerStyle={{ gap: spacing.md, paddingBottom: spacing.xxxl }}
-          keyboardShouldPersistTaps="handled"
-          showsVerticalScrollIndicator={false}
-        >
-          {/* آخر أداء أعلى الشاشة: القرار الأول للمستخدم هو "ماذا رفعت
-              آخر مرة؟"، وإخفاؤه يجعله يخمّن أو يخرج من الشاشة. */}
-          {lastSession.length > 0 ? (
-            <Card variant="soft" style={{ gap: spacing.xxs }}>
-              <Text variant="captionStrong">{t('exercises.lastSession')}</Text>
-              <Text variant="caption" color="textSecondary">
-                {lastSession
-                  .filter((s) => !s.is_warmup)
-                  .map((s) =>
-                    s.weight_kg !== null && s.reps !== null
-                      ? `${formatNumber(s.weight_kg)}×${formatNumber(s.reps)}`
-                      : s.reps !== null
-                        ? formatNumber(s.reps)
-                        : formatNumber(s.duration_seconds)
-                  )
-                  .join(' · ')}
-              </Text>
-            </Card>
-          ) : null}
+            contentContainerStyle={{ gap: spacing.md, paddingBottom: spacing.xxxl }}
+            keyboardShouldPersistTaps="handled"
+            showsVerticalScrollIndicator={false}
+          >
+            {/* آخر أداء أعلى الشاشة: القرار الأول للمستخدم هو "ماذا رفعت
+                آخر مرة؟"، وإخفاؤه يجعله يخمّن أو يخرج من الشاشة. */}
+            {lastSession.length > 0 ? (
+              <Card variant="soft" style={{ gap: spacing.xxs }}>
+                <Text variant="captionStrong">{t('exercises.lastSession')}</Text>
+                <Text variant="caption" color="textSecondary">
+                  {lastSession
+                    .filter((s) => !s.is_warmup)
+                    .map((s) =>
+                      s.weight_kg !== null && s.reps !== null
+                        ? `${formatNumber(s.weight_kg)}×${formatNumber(s.reps)}`
+                        : s.reps !== null
+                          ? formatNumber(s.reps)
+                          : formatNumber(s.duration_seconds)
+                    )
+                    .join(' · ')}
+                </Text>
+              </Card>
+            ) : null}
 
-          {sets.map((draft, index) => {
-            const weight = parseOptional(draft.weight);
-            const reps = parseOptional(draft.reps);
-            const duration = parseOptional(draft.duration);
-            const wouldBeRecord = isPersonalRecord(
-              exercise.metric,
-              {
-                weight_kg: weight,
-                reps,
-                duration_seconds: duration,
-                distance_m: parseOptional(draft.distance),
-                is_warmup: draft.isWarmup,
-              },
-              previousBest
-            );
+            {sets.map((draft, index) => {
+              const weight = parseOptional(draft.weight);
+              const reps = parseOptional(draft.reps);
+              const duration = parseOptional(draft.duration);
+              const wouldBeRecord = isPersonalRecord(
+                exercise.metric,
+                {
+                  weight_kg: weight,
+                  reps,
+                  duration_seconds: duration,
+                  distance_m: parseOptional(draft.distance),
+                  is_warmup: draft.isWarmup,
+                },
+                previousBest
+              );
 
-            return (
-              <Card key={index} style={{ gap: spacing.sm }}>
-                <View style={{ flexDirection: rowDirection, alignItems: 'center', justifyContent: 'space-between' }}>
-                  <Text variant="captionStrong">
-                    {draft.isWarmup
-                      ? t('exercises.warmupSet', { number: formatNumber(index + 1) })
-                      : t('exercises.setNumber', { number: formatNumber(index + 1) })}
-                  </Text>
-                  <View style={{ flexDirection: rowDirection, alignItems: 'center', gap: spacing.sm }}>
-                    {/* تأكيد فوري أن هذه المجموعة رقم قياسي — أقوى دافع
-                        في التطبيق كله، ويضيع إن ظهر بعد الحفظ فقط. */}
-                    {wouldBeRecord ? <Badge label={t('exercises.newRecord')} tone="accent" /> : null}
-                    {sets.length > 1 ? (
-                      <Pressable
-                        accessibilityRole="button"
-                        accessibilityLabel={t('exercises.removeSet')}
-                        hitSlop={10}
-                        onPress={() => removeSet(index)}
-                      >
-                        <Text variant="bodyStrong" color="danger">
-                          ✕
-                        </Text>
-                      </Pressable>
+              return (
+                <Card key={index} style={{ gap: spacing.sm }}>
+                  <View style={{ flexDirection: rowDirection, alignItems: 'center', justifyContent: 'space-between' }}>
+                    <Text variant="captionStrong">
+                      {draft.isWarmup
+                        ? t('exercises.warmupSet', { number: formatNumber(index + 1) })
+                        : t('exercises.setNumber', { number: formatNumber(index + 1) })}
+                    </Text>
+                    <View style={{ flexDirection: rowDirection, alignItems: 'center', gap: spacing.sm }}>
+                      {/* تأكيد فوري أن هذه المجموعة رقم قياسي — أقوى دافع
+                          في التطبيق كله، ويضيع إن ظهر بعد الحفظ فقط. */}
+                      {wouldBeRecord ? <Badge label={t('exercises.newRecord')} tone="accent" /> : null}
+                      {sets.length > 1 ? (
+                        <Pressable
+                          accessibilityRole="button"
+                          accessibilityLabel={t('exercises.removeSet')}
+                          hitSlop={10}
+                          onPress={() => removeSet(index)}
+                        >
+                          <Text variant="bodyStrong" color="danger">
+                            ✕
+                          </Text>
+                        </Pressable>
+                      ) : null}
+                    </View>
+                  </View>
+
+                  <View style={{ flexDirection: rowDirection, gap: spacing.sm }}>
+                    {fields.weight ? (
+                      <View style={{ flex: 1 }}>
+                        <TextField
+                          label={t('exercises.weight')}
+                          value={draft.weight}
+                          onChangeText={(v) => updateSet(index, { weight: v })}
+                          keyboardType="decimal-pad"
+                          placeholder="0"
+                        />
+                      </View>
+                    ) : null}
+                    {fields.reps ? (
+                      <View style={{ flex: 1 }}>
+                        <TextField
+                          label={t('exercises.reps')}
+                          value={draft.reps}
+                          onChangeText={(v) => updateSet(index, { reps: v })}
+                          keyboardType="number-pad"
+                          placeholder="0"
+                        />
+                      </View>
+                    ) : null}
+                    {fields.duration ? (
+                      <View style={{ flex: 1 }}>
+                        <TextField
+                          label={t('exercises.durationSeconds')}
+                          value={draft.duration}
+                          onChangeText={(v) => updateSet(index, { duration: v })}
+                          keyboardType="number-pad"
+                          placeholder="0"
+                        />
+                      </View>
+                    ) : null}
+                    {fields.distance ? (
+                      <View style={{ flex: 1 }}>
+                        <TextField
+                          label={t('exercises.distanceMeters')}
+                          value={draft.distance}
+                          onChangeText={(v) => updateSet(index, { distance: v })}
+                          keyboardType="decimal-pad"
+                          placeholder="0"
+                        />
+                      </View>
                     ) : null}
                   </View>
-                </View>
 
-                <View style={{ flexDirection: rowDirection, gap: spacing.sm }}>
-                  {fields.weight ? (
-                    <View style={{ flex: 1 }}>
-                      <TextField
-                        label={t('exercises.weight')}
-                        value={draft.weight}
-                        onChangeText={(v) => updateSet(index, { weight: v })}
-                        keyboardType="decimal-pad"
-                        placeholder="0"
-                      />
-                    </View>
-                  ) : null}
-                  {fields.reps ? (
-                    <View style={{ flex: 1 }}>
-                      <TextField
-                        label={t('exercises.reps')}
-                        value={draft.reps}
-                        onChangeText={(v) => updateSet(index, { reps: v })}
-                        keyboardType="number-pad"
-                        placeholder="0"
-                      />
-                    </View>
-                  ) : null}
-                  {fields.duration ? (
-                    <View style={{ flex: 1 }}>
-                      <TextField
-                        label={t('exercises.durationSeconds')}
-                        value={draft.duration}
-                        onChangeText={(v) => updateSet(index, { duration: v })}
-                        keyboardType="number-pad"
-                        placeholder="0"
-                      />
-                    </View>
-                  ) : null}
-                  {fields.distance ? (
-                    <View style={{ flex: 1 }}>
-                      <TextField
-                        label={t('exercises.distanceMeters')}
-                        value={draft.distance}
-                        onChangeText={(v) => updateSet(index, { distance: v })}
-                        keyboardType="decimal-pad"
-                        placeholder="0"
-                      />
-                    </View>
-                  ) : null}
-                </View>
+                  <Pressable
+                    accessibilityRole="checkbox"
+                    accessibilityState={{ checked: draft.isWarmup }}
+                    accessibilityLabel={t('exercises.warmup')}
+                    hitSlop={8}
+                    onPress={() => updateSet(index, { isWarmup: !draft.isWarmup })}
+                  >
+                    <Text variant="caption" color={draft.isWarmup ? 'primary' : 'textSecondary'}>
+                      {draft.isWarmup ? '☑' : '☐'} {t('exercises.warmup')}
+                    </Text>
+                  </Pressable>
+                </Card>
+              );
+            })}
 
-                <Pressable
-                  accessibilityRole="checkbox"
-                  accessibilityState={{ checked: draft.isWarmup }}
-                  accessibilityLabel={t('exercises.warmup')}
-                  hitSlop={8}
-                  onPress={() => updateSet(index, { isWarmup: !draft.isWarmup })}
-                >
-                  <Text variant="caption" color={draft.isWarmup ? 'primary' : 'textSecondary'}>
-                    {draft.isWarmup ? '☑' : '☐'} {t('exercises.warmup')}
-                  </Text>
-                </Pressable>
-              </Card>
-            );
-          })}
+            <Button label={t('exercises.addSet')} variant="secondary" onPress={addSet} />
 
-          <Button label={t('exercises.addSet')} variant="secondary" onPress={addSet} />
+            {error ? <InlineMessage tone="danger" message={error} /> : null}
 
-          {error ? <InlineMessage tone="danger" message={error} /> : null}
-
-          <Button label={t('common.save')} size="lg" loading={isSaving} onPress={handleSave} />
-        </ScrollView>
+            <Button label={t('common.save')} size="lg" loading={isSaving} onPress={handleSave} />
+          </ScrollView>
+      </Appear>
       </KeyboardAvoidingView>
     </Screen>
   );

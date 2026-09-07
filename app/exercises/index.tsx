@@ -3,6 +3,7 @@ import { FlatList, Pressable, RefreshControl, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import {
+  Appear,
   Badge,
   Card,
   EmptyState,
@@ -112,48 +113,50 @@ export default function ExerciseLibraryScreen() {
           description={t('exercises.emptyDescription')}
         />
       ) : (
-        <FlatList
-          data={exercises}
-          keyExtractor={(e) => e.id}
-          contentContainerStyle={{ gap: spacing.sm, paddingBottom: spacing.xxxl }}
-          showsVerticalScrollIndicator={false}
-          refreshControl={
-            <RefreshControl refreshing={isRefreshing} onRefresh={() => void refresh()} tintColor={colors.primary} />
-          }
-          renderItem={({ item }) => {
-            const isFavourite = favourites.has(item.id);
-            return (
-              <Pressable
-                accessibilityRole="button"
-                accessibilityLabel={isArabic ? item.name_ar : item.name_en}
-                onPress={() => router.push(`/exercises/${item.id}`)}
-                style={({ pressed }) => (pressed ? { opacity: 0.9 } : undefined)}
-              >
-                <Card>
-                  <View style={{ flexDirection: rowDirection, alignItems: 'center', gap: spacing.sm }}>
-                    <View style={{ flex: 1, gap: spacing.xxs }}>
-                      <Text variant="bodyStrong">{isArabic ? item.name_ar : item.name_en}</Text>
-                      <View style={{ flexDirection: rowDirection, gap: spacing.xs, flexWrap: 'wrap' }}>
-                        <Badge label={t(muscleLabelKey(item.primary_muscle))} tone="neutral" />
-                        <Badge label={t(`exercises.equipment.${item.equipment}`)} tone="neutral" />
+        <Appear style={{ flex: 1 }}>
+          <FlatList
+            data={exercises}
+            keyExtractor={(e) => e.id}
+            contentContainerStyle={{ gap: spacing.sm, paddingBottom: spacing.xxxl }}
+            showsVerticalScrollIndicator={false}
+            refreshControl={
+              <RefreshControl refreshing={isRefreshing} onRefresh={() => void refresh()} tintColor={colors.primary} />
+            }
+            renderItem={({ item }) => {
+              const isFavourite = favourites.has(item.id);
+              return (
+                <Pressable
+                  accessibilityRole="button"
+                  accessibilityLabel={isArabic ? item.name_ar : item.name_en}
+                  onPress={() => router.push(`/exercises/${item.id}`)}
+                  style={({ pressed }) => (pressed ? { opacity: 0.9 } : undefined)}
+                >
+                  <Card>
+                    <View style={{ flexDirection: rowDirection, alignItems: 'center', gap: spacing.sm }}>
+                      <View style={{ flex: 1, gap: spacing.xxs }}>
+                        <Text variant="bodyStrong">{isArabic ? item.name_ar : item.name_en}</Text>
+                        <View style={{ flexDirection: rowDirection, gap: spacing.xs, flexWrap: 'wrap' }}>
+                          <Badge label={t(muscleLabelKey(item.primary_muscle))} tone="neutral" />
+                          <Badge label={t(`exercises.equipment.${item.equipment}`)} tone="neutral" />
+                        </View>
                       </View>
+                      <Pressable
+                        accessibilityRole="button"
+                        accessibilityLabel={t(isFavourite ? 'exercises.removeFavourite' : 'exercises.addFavourite')}
+                        hitSlop={12}
+                        onPress={() => void toggleFavourite(item.id)}
+                      >
+                        <Text variant="title" color={isFavourite ? 'accent' : 'textSecondary'}>
+                          {isFavourite ? '★' : '☆'}
+                        </Text>
+                      </Pressable>
                     </View>
-                    <Pressable
-                      accessibilityRole="button"
-                      accessibilityLabel={t(isFavourite ? 'exercises.removeFavourite' : 'exercises.addFavourite')}
-                      hitSlop={12}
-                      onPress={() => void toggleFavourite(item.id)}
-                    >
-                      <Text variant="title" color={isFavourite ? 'accent' : 'textSecondary'}>
-                        {isFavourite ? '★' : '☆'}
-                      </Text>
-                    </Pressable>
-                  </View>
-                </Card>
-              </Pressable>
-            );
-          }}
-        />
+                  </Card>
+                </Pressable>
+              );
+            }}
+          />
+        </Appear>
       )}
     </Screen>
   );

@@ -2,6 +2,7 @@ import { RefreshControl, ScrollView, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import {
+  Appear,
   Button,
   Card,
   EmptyState,
@@ -60,108 +61,110 @@ export default function NutritionScreen() {
 
   return (
     <Screen>
-      <ScrollView
-        contentContainerStyle={{ gap: spacing.md, paddingBottom: spacing.xxxl }}
-        showsVerticalScrollIndicator={false}
-        refreshControl={<RefreshControl refreshing={isLoading} onRefresh={refetch} tintColor={colors.primary} />}
-      >
-        <Text variant="displayMd" style={{ marginTop: spacing.md }}>
-          {t('nutrition.title')}
-        </Text>
+      <Appear style={{ flex: 1 }}>
+        <ScrollView
+          contentContainerStyle={{ gap: spacing.md, paddingBottom: spacing.xxxl }}
+          showsVerticalScrollIndicator={false}
+          refreshControl={<RefreshControl refreshing={isLoading} onRefresh={refetch} tintColor={colors.primary} />}
+        >
+          <Text variant="displayMd" style={{ marginTop: spacing.md }}>
+            {t('nutrition.title')}
+          </Text>
 
-        {/* البطاقة الرئيسية: سؤال واحد يجيب عليه المستخدم بنظرة —
-            كم أكلت اليوم مقابل هدفي؟ */}
-        <Card>
-          <View style={{ flexDirection: rowDirection, alignItems: 'center', gap: spacing.lg }}>
-            {/* بلا هدف محفوظ: نعرض المُستهلَك وحده. حلقة بنسبة إلى صفر
-                ليست معلومة، وعرض "من ٠" أسوأ من عدم عرض شيء. */}
-            <ProgressRing
-              progress={hasTargets ? Math.min(1, calorieRatio) : 0}
-              size={116}
-              strokeWidth={11}
-              fillColor={ringColor}
-            >
-              <Text variant="title">{formatNumber(totals.calories)}</Text>
-              <Text variant="caption" color="textSecondary">
-                {hasTargets
-                  ? t('nutrition.ofTarget', { target: formatNumber(targets.calories) })
-                  : t('nutrition.noTargetYet')}
-              </Text>
-            </ProgressRing>
-
-            <View style={{ flex: 1, gap: spacing.xxs }}>
-              <Text variant="overline" color="textSecondary">
-                {t('nutrition.todayCalories')}
-              </Text>
-              <Text variant="bodyStrong" color={isOverTarget && hasTargets ? 'warning' : 'textPrimary'}>
-                {!hasTargets
-                  ? t('nutrition.noTargetYet')
-                  : isOverTarget
-                    ? t('nutrition.overBy', { value: formatNumber(Math.abs(caloriesRemaining)) })
-                    : t('nutrition.remaining', { value: formatNumber(caloriesRemaining) })}
-              </Text>
-              <Text variant="caption" color="textSecondary">
-                {t(getNutritionHintKey(summary))}
-              </Text>
-            </View>
-          </View>
-        </Card>
-
-        {/* الرقم المعروض قيمة مرجعية عامة، لا هدف محسوب لهذا المستخدم.
-            عرضه بلا هذا التوضيح يوهمه أن التطبيق حسب له شيئًا لم يحسبه. */}
-        {isReferenceTargets ? (
-          <Card variant="soft" style={{ gap: spacing.sm }}>
-            <Text variant="captionStrong">{t('nutrition.referenceTargetsTitle')}</Text>
-            <Text variant="caption" color="textSecondary">
-              {t('nutrition.referenceTargetsBody')}
-            </Text>
-            <Button
-              label={t('nutrition.setMyTargets')}
-              variant="secondary"
-              onPress={() => router.push('/goals')}
-            />
-          </Card>
-        ) : null}
-
-        <Card variant="soft" style={{ gap: spacing.md }}>
-          <SectionHeader title={t('nutrition.macrosTitle')} />
-          {MACRO_KEYS.map((macro) => (
-            <MacroRow key={macro} macro={macro} value={totals.macros[macro]} target={targets.macros[macro]} />
-          ))}
-        </Card>
-
-        <SectionHeader title={t('nutrition.mealsTitle')} />
-
-        {totals.mealCount === 0 ? (
-          <EmptyState
-            emoji="🍽️"
-            title={t('nutrition.emptyTitle')}
-            description={t('nutrition.emptyDescription')}
-            actionLabel={t('nutrition.addMeal')}
-            onAction={() => router.push('/log/nutrition')}
-          />
-        ) : (
-          <>
-            {MEAL_TYPES.filter((type) => summary.byMealType[type].length > 0).map((type) => (
-              <View key={type} style={{ gap: spacing.xs }}>
-                <Text variant="captionStrong" color="textSecondary">
-                  {t(`nutrition.mealType.${type}`)}
+          {/* البطاقة الرئيسية: سؤال واحد يجيب عليه المستخدم بنظرة —
+              كم أكلت اليوم مقابل هدفي؟ */}
+          <Card>
+            <View style={{ flexDirection: rowDirection, alignItems: 'center', gap: spacing.lg }}>
+              {/* بلا هدف محفوظ: نعرض المُستهلَك وحده. حلقة بنسبة إلى صفر
+                  ليست معلومة، وعرض "من ٠" أسوأ من عدم عرض شيء. */}
+              <ProgressRing
+                progress={hasTargets ? Math.min(1, calorieRatio) : 0}
+                size={116}
+                strokeWidth={11}
+                fillColor={ringColor}
+              >
+                <Text variant="title">{formatNumber(totals.calories)}</Text>
+                <Text variant="caption" color="textSecondary">
+                  {hasTargets
+                    ? t('nutrition.ofTarget', { target: formatNumber(targets.calories) })
+                    : t('nutrition.noTargetYet')}
                 </Text>
-                {summary.byMealType[type].map((meal) => (
-                  <MealCard key={meal.id} meal={meal} />
-                ))}
-              </View>
-            ))}
+              </ProgressRing>
 
-            <Button
-              label={t('nutrition.addMeal')}
-              variant="secondary"
-              icon="＋"
-              onPress={() => router.push('/log/nutrition')}
+              <View style={{ flex: 1, gap: spacing.xxs }}>
+                <Text variant="overline" color="textSecondary">
+                  {t('nutrition.todayCalories')}
+                </Text>
+                <Text variant="bodyStrong" color={isOverTarget && hasTargets ? 'warning' : 'textPrimary'}>
+                  {!hasTargets
+                    ? t('nutrition.noTargetYet')
+                    : isOverTarget
+                      ? t('nutrition.overBy', { value: formatNumber(Math.abs(caloriesRemaining)) })
+                      : t('nutrition.remaining', { value: formatNumber(caloriesRemaining) })}
+                </Text>
+                <Text variant="caption" color="textSecondary">
+                  {t(getNutritionHintKey(summary))}
+                </Text>
+              </View>
+            </View>
+          </Card>
+
+          {/* الرقم المعروض قيمة مرجعية عامة، لا هدف محسوب لهذا المستخدم.
+              عرضه بلا هذا التوضيح يوهمه أن التطبيق حسب له شيئًا لم يحسبه. */}
+          {isReferenceTargets ? (
+            <Card variant="soft" style={{ gap: spacing.sm }}>
+              <Text variant="captionStrong">{t('nutrition.referenceTargetsTitle')}</Text>
+              <Text variant="caption" color="textSecondary">
+                {t('nutrition.referenceTargetsBody')}
+              </Text>
+              <Button
+                label={t('nutrition.setMyTargets')}
+                variant="secondary"
+                onPress={() => router.push('/goals')}
+              />
+            </Card>
+          ) : null}
+
+          <Card variant="soft" style={{ gap: spacing.md }}>
+            <SectionHeader title={t('nutrition.macrosTitle')} />
+            {MACRO_KEYS.map((macro) => (
+              <MacroRow key={macro} macro={macro} value={totals.macros[macro]} target={targets.macros[macro]} />
+            ))}
+          </Card>
+
+          <SectionHeader title={t('nutrition.mealsTitle')} />
+
+          {totals.mealCount === 0 ? (
+            <EmptyState
+              emoji="🍽️"
+              title={t('nutrition.emptyTitle')}
+              description={t('nutrition.emptyDescription')}
+              actionLabel={t('nutrition.addMeal')}
+              onAction={() => router.push('/log/nutrition')}
             />
-          </>
-        )}
-      </ScrollView>
+          ) : (
+            <>
+              {MEAL_TYPES.filter((type) => summary.byMealType[type].length > 0).map((type) => (
+                <View key={type} style={{ gap: spacing.xs }}>
+                  <Text variant="captionStrong" color="textSecondary">
+                    {t(`nutrition.mealType.${type}`)}
+                  </Text>
+                  {summary.byMealType[type].map((meal) => (
+                    <MealCard key={meal.id} meal={meal} />
+                  ))}
+                </View>
+              ))}
+
+              <Button
+                label={t('nutrition.addMeal')}
+                variant="secondary"
+                icon="＋"
+                onPress={() => router.push('/log/nutrition')}
+              />
+            </>
+          )}
+        </ScrollView>
+      </Appear>
     </Screen>
   );
 }

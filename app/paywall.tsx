@@ -4,6 +4,7 @@ import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import type { PurchasesPackage } from 'react-native-purchases';
 import {
+  Appear,
   Badge,
   Button,
   Card,
@@ -164,143 +165,145 @@ export default function PaywallScreen() {
       {/* الشاشة أطول من الجهاز بعد إضافة إفصاح التجربة وشروط التجديد
           والروابط القانونية — بلا تمرير تُقتطع الروابط الإلزامية على
           الأجهزة الصغيرة، وهي بالضبط ما يبحث عنه مراجع App Store. */}
-      <ScrollView
-        contentContainerStyle={{ gap: spacing.lg, paddingBottom: spacing.xl }}
-        showsVerticalScrollIndicator={false}
-      >
-        <ScreenHeader title="" action="close" />
+      <Appear style={{ flex: 1 }}>
+        <ScrollView
+          contentContainerStyle={{ gap: spacing.lg, paddingBottom: spacing.xl }}
+          showsVerticalScrollIndicator={false}
+        >
+          <ScreenHeader title="" action="close" />
 
-        <View style={{ alignItems: 'center', gap: spacing.sm }}>
-          <Wordmark size="md" />
-          <Text variant="title" style={{ textAlign: 'center' }}>
-            {t('paywall.title')}
-          </Text>
-          <Text variant="body" color="textSecondary" style={{ textAlign: 'center' }}>
-            {t('paywall.subtitle')}
-          </Text>
-        </View>
-
-        {!isRevenueCatConfigured ? (
-          <Card variant="soft">
-            <Text variant="body" color="textSecondary">
-              {t('paywall.notConfigured')}
+          <View style={{ alignItems: 'center', gap: spacing.sm }}>
+            <Wordmark size="md" />
+            <Text variant="title" style={{ textAlign: 'center' }}>
+              {t('paywall.title')}
             </Text>
-          </Card>
-        ) : isLoading ? (
-          <View style={{ gap: spacing.sm }}>
-            <Skeleton height={140} />
-            <Skeleton height={140} />
+            <Text variant="body" color="textSecondary" style={{ textAlign: 'center' }}>
+              {t('paywall.subtitle')}
+            </Text>
           </View>
-        ) : packages.length === 0 ? (
-          <Card variant="soft">
-            <Text variant="body" color="textSecondary">
-              {t('paywall.noPlans')}
-            </Text>
-          </Card>
-        ) : (
-          <View style={{ gap: spacing.sm }}>
-            {/* الخط الزمني مرة واحدة فوق الباقات لا داخل كل بطاقة:
-                التسلسل واحد مهما اختار المستخدم، وتكراره ضجيج. */}
-            {trialDays !== null ? (
-              <Card variant="soft" style={{ gap: spacing.sm }}>
-                <Text variant="bodyStrong">{t('paywall.timeline.heading', { count: trialDays, days: formatNumber(trialDays) })}</Text>
-                <TrialTimeline trialDays={trialDays} />
-              </Card>
-            ) : null}
 
-            {packages.map((pkg) => {
-              const featured = isBestValue(pkg);
-              const trial = getTrialOffer(pkg);
-              const periodKey = renewalPeriodKey(pkg);
-              const perMonth = monthlyEquivalent(pkg);
-              return (
-                <Card
-                  key={pkg.identifier}
-                  style={featured ? { borderColor: palette.green900, borderWidth: 2 } : undefined}
-                >
-                  {featured ? <Badge label={t('paywall.bestValue')} tone="accent" /> : null}
+          {!isRevenueCatConfigured ? (
+            <Card variant="soft">
+              <Text variant="body" color="textSecondary">
+                {t('paywall.notConfigured')}
+              </Text>
+            </Card>
+          ) : isLoading ? (
+            <View style={{ gap: spacing.sm }}>
+              <Skeleton height={140} />
+              <Skeleton height={140} />
+            </View>
+          ) : packages.length === 0 ? (
+            <Card variant="soft">
+              <Text variant="body" color="textSecondary">
+                {t('paywall.noPlans')}
+              </Text>
+            </Card>
+          ) : (
+            <View style={{ gap: spacing.sm }}>
+              {/* الخط الزمني مرة واحدة فوق الباقات لا داخل كل بطاقة:
+                  التسلسل واحد مهما اختار المستخدم، وتكراره ضجيج. */}
+              {trialDays !== null ? (
+                <Card variant="soft" style={{ gap: spacing.sm }}>
+                  <Text variant="bodyStrong">{t('paywall.timeline.heading', { count: trialDays, days: formatNumber(trialDays) })}</Text>
+                  <TrialTimeline trialDays={trialDays} />
+                </Card>
+              ) : null}
 
-                  <Text variant="bodyStrong" style={{ marginTop: spacing.xxs }}>
-                    {pkg.product.title}
-                  </Text>
+              {packages.map((pkg) => {
+                const featured = isBestValue(pkg);
+                const trial = getTrialOffer(pkg);
+                const periodKey = renewalPeriodKey(pkg);
+                const perMonth = monthlyEquivalent(pkg);
+                return (
+                  <Card
+                    key={pkg.identifier}
+                    style={featured ? { borderColor: palette.green900, borderWidth: 2 } : undefined}
+                  >
+                    {featured ? <Badge label={t('paywall.bestValue')} tone="accent" /> : null}
 
-                  {/* السعر يأتي من المتجر (priceString) بعملة المستخدم
-                      وضريبته — لا رقم مكتوب في الكود. */}
-                  <Text variant="title" color="primary" style={{ marginTop: spacing.xxs }}>
-                    {pkg.product.priceString}
-                    {periodKey ? (
-                      <Text variant="body" color="textSecondary">
-                        {' '}
-                        {t(periodKey)}
+                    <Text variant="bodyStrong" style={{ marginTop: spacing.xxs }}>
+                      {pkg.product.title}
+                    </Text>
+
+                    {/* السعر يأتي من المتجر (priceString) بعملة المستخدم
+                        وضريبته — لا رقم مكتوب في الكود. */}
+                    <Text variant="title" color="primary" style={{ marginTop: spacing.xxs }}>
+                      {pkg.product.priceString}
+                      {periodKey ? (
+                        <Text variant="body" color="textSecondary">
+                          {' '}
+                          {t(periodKey)}
+                        </Text>
+                      ) : null}
+                    </Text>
+
+                    {/* المكافئ الشهري: باقة ٣ أشهر بسعر إجمالي تبدو أغلى
+                        من الشهرية وهي أرخص. المقارنة الصحيحة تحتاج القسمة. */}
+                    {perMonth !== null ? (
+                      <Text variant="caption" color="textSecondary" style={{ marginTop: spacing.xxs }}>
+                        {t('paywall.perMonthEquivalent', { value: formatNumber(perMonth) })}
                       </Text>
                     ) : null}
-                  </Text>
 
-                  {/* المكافئ الشهري: باقة ٣ أشهر بسعر إجمالي تبدو أغلى
-                      من الشهرية وهي أرخص. المقارنة الصحيحة تحتاج القسمة. */}
-                  {perMonth !== null ? (
-                    <Text variant="caption" color="textSecondary" style={{ marginTop: spacing.xxs }}>
-                      {t('paywall.perMonthEquivalent', { value: formatNumber(perMonth) })}
-                    </Text>
-                  ) : null}
+                    {/* إفصاح التجربة المجانية: مدتها، ثم ماذا يحدث بعدها.
+                        عرض المدة بلا ذكر التجديد التلقائي مخالفة صريحة. */}
+                    {trial ? (
+                      <Text variant="caption" color="textSecondary" style={{ marginTop: spacing.xxs }}>
+                        {t('paywall.trialLine', {
+                          count: trial.count,
+                          days: formatNumber(trial.count),
+                          unit: t(trialUnitKey(trial), { count: trial.count }),
+                          price: pkg.product.priceString,
+                          period: periodKey ? t(periodKey) : '',
+                        })}
+                      </Text>
+                    ) : null}
 
-                  {/* إفصاح التجربة المجانية: مدتها، ثم ماذا يحدث بعدها.
-                      عرض المدة بلا ذكر التجديد التلقائي مخالفة صريحة. */}
-                  {trial ? (
-                    <Text variant="caption" color="textSecondary" style={{ marginTop: spacing.xxs }}>
-                      {t('paywall.trialLine', {
-                        count: trial.count,
-                        days: formatNumber(trial.count),
-                        unit: t(trialUnitKey(trial), { count: trial.count }),
-                        price: pkg.product.priceString,
-                        period: periodKey ? t(periodKey) : '',
-                      })}
-                    </Text>
-                  ) : null}
+                    <Button
+                      label={trial ? t('paywall.startTrial') : t('paywall.subscribe')}
+                      variant={featured ? 'primary' : 'secondary'}
+                      size="lg"
+                      style={{ marginTop: spacing.sm }}
+                      loading={busyPackageId === pkg.identifier}
+                      disabled={isBusy}
+                      onPress={() => handlePurchase(pkg)}
+                    />
+                  </Card>
+                );
+              })}
+            </View>
+          )}
 
-                  <Button
-                    label={trial ? t('paywall.startTrial') : t('paywall.subscribe')}
-                    variant={featured ? 'primary' : 'secondary'}
-                    size="lg"
-                    style={{ marginTop: spacing.sm }}
-                    loading={busyPackageId === pkg.identifier}
-                    disabled={isBusy}
-                    onPress={() => handlePurchase(pkg)}
-                  />
-                </Card>
-              );
-            })}
-          </View>
-        )}
+          {/* الطمأنة قبل الزر لا بعده: القلق يسبق الضغط. */}
+          {trialDays !== null ? (
+            <Text variant="captionStrong" color="success" style={{ textAlign: 'center' }}>
+              ✓ {t('paywall.noChargeToday')}
+            </Text>
+          ) : null}
 
-        {/* الطمأنة قبل الزر لا بعده: القلق يسبق الضغط. */}
-        {trialDays !== null ? (
-          <Text variant="captionStrong" color="success" style={{ textAlign: 'center' }}>
-            ✓ {t('paywall.noChargeToday')}
+          {error ? <InlineMessage tone="danger" message={error} /> : null}
+          {notice ? <InlineMessage tone="info" message={notice} /> : null}
+
+          <Button
+            label={t('paywall.restorePurchases')}
+            variant="ghost"
+            loading={isRestoring}
+            disabled={isBusy}
+            onPress={handleRestore}
+          />
+
+          {/* شروط التجديد التلقائي — نص ثابت مطلوب بغضّ النظر عن وجود تجربة. */}
+          <Text variant="caption" color="textSecondary" style={{ textAlign: 'center' }}>
+            {t('paywall.renewalTerms')}
           </Text>
-        ) : null}
 
-        {error ? <InlineMessage tone="danger" message={error} /> : null}
-        {notice ? <InlineMessage tone="info" message={notice} /> : null}
-
-        <Button
-          label={t('paywall.restorePurchases')}
-          variant="ghost"
-          loading={isRestoring}
-          disabled={isBusy}
-          onPress={handleRestore}
-        />
-
-        {/* شروط التجديد التلقائي — نص ثابت مطلوب بغضّ النظر عن وجود تجربة. */}
-        <Text variant="caption" color="textSecondary" style={{ textAlign: 'center' }}>
-          {t('paywall.renewalTerms')}
-        </Text>
-
-        <View style={{ flexDirection: rowDirection, justifyContent: 'center', gap: spacing.md }}>
-          <Button label={t('paywall.termsOfUse')} variant="ghost" onPress={() => void openLink(TERMS_URL)} />
-          <Button label={t('paywall.privacyPolicy')} variant="ghost" onPress={() => void openLink(PRIVACY_URL)} />
-        </View>
-      </ScrollView>
+          <View style={{ flexDirection: rowDirection, justifyContent: 'center', gap: spacing.md }}>
+            <Button label={t('paywall.termsOfUse')} variant="ghost" onPress={() => void openLink(TERMS_URL)} />
+            <Button label={t('paywall.privacyPolicy')} variant="ghost" onPress={() => void openLink(PRIVACY_URL)} />
+          </View>
+        </ScrollView>
+      </Appear>
     </Screen>
   );
 }
