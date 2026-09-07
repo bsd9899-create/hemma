@@ -9,10 +9,14 @@
 - [x] Bundle Identifier: `com.hemma.himah` (`app.json`) — مسجَّل فعليًا في
       Apple Developer Portal (App ID)، ومفعَّل عليه Sign In with Apple.
 - [x] EAS build profiles (`eas.json`): development / preview / production
-- [x] أيقونة وSplash مُعاد بناؤهما ليطابقا شعار الهوية المرجعي (دمبل ذهبي
-      + كلمة "هِمّة" الخطّية، بنفس الألوان بالضبط) — راجع `assets/branding/README.md`.
-      لا تزال بديلاً مُعاد بناؤه يدويًا (SVG) وليست ملف الشعار الرسمي
-      الأصلي نفسه؛ استبدالها بالملف الرسمي إن توفر لاحقًا اختياري وليس ضروريًا
+- [x] أيقونة وSplash تُولَّدان من `logo.svg` نفسه (`assets/branding/generate_icons.py`)
+      بالهوية النهائية: أخضر `#0F2D23`، دمبل **أبيض**، كلمة «هِمّة» بالآيفوري.
+      الأيقونة تستخدم تدرّجًا داكنًا مكان الصورة الطبيعية حتى تصل صورة
+      الجبل الأصلية بدقة ≥1024px — والمولّد يرفض ما دونها بسبب معلن.
+- [x] اسم التطبيق تحت الأيقونة «هِمّة» بتشكيلها، مطابقًا للشعار
+      (كان «همة» بلا تشكيل) — يحرسه `appConfig.test.ts`
+- [x] `expo-image` و`expo-video` مُعلَنتان في `app.json` بلا تشغيل خلفي
+      ولا صورة داخل صورة: مقطع الأداء صامت ومتكرّر ولا يحتاج قدرات نظام
 - [x] وصف صلاحية HealthKit بالعربي في `app.json`، صلاحيات قراءة فقط
       (لا كتابة)، بلا Background Delivery
 - [x] حذف الحساب من داخل التطبيق (حسابي ← حذف حسابي نهائيًا) —
@@ -28,8 +32,10 @@
 - [ ] `eas login` + `eas init` + ربط Apple Team ID
 - [ ] تسجيل Bundle Identifier في App Store Connect
 - [ ] Certificates/Provisioning Profiles (تديرها EAS تلقائيًا بعد الربط)
-- [ ] إنشاء منتجات هِمّة+ (شهري/سنوي) في App Store Connect → ربطها
-      بـ RevenueCat → استبدال placeholder packages في `app/paywall.tsx`
+- [ ] إنشاء منتجَي هِمّة+ (**شهري 19.99 · ثلاثة أشهر 49.99 ريال**) في
+      App Store Connect → ربطهما بـ RevenueCat بنوعَي الحزمة `MONTHLY`
+      و`THREE_MONTH` واستحقاق `premium`. لا يوجد placeholder في الكود:
+      جدار الدفع يقرأ ما يرسله المتجر، ويعرض شاشة "غير مفعّلة" حتى ذلك.
 - [ ] بناء EAS Dev Client فعلي واختبار HealthKit على جهاز iPhone حقيقي
       (راجع التحذير في `src/integrations/health/healthkit.ts`)
 - [ ] تعبئة استبيان App Privacy في App Store Connect (البنية جاهزة في

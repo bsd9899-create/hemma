@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "همة",
+    "name": "هِمّة",
     "slug": "hemma",
     "scheme": "hemma",
     "version": "1.0.0",
@@ -18,7 +18,8 @@
       "infoPlist": {
         "UIBackgroundModes": [],
         "ITSAppUsesNonExemptEncryption": false
-      }
+      },
+      "buildNumber": "1"
     },
     "android": {
       "package": "com.hemma.himah",
@@ -28,7 +29,8 @@
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "versionCode": 1
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -62,6 +64,14 @@
         {
           "photosPermission": "تستخدم هِمّة صور وجباتك لتقدير سعراتها — بموافقتك وعند اختيارك للصورة فقط.",
           "cameraPermission": "تستخدم هِمّة الكاميرا لتصوير وجبتك وتقدير سعراتها — بموافقتك فقط."
+        }
+      ],
+      "expo-image",
+      [
+        "expo-video",
+        {
+          "supportsBackgroundPlayback": false,
+          "supportsPictureInPicture": false
         }
       ]
     ],
