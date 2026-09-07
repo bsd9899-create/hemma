@@ -17,7 +17,12 @@
   /* الأبيض الناصع للشعار على الداكن فقط — لا للأسطح.
      نصّ المرجع: "اللون الفاتح Ivory، وليس أبيض ناصع". */
   --white: #FFFFFF;
-  --surface: #FDFBF8; /* سطح مرفوع فوق الأوف وايت */
+  /* سطح مرفوع فوق الآيفوري: أفتح منه بدرجة واحدة، وما زال ليس أبيض
+     ناصعًا. البطاقة يجب أن تُقرأ كطبقة فوق الصفحة لا كقصاصة بيضاء. */
+  --surface: #FDFBF8;
+  /* النص الثانوي على الأرضية الخضراء الداكنة. الرمادي الثانوي #A7B8B1
+     تباينه 5.9:1 عليها، وهذا 8.1:1 — للنص الطويل الذي يُقرأ لا يُلمح. */
+  --sage-on-dark: #B9C4C2;
   --radius: 16px;
   --max-width: 46rem;
 }
@@ -49,6 +54,15 @@ header.site {
   color: var(--ivory-50);
   padding: 1rem 0;
 }
+/* الشعار على ترويسة خضراء: علامته الخضراء الداكنة لا تُقرأ على
+   الأخضر، فتجلس على رقعة آيفوري. كانت مكتوبة inline في الصفحات الأربع
+   بكود لون خام — فتتغيّر في ثلاث وتُنسى في الرابعة. */
+.site-logo {
+  background: var(--ivory-50);
+  border-radius: 8px;
+  padding: 2px;
+}
+
 header.site .wrap {
   display: flex;
   align-items: center;
@@ -201,10 +215,13 @@ details p { margin: 0.625rem 0 0; color: var(--sage-600); font-size: 0.9375rem; 
 
 @media (prefers-color-scheme: dark) {
   .steps li, .plan, details { background: rgba(255,255,255,0.04); border-color: rgba(255,255,255,0.14); }
-  .steps span, .plan .price span, details p { color: #B9C4C2; }
-  .plan .price { color: var(--green-900); }
-  .steps li::before { background: var(--green-900); color: var(--green-900); }
+  .steps span, .plan .price span, details p { color: var(--sage-on-dark); }
+  /* كان السعر ورقم الخطوة بلون الخلفية نفسها — أي غير مرئيين إطلاقًا
+     على الأرضية الخضراء. نفس الخطأ الذي أصاب الروابط بعد تبديل اللوحة،
+     وهذه المرة على أهم رقم في الصفحة. */
+  .plan .price { color: var(--ivory-50); }
+  .steps li::before { background: var(--ivory-50); color: var(--green-900); }
 }
 
 .plan .price-note { margin: 0.25rem 0 0; font-size: 0.875rem; color: var(--sage-600); }
-@media (prefers-color-scheme: dark) { .plan .price-note { color: #B9C4C2; } }
+@media (prefers-color-scheme: dark) { .plan .price-note { color: var(--sage-on-dark); } }
