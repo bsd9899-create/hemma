@@ -87,3 +87,31 @@ https://auth.himmah.online/auth/v1/callback
 `REVERSED_CLIENT_ID` كمخطط URL، أي مزيدًا من الإعداد الخارجي وخطرًا على
 تدفق يعمل — مقابل إصلاح يحلّه حقل واحد. يبقى الخيار مفتوحًا متى أردنا
 إلغاء المتصفح من التجربة.
+
+---
+
+## redirect_uri_mismatch — أين يوضع ماذا بالضبط
+
+الخطأ يأتي من Google، وسببه دائمًا أن الـURI الذي استقبلته Google غير
+مسجَّل عندها. والالتباس أن في التدفّق **رابطين مختلفين تمامًا**، وكلٌّ
+منهما يُسجَّل في مكان آخر:
+
+| الرابط | من يرسله | أين يُسجَّل |
+|---|---|---|
+| `https://zvcynshexfffvxskqhet.supabase.co/auth/v1/callback` | **Supabase** إلى Google | Google Cloud Console ← Credentials ← OAuth 2.0 Client ← **Authorized redirect URIs** |
+| `hemma://auth/callback` | **التطبيق** إلى Supabase | Supabase Dashboard ← Authentication ← URL Configuration ← **Redirect URLs** |
+
+مصدر كل قيمة، لا تخمينًا:
+
+- `hemma://auth/callback` — من `Linking.createURL('auth/callback')` في
+  `src/features/auth/oauth.ts:20`، و`scheme: "hemma"` في `app.json`.
+- رابط Supabase — يبنيه `supabase-js` من عنوان المشروع؛ التطبيق لا
+  يرسل `client_id` ولا `redirect_uri` إطلاقًا، وستة اختبارات في
+  `src/features/auth/__tests__/` تؤكد ذلك.
+
+**الخطأ الشائع:** وضع `hemma://auth/callback` في Google Cloud. لن تقبله
+Google أصلًا (لا تقبل مخططًا مخصّصًا في عميل ويب)، والصحيح أنه لا يخصّها.
+
+**للتحقق قبل التجربة:** افتح رابط تسجيل الدخول وانظر إلى معطى
+`redirect_uri` داخله — يجب أن يكون رابط Supabase حرفيًا. إن كان كذلك
+وما زال الخطأ ظاهرًا، فالنقص في Google Cloud لا في الكود.

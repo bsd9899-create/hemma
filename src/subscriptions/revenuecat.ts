@@ -1,6 +1,7 @@
 import Purchases, { LOG_LEVEL, type CustomerInfo, type PurchasesPackage } from 'react-native-purchases';
 import { Platform } from 'react-native';
 import { env } from '@/src/lib/env';
+import { inspectRevenueCatKey } from './apiKey';
 
 /**
  * معرّف الاستحقاق (Entitlement) في لوحة تحكم RevenueCat — يُضبط هناك
@@ -9,10 +10,32 @@ import { env } from '@/src/lib/env';
  */
 export const PREMIUM_ENTITLEMENT_ID = 'premium';
 
+/**
+ * اسم العرض (Offering) المعتمد في RevenueCat.
+ *
+ * ‏`offerings.current` هو الطبيعي، لكنه يعود null لو لم يُعلَّم أي عرض
+ * كـ"current" في اللوحة — وهو خطأ إعداد شائع ونتيجته جدار دفع فارغ بلا
+ * أي رسالة. الرجوع إلى العرض المسمّى يجعل الخطأ غير مرئي للمستخدم.
+ */
+export const DEFAULT_OFFERING_ID = 'default';
+
 let isConfigured = false;
 
-/** لا شيء يحدث بدون مفتاح RevenueCat حقيقي — يمنع محاولة إعداد SDK بمفتاح وهمي. */
-export const isRevenueCatConfigured = Boolean(env.EXPO_PUBLIC_REVENUECAT_IOS_API_KEY);
+/**
+ * الاشتراكات تعمل فقط بمفتاح SDK عام صالح.
+ *
+ * الفحص على **شكل** المفتاح لا على وجوده: مفتاح سري ملصوق بالخطأ يُهيّئ
+ * SDK بنجاح ثم يُشحن داخل الحزمة، فيُستخرج منها. هنا يُرفض ويبقى
+ * التطبيق كأن الاشتراكات غير مضبوطة — فشل مغلق لا صامت.
+ */
+const keyVerdict = inspectRevenueCatKey(env.EXPO_PUBLIC_REVENUECAT_IOS_API_KEY);
+
+if (__DEV__ && keyVerdict.kind !== 'valid' && keyVerdict.kind !== 'missing') {
+  // console.log لا console.error: الأخير يرفع LogBox فوق الواجهة.
+  console.log('[revenuecat] المفتاح مرفوض:', keyVerdict.reason);
+}
+
+export const isRevenueCatConfigured = keyVerdict.kind === 'valid';
 
 export function initPurchases(appUserID: string) {
   if (isConfigured || !isRevenueCatConfigured || Platform.OS !== 'ios') return;
@@ -29,7 +52,7 @@ export function hasPremiumEntitlement(customerInfo: CustomerInfo): boolean {
 export async function getCurrentOfferingPackages(): Promise<PurchasesPackage[]> {
   if (!isConfigured) return [];
   const offerings = await Purchases.getOfferings();
-  return offerings.current?.availablePackages ?? [];
+  return (offerings.current ?? offerings.all[DEFAULT_OFFERING_ID])?.availablePackages ?? [];
 }
 
 export async function purchasePackage(pkg: PurchasesPackage): Promise<CustomerInfo> {

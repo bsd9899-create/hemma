@@ -54,10 +54,22 @@ describe('لا وثيقة تصف تسعيرًا ملغى', () => {
   /** الأسعار النهائية. أي ذكر لباقة سنوية أو لسعر قديم خطأ. */
   const CANCELLED = [/سنوي/, /سنويًا/, /\b99\.99\b/, /\b199\.99\b/];
 
+  /**
+   * "لا توجد باقة سنوية" جملة صحيحة تحتوي الكلمة الممنوعة. الفحص على
+   * السطر لا على الملف، والسطر الذي يُلغي شيئًا يذكره بالضرورة — فيُسمح
+   * له. الممنوع أن يُوصَف الملغى كخيار قائم.
+   */
+  const CANCELLING = /ملغا|ملغى|لا توجد|لا يوجد|لا تستخدم|أُلغيت|لم تعد/;
+
   it.each(allDocs.filter(([name]) => /APP_STORE|HANDOFF|BACKEND/.test(name)))(
-    '%s لا تذكر باقة سنوية ولا سعرًا ملغى',
+    '%s لا تعرض باقة سنوية ولا سعرًا ملغى كخيار قائم',
     (_name, body) => {
-      expect(CANCELLED.filter((pattern) => pattern.test(body)).map(String)).toEqual([]);
+      const offending = body
+        .split('\n')
+        .filter((line) => CANCELLED.some((pattern) => pattern.test(line)))
+        .filter((line) => !CANCELLING.test(line))
+        .map((line) => line.trim().slice(0, 70));
+      expect(offending).toEqual([]);
     },
   );
 
