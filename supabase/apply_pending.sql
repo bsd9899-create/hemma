@@ -12,6 +12,7 @@
 --   20260906000003  مكتبة التمارين وتسجيل المجموعات والأرقام القياسية
 --   20260906000004  بذرة ٢٠ تمرينًا أساسيًا
 --   20260906000005  سجل استخدام تحليل الطعام (الحدّ اليومي)
+--   20260907000001  ترتيب الفريق: تجميع جانبي بدل قراءة كل سجل النقاط
 --
 -- ✅ تكراره آمن (idempotent). تشغيله مرة أو خمس مرات يعطي النتيجة
 --    نفسها: كل جملة إما IF NOT EXISTS، أو OR REPLACE، أو مسبوقة بـ
@@ -770,6 +771,30 @@ create policy "food_analysis_usage_select_own" on public.food_analysis_usage
 
 grant select on public.food_analysis_usage to authenticated;
 
+
+
+-- ============================================================
+-- 20260907000001_leaderboard_scaling.sql
+-- ============================================================
+create or replace view public.team_leaderboard
+as
+select
+  r.team_id,
+  r.user_id,
+  r.display_name,
+  r.avatar_url,
+  coalesce(p.total_points, 0) as total_points
+from public.team_roster r
+left join lateral (
+  select sum(l.delta) as total_points
+  from public.points_ledger l
+  where l.user_id = r.user_id
+) p on true;
+
+comment on view public.team_leaderboard is
+  'ترتيب أعضاء الفريق. التجميع جانبي لكل عضو حتى لا يُقرأ سجل نقاط كل مستخدمي التطبيق عند فتح شاشة فريق واحد.';
+
+grant select on public.team_leaderboard to authenticated;
 
 commit;
 
