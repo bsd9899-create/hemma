@@ -2,6 +2,7 @@ import { useTranslation } from 'react-i18next';
 import { dailyLogsRepository } from '@/src/data/repositories/dailyLogsRepository';
 import { useAuthStore } from '@/src/features/auth/store';
 import { NumericLogForm } from '@/src/features/quick-add/NumericLogForm';
+import { UserFacingError } from '@/src/lib/errors';
 
 export default function LogStepsScreen() {
   const { t } = useTranslation();
@@ -14,7 +15,7 @@ export default function LogStepsScreen() {
       unitKey="logSteps.unit"
       placeholderKey="logSteps.placeholder"
       onSubmit={async (steps) => {
-        if (!userId) throw new Error(t('common.notSignedIn'));
+        if (!userId) throw new UserFacingError(t('common.notSignedIn'));
         await dailyLogsRepository.setStepsToday(userId, Math.round(steps));
       }}
     />

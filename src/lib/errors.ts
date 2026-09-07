@@ -9,6 +9,23 @@ import i18n from '@/src/lib/i18n';
  */
 type BackendError = { message?: unknown; code?: unknown; status?: unknown; details?: unknown; hint?: unknown };
 
+/**
+ * خطأ رسالته مكتوبة للمستخدم عمدًا، فتُعرض كما هي.
+ *
+ * وجوده ضروري لأن `instanceof Error` لا يميّز شيئًا: خطأ نرميه نحن
+ * برسالة عربية، وTypeError ناتج عن خلل برمجي، كلاهما `Error`. الاعتماد
+ * على ذلك كان يضع نصًّا مثل
+ *   "x.y is not a function"
+ * وسط واجهة عربية أمام المستخدم. أي خطأ ليس من هذا النوع يُعامَل الآن
+ * كخلل داخلي: يُسجَّل للمطوّر، ويُعرض للمستخدم بنص مفهوم.
+ */
+export class UserFacingError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'UserFacingError';
+  }
+}
+
 const CODE_MESSAGE_KEYS: Record<string, string> = {
   '42501': 'common.errors.permissionDenied', // RLS أو صلاحية غير كافية
   '23505': 'common.errors.duplicate', // unique_violation
@@ -65,11 +82,13 @@ export function getFriendlyErrorMessage(error: unknown, fallback?: string): stri
     return key ? i18n.t(key) : (fallback ?? i18n.t('common.genericError'));
   }
 
-  // خطأ رميناه نحن داخل التطبيق — رسالته مكتوبة أصلًا للمستخدم.
-  if (error instanceof Error && error.message) {
+  // رسالة كُتبت للمستخدم عمدًا — وحدها تُعرض كما هي.
+  if (error instanceof UserFacingError && error.message) {
     return error.message;
   }
 
+  // كل ما عداه (TypeError، خطأ مكتبة، رسالة إنجليزية تقنية) لا يصل
+  // للمستخدم أبدًا: يبقى في سجل المطوّر أعلاه فقط.
   return fallback ?? i18n.t('common.genericError');
 }
 

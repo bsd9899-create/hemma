@@ -113,18 +113,27 @@ export default function ProgressScreen() {
           <Text variant="displayLg" color="primary" style={{ marginTop: spacing.xxs }}>
             {t('progress.scoreOutOf10', { score: summary.weeklyReview.score })}
           </Text>
-          <View style={{ marginTop: spacing.sm, gap: spacing.xxs }}>
-            <Text variant="body">
-              {t('progress.strongestPoint')}{' '}
-              <Text variant="bodyStrong">{t(`weeklyMetrics.${summary.weeklyReview.strongestKey}`)}</Text>
+          {summary.weeklyReview.hasData ? (
+            <>
+              <View style={{ marginTop: spacing.sm, gap: spacing.xxs }}>
+                <Text variant="body">
+                  {t('progress.strongestPoint')}{' '}
+                  <Text variant="bodyStrong">{t(`weeklyMetrics.${summary.weeklyReview.strongestKey}`)}</Text>
+                </Text>
+                <Text variant="body">
+                  {t('progress.weakestPoint')}{' '}
+                  <Text variant="bodyStrong">{t(`weeklyMetrics.${summary.weeklyReview.weakestKey}`)}</Text>
+                </Text>
+              </View>
+              <Text variant="caption" color="textSecondary" style={{ marginTop: spacing.sm }}>
+                {t('progress.focusNextWeek', { label: t(`weeklyMetrics.${summary.weeklyReview.focusNextWeekKey}`) })}
+              </Text>
+            </>
+          ) : (
+            <Text variant="body" color="textSecondary" style={{ marginTop: spacing.sm }}>
+              {t('progress.weeklyReviewEmpty')}
             </Text>
-            <Text variant="body">
-              {t('progress.weakestPoint')} <Text variant="bodyStrong">{t(`weeklyMetrics.${summary.weeklyReview.weakestKey}`)}</Text>
-            </Text>
-          </View>
-          <Text variant="caption" color="textSecondary" style={{ marginTop: spacing.sm }}>
-            {t('progress.focusNextWeek', { label: t(`weeklyMetrics.${summary.weeklyReview.focusNextWeekKey}`) })}
-          </Text>
+          )}
         </Card>
       </ScrollView>
     </Screen>

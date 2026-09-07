@@ -37,10 +37,17 @@ export function useProgressData(userId: string | undefined) {
         goalsRepository.getCurrent(userId),
       ]);
 
+      /**
+       * ‏`!== null` وحده لا يكفي: عمود ناقص أو شكل متغيّر يصل `undefined`،
+       * فيمرّ الشرط ثم يعطي الطرح NaN — الذي يُعرض للمستخدم كـ
+       * "NaN كجم آخر 30 يوم" بلا أي خطأ يُرفع. الرقم إما صالح للحساب أو
+       * غائب، ولا حالة ثالثة.
+       */
+      const latestKg = Number.isFinite(weightTrend.latestKg) ? (weightTrend.latestKg as number) : null;
+      const earliestKg = Number.isFinite(weightTrend.earliestKg) ? (weightTrend.earliestKg as number) : null;
+
       const weightDeltaKg =
-        weightTrend.latestKg !== null && weightTrend.earliestKg !== null
-          ? Math.round((weightTrend.latestKg - weightTrend.earliestKg) * 10) / 10
-          : null;
+        latestKg !== null && earliestKg !== null ? Math.round((latestKg - earliestKg) * 10) / 10 : null;
 
       const weeklyReview = computeWeeklyReview(weeklyRaw, {
         targetSteps: goals.target_steps,
@@ -49,7 +56,7 @@ export function useProgressData(userId: string | undefined) {
 
       setSummary({
         history,
-        weightNowKg: weightTrend.latestKg,
+        weightNowKg: latestKg,
         weightDeltaKg,
         workoutsThisWeek,
         averageSteps,

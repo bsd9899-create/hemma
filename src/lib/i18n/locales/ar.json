@@ -234,6 +234,7 @@
     "last7DaysShort": "آخر 7 أيام",
     "workoutsThisWeek": "التمارين هذا الأسبوع",
     "weeklyReviewTitle": "تقييم هِمّة الأسبوعي",
+    "weeklyReviewEmpty": "سجّل تمرينًا أو خطواتك أو نومك، ويجيك تقييم أسبوعك هنا.",
     "scoreOutOf10": "{{score}} / 10",
     "strongestPoint": "أقوى نقطة:",
     "weakestPoint": "تحتاج اهتمامًا:",

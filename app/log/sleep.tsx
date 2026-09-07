@@ -2,6 +2,7 @@ import { useTranslation } from 'react-i18next';
 import { dailyLogsRepository } from '@/src/data/repositories/dailyLogsRepository';
 import { useAuthStore } from '@/src/features/auth/store';
 import { NumericLogForm } from '@/src/features/quick-add/NumericLogForm';
+import { UserFacingError } from '@/src/lib/errors';
 
 export default function LogSleepScreen() {
   const { t } = useTranslation();
@@ -15,7 +16,7 @@ export default function LogSleepScreen() {
       placeholderKey="logSleep.placeholder"
       allowDecimal
       onSubmit={async (hours) => {
-        if (!userId) throw new Error(t('common.notSignedIn'));
+        if (!userId) throw new UserFacingError(t('common.notSignedIn'));
         await dailyLogsRepository.setSleepToday(userId, hours);
       }}
     />

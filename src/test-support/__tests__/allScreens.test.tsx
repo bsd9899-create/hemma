@@ -77,8 +77,8 @@ jest.mock('@/src/data/repositories/dailyLogsRepository', () => ({
     getRecentProgress: jest.fn(async () => []),
     addNutritionLog: jest.fn(async () => undefined),
     addWorkout: jest.fn(async () => undefined),
-    upsertSteps: jest.fn(async () => undefined),
-    upsertSleep: jest.fn(async () => undefined),
+    setStepsToday: jest.fn(async () => undefined),
+    setSleepToday: jest.fn(async () => undefined),
     addWeight: jest.fn(async () => undefined),
   },
 }));
@@ -89,33 +89,39 @@ jest.mock('@/src/data/repositories/dailyProgressRepository', () => ({
 
 jest.mock('@/src/data/repositories/progressRepository', () => ({
   progressRepository: {
-    getWeeklySummary: jest.fn(async () => null),
-    getWeightSeries: jest.fn(async () => []),
-    getLatestWeightKg: jest.fn(async () => 80),
-    getRecentProgress: jest.fn(async () => []),
+    getCompletionHistory: jest.fn(async () => []),
+    getWeightTrend: jest.fn(async () => ({ latestKg: null, earliestKg: null })),
+    getWorkoutCount: jest.fn(async () => 0),
+    getAverageCompletionInRange: jest.fn(async () => 0),
+    getAverageSteps: jest.fn(async () => 0),
+    getWeeklyRawAverages: jest.fn(async () => ({ avgWorkoutMinutes: 0, avgSteps: 0, avgSleepHours: 0 })),
+    getLatestWeightKg: jest.fn(async () => null),
   },
 }));
 
 jest.mock('@/src/data/repositories/teamsRepository', () => ({
   teamsRepository: {
-    getMyTeams: jest.fn(async () => []),
-    getTeamPulse: jest.fn(async () => null),
-    getLeaderboard: jest.fn(async () => []),
-    getRoster: jest.fn(async () => []),
-    getChallenges: jest.fn(async () => []),
-    createTeam: jest.fn(async () => ({ id: 't1' })),
+    getMyTeam: jest.fn(async () => null),
+    createTeam: jest.fn(async () => ({ id: 't1', name: 'فريق', invite_code: 'ABC123' })),
     joinByCode: jest.fn(async () => 't1'),
+    getRoster: jest.fn(async () => []),
+    getLeaderboard: jest.fn(async () => []),
+    getPulseToday: jest.fn(async () => null),
+    getChallenges: jest.fn(async () => []),
     createChallenge: jest.fn(async () => undefined),
+    getMyChallengeProgress: jest.fn(async () => 0),
+    upsertMyChallengeProgress: jest.fn(async () => undefined),
   },
 }));
 
 jest.mock('@/src/data/repositories/accountabilityRepository', () => ({
   accountabilityRepository: {
-    getCurrentPair: jest.fn(async () => null),
+    getMyPair: jest.fn(async () => null),
+    sendRequest: jest.fn(async () => undefined),
+    respond: jest.fn(async () => undefined),
+    endPair: jest.fn(async () => undefined),
     getPings: jest.fn(async () => []),
     sendPing: jest.fn(async () => undefined),
-    requestPair: jest.fn(async () => undefined),
-    respondToPair: jest.fn(async () => undefined),
   },
 }));
 
